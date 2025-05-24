@@ -13,8 +13,8 @@ export default function Home() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [form, setForm] = useState({
     nome: '',
-    quantidade_empresa: 0,
-    quantidade_rua: 0,
+    quantidade_empresa: '',
+    quantidade_rua: '',
   });
 
   // Buscar produtos
@@ -36,7 +36,7 @@ export default function Home() {
     const { error } = await supabase.from('produtos').insert([form]);
 
     if (!error) {
-      setForm({ nome: '', quantidade_empresa: 0 , quantidade_rua: 0 });
+      setForm({ nome: '', quantidade_empresa: '' , quantidade_rua: '' });
       alert('Produto adicionado com sucesso!');
       fetchProdutos();
     } else {
@@ -66,7 +66,7 @@ export default function Home() {
           placeholder="Quantidade na empresa"
           value={form.quantidade_empresa}
           onChange={(e) =>
-            setForm({ ...form, quantidade_empresa: parseInt(e.target.value) })
+            setForm({ ...form, quantidade_empresa: (e.target.value) })
           }
         />
         <input
@@ -75,7 +75,7 @@ export default function Home() {
           placeholder="Quantidade em rota de entrega"
           value={form.quantidade_rua}
           onChange={(e) =>
-            setForm({ ...form, quantidade_rua: parseInt(e.target.value) })
+            setForm({ ...form, quantidade_rua: (e.target.value) })
           }
         />
         <button
