@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 type Produto = {
   id: string;
@@ -12,17 +12,17 @@ type Produto = {
 export default function Home() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [form, setForm] = useState({
-    nome: '',
-    quantidade_empresa: '',
-    quantidade_rua: '',
+    nome: "",
+    quantidade_empresa: "",
+    quantidade_rua: "",
   });
 
   // Buscar produtos
   const fetchProdutos = async () => {
     const { data, error } = await supabase
-      .from('produtos')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .from("produtos")
+      .select("*")
+      .order("created_at", { ascending: false });
 
     if (!error && data) setProdutos(data);
   };
@@ -33,21 +33,45 @@ export default function Home() {
 
   // Adicionar produto
   const adicionarProduto = async () => {
-    const { error } = await supabase.from('produtos').insert([form]);
+    const quantidadeEmpresa = parseInt(form.quantidade_empresa);
+    const quantidadeRua = parseInt(form.quantidade_rua);
+
+    if (!form.nome.trim()) {
+      alert("Por favor, preencha o nome do produto.");
+      return;
+    }
+
+    if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua)) {
+      alert("Por favor, preencha as quantidades corretamente.");
+      return;
+    }
+
+    const produtoParaSalvar = {
+      nome: form.nome,
+      quantidade_empresa: quantidadeEmpresa,
+      quantidade_rua: quantidadeRua,
+    };
+
+    const { error } = await supabase
+      .from("produtos")
+      .insert([produtoParaSalvar]);
 
     if (!error) {
-      setForm({ nome: '', quantidade_empresa: '' , quantidade_rua: '' });
-      alert('Produto adicionado com sucesso!');
+      setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
+      alert("Produto adicionado com sucesso!");
       fetchProdutos();
     } else {
-      console.error('Erro ao adicionar produto:', error);
-      alert('Erro ao adicionar produto!');
+      console.error("Erro ao adicionar produto:", error);
+      alert("Erro ao adicionar produto!");
     }
   };
 
   return (
     <main className="p-8 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Controle de Estoque - Flavinho</h1>
+      <h2 className="text-2xl font-bold mb-4">
+        Flavinho Festas Espaço & Locações
+      </h2>
+      <h1 className="text-2xl font-bold mb-4">Controle de Estoque</h1>
 
       <div className="mb-6 bg-[#1E1E1E] p-4 rounded shadow text-white">
         <h3 className="text-xl font-semibold mb-2">Adicionar Produto</h3>
@@ -66,7 +90,7 @@ export default function Home() {
           placeholder="Quantidade na empresa"
           value={form.quantidade_empresa}
           onChange={(e) =>
-            setForm({ ...form, quantidade_empresa: (e.target.value) })
+            setForm({ ...form, quantidade_empresa: e.target.value })
           }
         />
         <input
@@ -74,9 +98,7 @@ export default function Home() {
           className="border p-2 w-full mb-2 bg-[#1b1b1b] placeholder-[#adadad]"
           placeholder="Quantidade em rota de entrega"
           value={form.quantidade_rua}
-          onChange={(e) =>
-            setForm({ ...form, quantidade_rua: (e.target.value) })
-          }
+          onChange={(e) => setForm({ ...form, quantidade_rua: e.target.value })}
         />
         <button
           onClick={adicionarProduto}
@@ -86,11 +108,22 @@ export default function Home() {
         </button>
       </div>
 
-      <h2 className="text-xl font-semibold mb-2">Produtos Cadastrados</h2>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-xl font-semibold">Produtos Cadastrados</h2>
+        <button
+          onClick={fetchProdutos}
+          className="bg-blue-600 text-white text-sm px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Atualizar
+        </button>
+      </div>
+
       <ul className="bg-[#1b1b1b] p-4 rounded shadow divide-y">
         {produtos.map((produto) => (
           <li key={produto.id} className="py-2">
-            <strong>{produto.nome}</strong> — Na empresa: {produto.quantidade_empresa} | Em rota de entrega: {produto.quantidade_rua}
+            <strong>{produto.nome}</strong> — Na empresa:{" "}
+            {produto.quantidade_empresa} | Em rota de entrega:{" "}
+            {produto.quantidade_rua}
           </li>
         ))}
       </ul>
