@@ -18,6 +18,7 @@ export default function Home() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [editando, setEditando] = useState<string | null>(null);
 
   // Buscar produtos
   const fetchProdutos = async () => {
@@ -71,6 +72,9 @@ export default function Home() {
   };
 
   const excluirProduto = async (id: string) => {
+    const confirmar = window.confirm("Tem certeza que deseja excluir este produto?");
+    if (!confirmar) return;
+
     const { error } = await supabase
       .from("produtos")
       .delete()
@@ -97,27 +101,35 @@ export default function Home() {
         quantidade_empresa: data.quantidade_empresa.toString(),
         quantidade_rua: data.quantidade_rua.toString(),
       });
+      setEditando(id);
     }
   };
 
-  const atualizarProduto = async (id: string) => {
+  const atualizarProduto = async () => {
+    if (!editando) return;
+
     const quantidadeEmpresa = parseInt(form.quantidade_empresa);
     const quantidadeRua = parseInt(form.quantidade_rua);
+
     if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua)) {
       alert("Por favor, preencha as quantidades corretamente.");
       return;
     }
+
     const produtoParaAtualizar = {
       nome: form.nome,
       quantidade_empresa: quantidadeEmpresa,
       quantidade_rua: quantidadeRua,
     };
+
     const { error } = await supabase
       .from("produtos")
       .update(produtoParaAtualizar)
-      .eq("id", id);
+      .eq("id", editando);
+
     if (!error) {
       setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
+      setEditando(null);
       alert("Produto atualizado com sucesso!");
       fetchProdutos();
     } else {
@@ -134,7 +146,7 @@ export default function Home() {
       <h1 className="text-2xl font-bold mb-4">Controle de Estoque</h1>
 
       <div className="mb-6 bg-[#1E1E1E] p-4 rounded shadow text-white">
-        <h3 className="text-xl font-semibold mb-2">Adicionar Produto</h3>
+        <h3 className="text-xl font-semibold mb-2">Adicionar produto</h3>
         <h6 className="text-sm mb-2">
           Preencha os campos abaixo para adicionar um novo produto ao estoque.
         </h6>
@@ -161,15 +173,17 @@ export default function Home() {
           onChange={(e) => setForm({ ...form, quantidade_rua: e.target.value })}
         />
         <button
-          onClick={adicionarProduto}
-          className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 w-full"
+          onClick={editando ? atualizarProduto : adicionarProduto}
+          className={`${
+            editando ? "bg-blue-700 hover:bg-blue-800" : "bg-green-700 hover:bg-green-800"
+          } text-white px-4 py-2 rounded w-full`}
         >
-          Adicionar Produto
+          {editando ? "Atualizar produto" : "Adicionar produto"}
         </button>
       </div>
 
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl font-semibold">Produtos Cadastrados</h2>
+        <h2 className="text-xl font-semibold">Estoque</h2>
         <button
           onClick={fetchProdutos}
           className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex items-center justify-center"
