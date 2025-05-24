@@ -12,6 +12,10 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        inter: ["Inter", "Arial", "Helvetica", "sans-serif"],
+        poppins: ["Poppins", "Arial", "Helvetica", "sans-serif"],
+      },
       animation: {
         "spin-reverse": "spin-reverse 1s linear infinite",
       },

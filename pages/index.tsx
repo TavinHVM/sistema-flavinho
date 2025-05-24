@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { FaTrash, FaEdit, FaPlus, FaSyncAlt, FaSignOutAlt } from "react-icons/fa";
 
 type Produto = {
   id: string;
@@ -139,99 +140,128 @@ export default function Home() {
   };
 
   return (
-    <main className="p-8 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">
-        Flavinho Festas Espaço & Locações
-      </h2>
-      <h1 className="text-2xl font-bold mb-4">Controle de Estoque</h1>
+    <main className="p-8 max-w-4xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg mt-8 mb-8">
+      <header className="mb-8">
+        <div className="w-full flex items-center justify-between relative">
+          <div className="flex-1 flex justify-start">
+            <a href="/login" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-poppins font-medium px-2 py-2 rounded transition-all ml-0">
+              <FaSignOutAlt />
+              Sair
+            </a>
+          </div>
 
-      <div className="mb-6 bg-[#1E1E1E] p-4 rounded shadow text-white">
-        <h3 className="text-xl font-semibold mb-2">Adicionar produto</h3>
-        <h6 className="text-sm mb-2">
-          Preencha os campos abaixo para adicionar um novo produto ao estoque.
-        </h6>
-        <input
-          className="border p-2 w-full mb-2 bg-[#1b1b1b] placeholder-[#adadad]"
-          placeholder="Nome do produto"
-          value={form.nome}
-          onChange={(e) => setForm({ ...form, nome: e.target.value })}
-        />
-        <input
-          type="number"
-          className="border p-2 w-full mb-2 bg-[#1b1b1b] placeholder-[#adadad]"
-          placeholder="Quantidade na empresa"
-          value={form.quantidade_empresa}
-          onChange={(e) =>
-            setForm({ ...form, quantidade_empresa: e.target.value })
-          }
-        />
-        <input
-          type="number"
-          className="border p-2 w-full mb-2 bg-[#1b1b1b] placeholder-[#adadad]"
-          placeholder="Quantidade em rota de entrega"
-          value={form.quantidade_rua}
-          onChange={(e) => setForm({ ...form, quantidade_rua: e.target.value })}
-        />
+          <div className="flex flex-col items-center justify-center">
+            <h1 className="font-poppins text-[2rem] font-bold mb-1 text-center">Flavinho Festas</h1>
+            <p className="font-inter text-[1rem] font-normal text-gray-400 text-center mt-0">Gerencie seu estoque de forma eficiente e prática</p>
+          </div>
+
+          <div className="flex-1 flex justify-end">
+            <img src="/favicon.ico" alt="Favicon" className="w-28 h-28 ml-0 mr-0" />
+          </div>
+        </div>
+      </header>
+
+      <section className="mb-8 bg-gray-800 p-6 rounded-lg shadow-md">
+        <h2 className="font-poppins text-[1.1rem] font-semibold mb-4">
+          {editando ? "Atualizar Produto" : "Adicionar Produto"}
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="flex flex-col">
+            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">Nome</label>
+            <input
+              className="font-poppins border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Nome do produto"
+              value={form.nome}
+              onChange={(e) => setForm({ ...form, nome: e.target.value })}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">Qtde. Empresa</label>
+            <input
+              type="number"
+              className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Quantidade na empresa"
+              value={form.quantidade_empresa}
+              onChange={(e) =>
+                setForm({ ...form, quantidade_empresa: e.target.value })
+              }
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">Qtde. Entrega</label>
+            <input
+              type="number"
+              className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Quantidade em rota de entrega"
+              value={form.quantidade_rua}
+              onChange={(e) => setForm({ ...form, quantidade_rua: e.target.value })}
+            />
+          </div>
+        </div>
         <button
           onClick={editando ? atualizarProduto : adicionarProduto}
-          className={`${
-            editando ? "bg-blue-700 hover:bg-blue-800" : "bg-green-700 hover:bg-green-800"
-          } text-white px-4 py-2 rounded w-full`}
+          className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${
+            editando ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
+          }`}
         >
-          {editando ? "Atualizar produto" : "Adicionar produto"}
+          {editando ? <FaEdit /> : <FaPlus />}
+          {editando ? "Atualizar Produto" : "Adicionar Produto"}
         </button>
-      </div>
-
-      <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl font-semibold">Estoque</h2>
-        <button
-          onClick={fetchProdutos}
-          className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 flex items-center justify-center"
-          disabled={loading}
-        >
-          <svg
-            className={`h-6 w-6 text-white transition-transform ${
-              loading ? "animate-spin-reverse" : ""
-            }`}
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        {editando && (
+          <button
+            onClick={() => {
+              setEditando(null);
+              setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
+            }}
+            className="mt-2 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all bg-gray-600 hover:bg-gray-700"
+            type="button"
           >
-            {/* Arco circular */}
-            <path d="M6.75 3v5h5" />
-            {/* Arco que cria o círculo */}
-            <path d="M19 17a8 8 0 00-11-11" />
-          </svg>
-        </button>
-      </div>
+            Cancelar
+          </button>
+        )}
+      </section>
 
-      <ul className="bg-[#1b1b1b] p-4 rounded shadow divide-y">
-        {produtos.map((produto) => (
-          <li key={produto.id} className="py-2 flex justify-between items-center">
-            <div>
-              <strong>{produto.nome}</strong> — Na empresa: {produto.quantidade_empresa} | Em rota de entrega: {produto.quantidade_rua}
-            </div>
-            <div>
-              <button
-                onClick={() => excluirProduto(produto.id)}
-                className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-800 ml-2"
-              >
-                Excluir
-              </button>
-              <button
-                onClick={() => editarProduto(produto.id)}
-                className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-800 ml-2"
-              >
-                Editar
-              </button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-poppins text-[1.2rem] font-semibold">Estoque</h2>
+          <button
+            onClick={fetchProdutos}
+            className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+            disabled={loading}
+          >
+            <FaSyncAlt className={loading ? "animate-spin" : ""} />
+            Atualizar Lista
+          </button>
+        </div>
+
+        <ul className="bg-gray-800 p-6 rounded-lg shadow-md divide-y divide-gray-700">
+          {produtos.map((produto) => (
+            <li key={produto.id} className="py-4 flex justify-between items-center">
+              <div>
+                <strong className="font-poppins text-[1.1rem] font-semibold">{produto.nome}</strong>
+                <p className="font-inter text-[0.9rem] font-normal text-gray-400">
+                  Na empresa: {produto.quantidade_empresa} | Em rota de entrega: {produto.quantidade_rua} | Total: {produto.quantidade_empresa + produto.quantidade_rua}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => excluirProduto(produto.id)}
+                  className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
+                >
+                  <FaTrash /> Excluir
+                </button>
+                <button
+                  onClick={() => editarProduto(produto.id)}
+                  className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+                >
+                  <FaEdit /> Editar
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <span className="flex items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-500 mt-10 mb-0">Desenvolvido por: <a href="https://www.linkedin.com/in/gustavo-henrique-6b8352304/" target="_blank" rel="noopener noreferrer" className="underline">Gustavo Henrique</a></span>
     </main>
   );
 }
