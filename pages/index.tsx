@@ -70,6 +70,62 @@ export default function Home() {
     }
   };
 
+  const excluirProduto = async (id: string) => {
+    const { error } = await supabase
+      .from("produtos")
+      .delete()
+      .eq("id", id);
+    if (!error) {
+      alert("Produto excluído com sucesso!");
+      fetchProdutos();
+    } else {
+      console.error("Erro ao excluir produto:", error);
+      alert("Erro ao excluir produto!");
+    }
+  };
+
+  const editarProduto = async (id: string) => {
+    const { data } = await supabase
+      .from("produtos")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (data) {
+      setForm({
+        nome: data.nome,
+        quantidade_empresa: data.quantidade_empresa.toString(),
+        quantidade_rua: data.quantidade_rua.toString(),
+      });
+    }
+  };
+
+  const atualizarProduto = async (id: string) => {
+    const quantidadeEmpresa = parseInt(form.quantidade_empresa);
+    const quantidadeRua = parseInt(form.quantidade_rua);
+    if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua)) {
+      alert("Por favor, preencha as quantidades corretamente.");
+      return;
+    }
+    const produtoParaAtualizar = {
+      nome: form.nome,
+      quantidade_empresa: quantidadeEmpresa,
+      quantidade_rua: quantidadeRua,
+    };
+    const { error } = await supabase
+      .from("produtos")
+      .update(produtoParaAtualizar)
+      .eq("id", id);
+    if (!error) {
+      setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
+      alert("Produto atualizado com sucesso!");
+      fetchProdutos();
+    } else {
+      console.error("Erro ao atualizar produto:", error);
+      alert("Erro ao atualizar produto!");
+    }
+  };
+
   return (
     <main className="p-8 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">
@@ -106,7 +162,7 @@ export default function Home() {
         />
         <button
           onClick={adicionarProduto}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full"
+          className="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800 w-full"
         >
           Adicionar Produto
         </button>
@@ -132,7 +188,7 @@ export default function Home() {
             strokeLinejoin="round"
           >
             {/* Arco circular */}
-            <path d="M6 3.5v5h5" />
+            <path d="M6.75 3v5h5" />
             {/* Arco que cria o círculo */}
             <path d="M19 17a8 8 0 00-11-11" />
           </svg>
@@ -141,10 +197,24 @@ export default function Home() {
 
       <ul className="bg-[#1b1b1b] p-4 rounded shadow divide-y">
         {produtos.map((produto) => (
-          <li key={produto.id} className="py-2">
-            <strong>{produto.nome}</strong> — Na empresa:{" "}
-            {produto.quantidade_empresa} | Em rota de entrega:{" "}
-            {produto.quantidade_rua}
+          <li key={produto.id} className="py-2 flex justify-between items-center">
+            <div>
+              <strong>{produto.nome}</strong> — Na empresa: {produto.quantidade_empresa} | Em rota de entrega: {produto.quantidade_rua}
+            </div>
+            <div>
+              <button
+                onClick={() => excluirProduto(produto.id)}
+                className="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-800 ml-2"
+              >
+                Excluir
+              </button>
+              <button
+                onClick={() => editarProduto(produto.id)}
+                className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-800 ml-2"
+              >
+                Editar
+              </button>
+            </div>
           </li>
         ))}
       </ul>
