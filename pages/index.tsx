@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
-import { FaTrash, FaEdit, FaPlus, FaSyncAlt, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaTrash,
+  FaEdit,
+  FaPlus,
+  FaSyncAlt,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -19,10 +26,13 @@ export default function Home() {
     quantidade_empresa: "",
     quantidade_rua: "",
   });
+  const [userEmail, setUserEmail] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [editando, setEditando] = useState<string | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const router = useRouter();
 
   // Buscar produtos
   const fetchProdutos = async () => {
@@ -37,7 +47,31 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchProdutos();
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession();
+
+      if (!data.session) {
+        router.replace("/login");
+      } else {
+        fetchProdutos();
+      }
+    };
+
+    checkSession();
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user) {
+        setUserEmail(user.email || "");
+        setIsAdmin(user.user_metadata?.role === "admin");
+      }
+    };
+
+    fetchUser();
   }, []);
 
   // Adicionar produto
@@ -76,13 +110,12 @@ export default function Home() {
   };
 
   const excluirProduto = async (id: string) => {
-    const confirmar = window.confirm("Tem certeza que deseja excluir este produto?");
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir este produto?"
+    );
     if (!confirmar) return;
 
-    const { error } = await supabase
-      .from("produtos")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("produtos").delete().eq("id", id);
     if (!error) {
       alert("Produto excluído com sucesso!");
       fetchProdutos();
@@ -145,11 +178,11 @@ export default function Home() {
   // Função para obter data/hora formatada
   function getDataHoraFormatada() {
     const agora = new Date();
-    const dia = String(agora.getDate()).padStart(2, '0');
-    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const dia = String(agora.getDate()).padStart(2, "0");
+    const mes = String(agora.getMonth() + 1).padStart(2, "0");
     const ano = agora.getFullYear();
-    const hora = String(agora.getHours()).padStart(2, '0');
-    const min = String(agora.getMinutes()).padStart(2, '0');
+    const hora = String(agora.getHours()).padStart(2, "0");
+    const min = String(agora.getMinutes()).padStart(2, "0");
     return `${dia}-${mes}-${ano} ${hora}h${min}`;
   }
 
@@ -202,24 +235,49 @@ export default function Home() {
     doc.save(`Estoque - Flavinho Festas ${dataHora}.pdf`);
   };
 
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (!error) {
+      router.replace("/login");
+    } else {
+      console.error("Erro ao sair:", error);
+      alert("Erro ao sair!");
+    }
+  };
+
   return (
     <main className="p-8 max-w-4xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg mt-8 mb-8">
       <header className="mb-8">
         <div className="w-full flex items-center justify-between relative">
           <div className="flex-1 flex justify-start">
-            <a href="/login" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-poppins font-medium px-2 py-2 rounded transition-all ml-0">
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleLogout();
+              }}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-poppins font-medium px-2 py-2 rounded transition-all ml-0"
+            >
               <FaSignOutAlt />
-              Sair
+              Logout
             </a>
           </div>
 
           <div className="flex flex-col items-center justify-center">
-            <h1 className="font-poppins text-[2rem] font-bold mb-1 text-center">Flavinho Festas</h1>
-            <p className="font-inter text-[1rem] font-normal text-gray-400 text-center mt-0">Gerencie seu estoque de forma eficiente e prática</p>
+            <h1 className="font-poppins text-[2rem] font-bold mb-1 text-center">
+              Flavinho Festas
+            </h1>
+            <p className="font-inter text-[1rem] font-normal text-gray-400 text-center mt-0">
+              Gerencie seu estoque de forma eficiente e prática
+            </p>
           </div>
 
           <div className="flex-1 flex justify-end">
-            <img src="/favicon.ico" alt="Favicon" className="w-28 h-28 ml-0 mr-0" />
+            <img
+              src="/favicon.ico"
+              alt="Favicon"
+              className="w-28 h-28 ml-0 mr-0"
+            />
           </div>
         </div>
       </header>
@@ -230,7 +288,9 @@ export default function Home() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">Nome</label>
+            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">
+              Nome
+            </label>
             <input
               className="font-poppins border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Nome do produto"
@@ -239,7 +299,9 @@ export default function Home() {
             />
           </div>
           <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">Qtde. Empresa</label>
+            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">
+              Qtde. Empresa
+            </label>
             <input
               type="number"
               className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -251,20 +313,26 @@ export default function Home() {
             />
           </div>
           <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">Qtde. Entrega</label>
+            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">
+              Qtde. Entrega
+            </label>
             <input
               type="number"
               className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Quantidade em rota de entrega"
               value={form.quantidade_rua}
-              onChange={(e) => setForm({ ...form, quantidade_rua: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, quantidade_rua: e.target.value })
+              }
             />
           </div>
         </div>
         <button
           onClick={editando ? atualizarProduto : adicionarProduto}
           className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${
-            editando ? "bg-blue-600 hover:bg-blue-700" : "bg-green-600 hover:bg-green-700"
+            editando
+              ? "bg-blue-600 hover:bg-blue-700"
+              : "bg-green-600 hover:bg-green-700"
           }`}
         >
           {editando ? <FaEdit /> : <FaPlus />}
@@ -283,7 +351,16 @@ export default function Home() {
           </button>
         )}
       </section>
-
+      {isAdmin && (
+        <div className="mt-0">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+          >
+            Voltar para o Painel
+          </button>
+        </div>
+      )}
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-poppins text-[1.2rem] font-semibold">Estoque</h2>
@@ -299,13 +376,19 @@ export default function Home() {
               {exportMenuOpen && (
                 <div className="absolute right-0 mt-1 w-32 bg-gray-800 border border-gray-700 rounded shadow-lg z-10">
                   <button
-                    onClick={() => { exportarPDF(); setExportMenuOpen(false); }}
+                    onClick={() => {
+                      exportarPDF();
+                      setExportMenuOpen(false);
+                    }}
                     className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
                   >
                     PDF
                   </button>
                   <button
-                    onClick={() => { exportarCSV(); setExportMenuOpen(false); }}
+                    onClick={() => {
+                      exportarCSV();
+                      setExportMenuOpen(false);
+                    }}
                     className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
                   >
                     CSV
@@ -326,11 +409,18 @@ export default function Home() {
 
         <ul className="bg-gray-800 p-6 rounded-lg shadow-md divide-y divide-gray-700">
           {produtos.map((produto) => (
-            <li key={produto.id} className="py-4 flex justify-between items-center">
+            <li
+              key={produto.id}
+              className="py-4 flex justify-between items-center"
+            >
               <div>
-                <strong className="font-poppins text-[1.1rem] font-semibold">{produto.nome}</strong>
+                <strong className="font-poppins text-[1.1rem] font-semibold">
+                  {produto.nome}
+                </strong>
                 <p className="font-inter text-[0.9rem] font-normal text-gray-400">
-                  Na empresa: {produto.quantidade_empresa} | Em rota de entrega: {produto.quantidade_rua} | Total: {produto.quantidade_empresa + produto.quantidade_rua}
+                  Na empresa: {produto.quantidade_empresa} | Em rota de entrega:{" "}
+                  {produto.quantidade_rua} | Total:{" "}
+                  {produto.quantidade_empresa + produto.quantidade_rua}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -351,7 +441,18 @@ export default function Home() {
           ))}
         </ul>
       </section>
-      <span className="flex items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-500 mt-10 mb-0">Desenvolvido por: <a href="https://www.linkedin.com/in/gustavo-henrique-6b8352304/" target="_blank" rel="noopener noreferrer" className="underline">Gustavo Henrique</a></span>
+
+      <span className="flex items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-500 mt-10 mb-0">
+        Desenvolvido por:{" "}
+        <a
+          href="https://www.linkedin.com/in/gustavo-henrique-6b8352304/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          Gustavo Henrique
+        </a>
+      </span>
     </main>
   );
 }
