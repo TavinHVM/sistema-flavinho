@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { FaTrash, FaEdit, FaPlus, FaSyncAlt, FaSignOutAlt } from "react-icons/fa";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 type Produto = {
   id: string;
@@ -20,6 +22,7 @@ export default function Home() {
 
   const [loading, setLoading] = useState(false);
   const [editando, setEditando] = useState<string | null>(null);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
 
   // Buscar produtos
   const fetchProdutos = async () => {
@@ -139,6 +142,66 @@ export default function Home() {
     }
   };
 
+  // Função para obter data/hora formatada
+  function getDataHoraFormatada() {
+    const agora = new Date();
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const ano = agora.getFullYear();
+    const hora = String(agora.getHours()).padStart(2, '0');
+    const min = String(agora.getMinutes()).padStart(2, '0');
+    return `${dia}-${mes}-${ano} ${hora}h${min}`;
+  }
+
+  // Função para exportar CSV
+  const exportarCSV = () => {
+    const dataHora = getDataHoraFormatada();
+    const header = ["Nome", "Qtde. Empresa", "Qtde. Entrega", "Total"];
+    const rows = produtos.map((p) => [
+      p.nome,
+      p.quantidade_empresa,
+      p.quantidade_rua,
+      p.quantidade_empresa + p.quantidade_rua,
+    ]);
+    let csvContent = "data:text/csv;charset=utf-8,";
+    csvContent += `Estoque - Flavinho Festas;Gerado em: ${dataHora}\n`;
+    csvContent += header.join(";") + "\n";
+    rows.forEach((rowArray) => {
+      csvContent += rowArray.join(";") + "\n";
+    });
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Estoque - Flavinho Festas ${dataHora}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Função para exportar PDF
+  const exportarPDF = () => {
+    const dataHora = getDataHoraFormatada();
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text("Estoque - Flavinho Festas", 14, 14);
+    doc.setFontSize(10);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const text = `Gerado em: ${dataHora}`;
+    const textWidth = doc.getTextWidth(text);
+    doc.text(text, pageWidth - textWidth - 14, 14);
+    autoTable(doc, {
+      startY: 20,
+      head: [["Nome", "Qtde. Empresa", "Qtde. Entrega", "Total"]],
+      body: produtos.map((p) => [
+        p.nome,
+        p.quantidade_empresa,
+        p.quantidade_rua,
+        p.quantidade_empresa + p.quantidade_rua,
+      ]),
+    });
+    doc.save(`Estoque - Flavinho Festas ${dataHora}.pdf`);
+  };
+
   return (
     <main className="p-8 max-w-4xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg mt-8 mb-8">
       <header className="mb-8">
@@ -224,14 +287,41 @@ export default function Home() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-poppins text-[1.2rem] font-semibold">Estoque</h2>
-          <button
-            onClick={fetchProdutos}
-            className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
-            disabled={loading}
-          >
-            <FaSyncAlt className={loading ? "animate-spin" : ""} />
-            Atualizar Lista
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <button
+                className="flex items-center gap-2 bg-gray-700 text-white p-2 rounded hover:bg-gray-800 transition-all font-poppins text-[0.95rem] font-medium"
+                onClick={() => setExportMenuOpen((open) => !open)}
+                type="button"
+              >
+                Exportar <span className="ml-1">⏷</span>
+              </button>
+              {exportMenuOpen && (
+                <div className="absolute right-0 mt-1 w-32 bg-gray-800 border border-gray-700 rounded shadow-lg z-10">
+                  <button
+                    onClick={() => { exportarPDF(); setExportMenuOpen(false); }}
+                    className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  >
+                    PDF
+                  </button>
+                  <button
+                    onClick={() => { exportarCSV(); setExportMenuOpen(false); }}
+                    className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
+                  >
+                    CSV
+                  </button>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={fetchProdutos}
+              className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+              disabled={loading}
+            >
+              <FaSyncAlt className={loading ? "animate-spin" : ""} />
+              Atualizar Lista
+            </button>
+          </div>
         </div>
 
         <ul className="bg-gray-800 p-6 rounded-lg shadow-md divide-y divide-gray-700">
