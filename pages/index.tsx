@@ -256,7 +256,7 @@ export default function Home() {
                 e.preventDefault();
                 handleLogout();
               }}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-poppins font-medium px-2 py-2 rounded transition-all ml-0"
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-poppins font-medium px-2 py-2 rounded transition-all ml-0"
             >
               <FaSignOutAlt />
               Logout
@@ -282,7 +282,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="mb-8 bg-gray-800 p-6 rounded-lg shadow-md">
+      <section className="mb-4 bg-gray-800 p-6 rounded-lg shadow-md">
         <h2 className="font-poppins text-[1.1rem] font-semibold mb-4">
           {editando ? "Atualizar Produto" : "Adicionar Produto"}
         </h2>
@@ -355,9 +355,9 @@ export default function Home() {
         <div className="mt-0">
           <button
             onClick={() => router.push("/dashboard")}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+            className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition-all font-poppins text-[0.95rem] font-medium mb-8"
           >
-            Voltar para o Painel
+            Voltar ao Painel
           </button>
         </div>
       )}
