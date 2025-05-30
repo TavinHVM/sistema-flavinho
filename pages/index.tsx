@@ -288,7 +288,7 @@ export default function Home() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">
+            <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
               Nome
             </label>
             <input
@@ -299,7 +299,7 @@ export default function Home() {
             />
           </div>
           <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">
+            <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
               Qtde. Empresa
             </label>
             <input
@@ -313,7 +313,7 @@ export default function Home() {
             />
           </div>
           <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-xs text-gray-300 font-poppins">
+            <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
               Qtde. Entrega
             </label>
             <input
