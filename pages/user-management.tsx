@@ -2,8 +2,18 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
 import { NOMEM } from "dns";
-import { FaSyncAlt } from "react-icons/fa";
+import { FaSyncAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import "tailwindcss/tailwind.css";
+
+type User = {
+  id: string;
+  nome: string;
+  email: string;
+  senha: string;
+  role: string;
+  created_at?: string;
+  updated_at?: string;
+};
 
 export default function UserManagement() {
   const [form, setForm] = useState({
@@ -18,7 +28,9 @@ export default function UserManagement() {
   >([]);
   const [loading, setLoading] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({ nome: "", email: "", role: "" });
+  const [editForm, setEditForm] = useState({ nome: "", email: "", role: "", senha: "" });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
   const router = useRouter();
 
   const fetchUsers = async () => {
@@ -40,31 +52,28 @@ export default function UserManagement() {
   const handleRegister = async () => {
     const { nome, email, password, role } = form;
 
-    if (!email || !password) {
+    if (!nome || !email || !password || !role) {
       setMessage("Por favor, preencha todos os campos.");
       return;
     }
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data: existing, error: findError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("email", email)
+      .single();
+
+    if (existing) {
+      setMessage("Já existe um usuário com este email.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("profiles")
+      .insert([{ nome, email, senha: password, role }]);
 
     if (error) {
       setMessage("Erro ao registrar usuário: " + error.message);
-      return;
-    }
-
-    if (!data.user) {
-      setMessage(
-        "Erro ao registrar usuário: dados do usuário não encontrados."
-      );
-      return;
-    }
-
-    const { error: profileError } = await supabase
-      .from("profiles")
-      .insert([{ id: data.user.id, email: data.user.email, role }]);
-
-    if (profileError) {
-      setMessage("Erro ao salvar o perfil do usuário: " + profileError.message);
       return;
     }
 
@@ -73,17 +82,30 @@ export default function UserManagement() {
     fetchUsers();
   };
 
+  useEffect(() => {
+    if (editingUserId) {
+      setTimeout(() => setShowEdit(true), 10);
+    }
+  }, [editingUserId]);
+
   const handleEdit = (user: { id: string; nome: string; email: string; role: string }) => {
-    setEditingUserId(user.id);
-    setEditForm({ nome: user.nome, email: user.email, role: user.role });
+    if (editingUserId === user.id) {
+      setShowEdit(false);
+      setTimeout(() => setEditingUserId(null), 300);
+    } else {
+      setEditingUserId(user.id);
+      setEditForm({ nome: user.nome, email: user.email, role: user.role, senha: "" });
+    }
   };
 
   const handleUpdate = async () => {
-    const { nome, email, role } = editForm;
+    const { nome, email, role, senha } = editForm;
+    const updateData: any = { nome, email, role };
+    if (senha && senha.length >= 6) updateData.senha = senha;
 
     const { error } = await supabase
       .from("profiles")
-      .update({ nome, email, role })
+      .update(updateData)
       .eq("id", editingUserId);
 
     if (!error) {
@@ -109,6 +131,29 @@ export default function UserManagement() {
       setMessage("Erro ao excluir usuário: " + error.message);
     }
   };
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) {
+        alert(
+          "Você precisa estar logado como administrador para acessar esta página."
+        );
+        router.replace("/login");
+        return;
+      }
+      const user = JSON.parse(userStr);
+      const role = user.role;
+      if (role !== "Administrador") {
+        alert(
+          "Acesso negado. Apenas administradores podem acessar esta página."
+        );
+        router.replace("/login");
+      }
+    };
+
+    checkAdmin();
+  }, []);
 
   return (
     <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white">
@@ -152,14 +197,24 @@ export default function UserManagement() {
         <label htmlFor="password" className="block text-sm font-medium mb-1">
           Senha
         </label>
-        <input
-          id="password"
-          type="password"
-          placeholder="Senha"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-          className="w-full border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-1"
-        />
+        <div className="relative">
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Senha"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            className="w-full border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-1 pr-10"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 text-xl"
+            tabIndex={-1}
+          >
+            {showPassword ? <FaEye /> : <FaEyeSlash />}
+          </button>
+        </div>
         <p className="text-xs text-gray-400 mb-3 ml-1">
           A senha deve ter pelo menos 6 caracteres
         </p>
@@ -173,7 +228,8 @@ export default function UserManagement() {
           onChange={(e) => setForm({ ...form, role: e.target.value })}
           className="w-full border p-3 rounded bg-gray-700 text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
         >
-          <option value="Funcionario">Funcionário</option>
+          <option value="">Selecione o cargo</option>
+          <option value="Funcionário">Funcionário</option>
           <option value="Administrador">Administrador</option>
         </select>
         <p className="text-xs text-gray-400 mb-3 ml-1">
@@ -255,7 +311,11 @@ export default function UserManagement() {
           )}
         </ul>
         {editingUserId && (
-          <div className="mt-4 bg-gray-800 p-6 rounded-lg shadow-md">
+          <div
+            className={`mt-4 bg-gray-800 p-6 rounded-lg shadow-md transition-all duration-300
+              ${showEdit ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}
+            `}
+          >
             <h3 className="font-poppins text-[1.1rem] font-semibold mb-4">
               Editar Usuário
             </h3>
@@ -310,6 +370,17 @@ export default function UserManagement() {
               <option value="Funcionario">Funcionário</option>
               <option value="Administrador">Administrador</option>
             </select>
+            <label htmlFor="edit-senha" className="block text-sm font-medium mb-1">
+              Nova Senha (opcional)
+            </label>
+            <input
+              id="edit-senha"
+              type="password"
+              placeholder="Nova senha"
+              value={editForm.senha}
+              onChange={(e) => setEditForm({ ...editForm, senha: e.target.value })}
+              className="w-full border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
+            />
             <button
               onClick={handleUpdate}
               className="w-full bg-blue-600 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-blue-700 transition-all flex items-center justify-center"

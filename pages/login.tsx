@@ -10,43 +10,45 @@ export default function Login() {
   const router = useRouter();
 
   useEffect(() => {
-    const verificarSessao = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (session) {
-        router.replace("/");
-      }
-    };
-
-    verificarSessao();
+    // Remova este bloco
+    // const userStr = localStorage.getItem("user");
+    // if (!userStr) {
+    //   router.replace("/login");
+    //   return;
+    // }
+    // const user = JSON.parse(userStr);
+    // if (user.role !== "Administrador") {
+    //   router.replace("/login");
+    // }
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: usuario, // deve ser o email usado no cadastro
-      password: password,
-    });
+    const { data: user, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("email", usuario)
+      .eq("senha", password)
+      .single();
 
-    if (error) {
+    if (error || !user) {
       setError("Usuário ou senha inválidos.");
       return;
     }
 
-    // Login OK
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    localStorage.setItem("user", JSON.stringify(user));
 
-    const role = user?.user_metadata?.role;
-    if (role === "admin") {
+    if (user.role === "Administrador") {
       router.replace("/dashboard");
     } else {
       router.replace("/");
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    router.replace("/login");
   };
 
   return (
@@ -77,7 +79,7 @@ export default function Login() {
         )}
         <div className="mb-4">
           <label className="block mb-1 font-medium font-poppins text-xs text-gray-300">
-            Usuário
+            Email
           </label>
           <input
             type="text"
@@ -85,7 +87,7 @@ export default function Login() {
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
             required
-            placeholder="Digite seu usuário"
+            placeholder="Digite seu email"
           />
         </div>
         <div className="mb-6">

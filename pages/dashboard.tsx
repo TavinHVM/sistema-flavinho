@@ -1,16 +1,13 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { supabase } from "../lib/supabaseClient";
 
 export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
     const checkAdmin = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) {
         alert(
           "Você precisa estar logado como administrador para acessar esta página."
         );
@@ -18,8 +15,8 @@ export default function Dashboard() {
         return;
       }
 
-      const role = user.user_metadata?.role;
-      if (role !== "admin") {
+      const user = JSON.parse(userStr);
+      if (user.role !== "Administrador") {
         alert(
           "Acesso negado. Apenas administradores podem acessar esta página."
         );
@@ -30,14 +27,9 @@ export default function Dashboard() {
     checkAdmin();
   }, []);
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-      router.replace("/login");
-    } else {
-      console.error("Erro ao sair:", error);
-      alert("Erro ao sair!");
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    router.replace("/login");
   };
 
   return (

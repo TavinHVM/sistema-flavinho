@@ -34,7 +34,6 @@ export default function Home() {
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const router = useRouter();
 
-  // Buscar produtos
   const fetchProdutos = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -48,33 +47,26 @@ export default function Home() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-
-      if (!data.session) {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) {
         router.replace("/login");
-      } else {
-        fetchProdutos();
+        return;
       }
+      fetchProdutos();
     };
 
     checkSession();
   }, []);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
-        setUserEmail(user.email || "");
-        setIsAdmin(user.user_metadata?.role === "admin");
-      }
-    };
-
-    fetchUser();
+    const userStr = localStorage.getItem("user");
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      setUserEmail(user.email || "");
+      setIsAdmin(user.role === "Administrador");
+    }
   }, []);
 
-  // Adicionar produto
   const adicionarProduto = async () => {
     const quantidadeEmpresa = parseInt(form.quantidade_empresa);
     const quantidadeRua = parseInt(form.quantidade_rua);
@@ -175,7 +167,6 @@ export default function Home() {
     }
   };
 
-  // Função para obter data/hora formatada
   function getDataHoraFormatada() {
     const agora = new Date();
     const dia = String(agora.getDate()).padStart(2, "0");
@@ -186,7 +177,6 @@ export default function Home() {
     return `${dia}-${mes}-${ano} ${hora}h${min}`;
   }
 
-  // Função para exportar CSV
   const exportarCSV = () => {
     const dataHora = getDataHoraFormatada();
     const header = ["Nome", "Qtde. Empresa", "Qtde. Entrega", "Total"];
@@ -211,7 +201,6 @@ export default function Home() {
     document.body.removeChild(link);
   };
 
-  // Função para exportar PDF
   const exportarPDF = () => {
     const dataHora = getDataHoraFormatada();
     const doc = new jsPDF();
@@ -235,14 +224,9 @@ export default function Home() {
     doc.save(`Estoque - Flavinho Festas ${dataHora}.pdf`);
   };
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (!error) {
-      router.replace("/login");
-    } else {
-      console.error("Erro ao sair:", error);
-      alert("Erro ao sair!");
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    router.replace("/login");
   };
 
   return (
