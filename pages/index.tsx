@@ -10,8 +10,10 @@ import {
 } from "react-icons/fa";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import Header from "../components/Header";
 
 type Produto = {
+  last_modified_by: string;
   id: string;
   nome: string;
   quantidade_empresa: number;
@@ -105,6 +107,8 @@ export default function Home() {
       nome: form.nome,
       quantidade_empresa: quantidadeEmpresa,
       quantidade_rua: quantidadeRua,
+      last_modified_by: JSON.parse(localStorage.getItem("user") || "{}").nome || "",
+      last_modified_at: new Date().toISOString(),
     };
 
     const { error } = await supabase
@@ -169,6 +173,8 @@ export default function Home() {
       nome: form.nome,
       quantidade_empresa: quantidadeEmpresa,
       quantidade_rua: quantidadeRua,
+      last_modified_by: JSON.parse(localStorage.getItem("user") || "{}").nome || "",
+      last_modified_at: new Date().toISOString(),
     };
 
     const { error } = await supabase
@@ -250,224 +256,230 @@ export default function Home() {
   };
 
   return (
-    <main className="p-8 max-w-4xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg mt-8 mb-8">
-      <header className="mb-8">
-        <div className="w-full flex items-center justify-between relative">
-          <div className="flex-1 flex justify-start">
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                handleLogout();
-              }}
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-poppins font-medium px-2 py-2 rounded transition-all ml-0"
-            >
-              <FaSignOutAlt />
-              Logout
-            </a>
-          </div>
-
-          <div className="flex flex-col items-center justify-center">
-            <h1 className="font-poppins text-[2rem] font-bold mb-1 text-center">
-              Flavinho Festas
-            </h1>
-            <p className="font-inter text-[1rem] font-normal text-gray-400 text-center mt-0">
-              Gerencie seu estoque de forma eficiente e prática
-            </p>
-          </div>
-
-          <div className="flex-1 flex justify-end">
-            <img
-              src="/favicon.ico"
-              alt="Favicon"
-              className="w-28 h-28 ml-0 mr-0"
-            />
-          </div>
-        </div>
-      </header>
-
-      <section className="mb-4 bg-gray-800 p-6 rounded-lg shadow-md">
-        <h2 className="font-poppins text-[1.1rem] font-semibold mb-4">
-          {editando ? "Atualizar Produto" : "Adicionar Produto"}
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
-              Nome
-            </label>
-            <input
-              className="font-poppins border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Nome do produto"
-              value={form.nome}
-              onChange={(e) => setForm({ ...form, nome: e.target.value })}
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
-              Qtde. Empresa
-            </label>
-            <input
-              type="number"
-              className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Quantidade na empresa"
-              value={form.quantidade_empresa}
-              onChange={(e) =>
-                setForm({ ...form, quantidade_empresa: e.target.value })
-              }
-            />
-          </div>
-          <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
-              Qtde. Entrega
-            </label>
-            <input
-              type="number"
-              className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Quantidade em rota de entrega"
-              value={form.quantidade_rua}
-              onChange={(e) =>
-                setForm({ ...form, quantidade_rua: e.target.value })
-              }
-            />
-          </div>
-        </div>
-        <button
-          onClick={editando ? atualizarProduto : adicionarProduto}
-          className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${editando
-              ? "bg-blue-600 hover:bg-blue-700"
-              : "bg-green-600 hover:bg-green-700"
-            }`}
-        >
-          {editando ? <FaEdit /> : <FaPlus />}
-          {editando ? "Atualizar Produto" : "Adicionar Produto"}
-        </button>
-        {editando && (
-          <button
-            onClick={() => {
-              setEditando(null);
-              setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
-            }}
-            className="mt-2 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all bg-gray-600 hover:bg-gray-700"
-            type="button"
-          >
-            Cancelar
-          </button>
-        )}
-      </section>
-      {isAdmin && (
-        <div className="mt-0">
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition-all font-poppins text-[0.95rem] font-medium mb-8"
-          >
-            Voltar ao Painel
-          </button>
-        </div>
-      )}
-      <section>
-        <div className="flex items-center justify-between mb-4 gap-2">
-          <h2 className="font-poppins text-[1.2rem] font-semibold">Estoque</h2>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              placeholder="Pesquisar por nome"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="border p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm"
-              style={{ minWidth: 180 }}
-            />
-            <div className="relative" ref={exportMenuRef}>
-              <button
-                className="flex items-center gap-2 bg-gray-700 text-white p-2 rounded hover:bg-gray-800 transition-all font-poppins text-[0.95rem] font-medium"
-                onClick={() => setExportMenuOpen((open) => !open)}
-                type="button"
+    <>
+      <Header />
+      <main className="p-8 max-w-4xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg mt-8 mb-8">
+        <header className="mb-8">
+          <div className="w-full flex items-center justify-between relative">
+            <div className="flex-1 flex justify-start">
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLogout();
+                }}
+                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-poppins font-medium px-2 py-2 rounded transition-all ml-0"
               >
-                Exportar <span className="ml-1">⏷</span>
-              </button>
-              {exportMenuOpen && (
-                <div className="absolute right-0 mt-1 w-32 bg-gray-800 border border-gray-700 rounded shadow-lg z-10">
-                  <button
-                    onClick={() => {
-                      exportarPDF();
-                      setExportMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
-                  >
-                    PDF
-                  </button>
-                  <button
-                    onClick={() => {
-                      exportarCSV();
-                      setExportMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
-                  >
-                    CSV
-                  </button>
-                </div>
-              )}
+                <FaSignOutAlt />
+                Logout
+              </a>
             </div>
+
+            <div className="flex flex-col items-center justify-center">
+              <h1 className="font-poppins text-[2rem] font-bold mb-1 text-center">
+                Flavinho Festas
+              </h1>
+              <p className="font-inter text-[1rem] font-normal text-gray-400 text-center mt-0">
+                Gerencie seu estoque de forma eficiente e prática
+              </p>
+            </div>
+
+            <div className="flex-1 flex justify-end">
+              <img
+                src="/favicon.ico"
+                alt="Favicon"
+                className="w-28 h-28 ml-0 mr-0"
+              />
+            </div>
+          </div>
+        </header>
+
+        <section className="mb-4 bg-gray-800 p-6 rounded-lg shadow-md">
+          <h2 className="font-poppins text-[1.1rem] font-semibold mb-4">
+            {editando ? "Atualizar Produto" : "Adicionar Produto"}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex flex-col">
+              <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
+                Nome
+              </label>
+              <input
+                className="font-poppins border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Nome do produto"
+                value={form.nome}
+                onChange={(e) => setForm({ ...form, nome: e.target.value })}
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
+                Qtde. Empresa
+              </label>
+              <input
+                type="number"
+                className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Quantidade na empresa"
+                value={form.quantidade_empresa}
+                onChange={(e) =>
+                  setForm({ ...form, quantidade_empresa: e.target.value })
+                }
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
+                Qtde. Entrega
+              </label>
+              <input
+                type="number"
+                className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Quantidade em rota de entrega"
+                value={form.quantidade_rua}
+                onChange={(e) =>
+                  setForm({ ...form, quantidade_rua: e.target.value })
+                }
+              />
+            </div>
+          </div>
+          <button
+            onClick={editando ? atualizarProduto : adicionarProduto}
+            className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${editando
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "bg-green-600 hover:bg-green-700"
+              }`}
+          >
+            {editando ? <FaEdit /> : <FaPlus />}
+            {editando ? "Atualizar Produto" : "Adicionar Produto"}
+          </button>
+          {editando && (
             <button
-              onClick={fetchProdutos}
-              className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
-              disabled={loading}
+              onClick={() => {
+                setEditando(null);
+                setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
+              }}
+              className="mt-2 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all bg-gray-600 hover:bg-gray-700"
+              type="button"
             >
-              <FaSyncAlt className={loading ? "animate-spin" : ""} />
-              Atualizar Lista
+              Cancelar
+            </button>
+          )}
+        </section>
+        {isAdmin && (
+          <div className="mt-0">
+            <button
+              onClick={() => router.push("/dashboard")}
+              className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition-all font-poppins text-[0.95rem] font-medium mb-8"
+            >
+              Voltar ao Painel
             </button>
           </div>
-        </div>
-
-        <ul className="bg-gray-800 p-6 rounded-lg shadow-md divide-y divide-gray-700">
-          {produtos
-            .filter((produto) =>
-              produto.nome.toLowerCase().includes(search.toLowerCase())
-            )
-            .map((produto) => (
-              <li
-                key={produto.id}
-                className="py-4 flex justify-between items-center"
+        )}
+        <section>
+          <div className="flex items-center justify-between mb-4 gap-2">
+            <h2 className="font-poppins text-[1.2rem] font-semibold">Estoque</h2>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Pesquisar por nome"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="border p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm"
+                style={{ minWidth: 180 }}
+              />
+              <div className="relative" ref={exportMenuRef}>
+                <button
+                  className="flex items-center gap-2 bg-gray-700 text-white p-2 rounded hover:bg-gray-800 transition-all font-poppins text-[0.95rem] font-medium"
+                  onClick={() => setExportMenuOpen((open) => !open)}
+                  type="button"
+                >
+                  Exportar <span className="ml-1">⏷</span>
+                </button>
+                {exportMenuOpen && (
+                  <div className="absolute right-0 mt-1 w-32 bg-gray-800 border border-gray-700 rounded shadow-lg z-10">
+                    <button
+                      onClick={() => {
+                        exportarPDF();
+                        setExportMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
+                    >
+                      PDF
+                    </button>
+                    <button
+                      onClick={() => {
+                        exportarCSV();
+                        setExportMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700"
+                    >
+                      CSV
+                    </button>
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={fetchProdutos}
+                className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+                disabled={loading}
               >
-                <div>
-                  <strong className="font-poppins text-[1.1rem] font-semibold">
-                    {produto.nome}
-                  </strong>
-                  <p className="font-inter text-[0.9rem] font-normal text-gray-400">
-                    Na empresa: {produto.quantidade_empresa} | Em rota de entrega:{" "}
-                    {produto.quantidade_rua} | Total:{" "}
-                    {produto.quantidade_empresa + produto.quantidade_rua}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => excluirProduto(produto.id)}
-                    className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
-                  >
-                    <FaTrash /> Excluir
-                  </button>
-                  <button
-                    onClick={() => editarProduto(produto.id)}
-                    className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
-                  >
-                    <FaEdit /> Editar
-                  </button>
-                </div>
-              </li>
-            ))}
-        </ul>
-      </section>
+                <FaSyncAlt className={loading ? "animate-spin" : ""} />
+                Atualizar Lista
+              </button>
+            </div>
+          </div>
 
-      <span className="flex items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-500 mt-10 mb-0">
-        Desenvolvido por:{" "}
-        <a
-          href="https://www.linkedin.com/in/gustavo-henrique-6b8352304/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          Gustavo Henrique
-        </a>
-      </span>
-    </main>
+          <ul className="bg-gray-800 p-6 rounded-lg shadow-md divide-y divide-gray-700">
+            {produtos
+              .filter((produto) =>
+                produto.nome.toLowerCase().includes(search.toLowerCase())
+              )
+              .map((produto) => (
+                <li
+                  key={produto.id}
+                  className="py-4 flex justify-between items-center"
+                >
+                  <div>
+                    <strong className="font-poppins text-[1.1rem] font-semibold">
+                      {produto.nome}
+                    </strong>
+                    <p className="font-inter text-[0.9rem] font-normal text-gray-400">
+                      Na empresa: {produto.quantidade_empresa} | Em rota de entrega:{" "}
+                      {produto.quantidade_rua} | Total:{" "}
+                      {produto.quantidade_empresa + produto.quantidade_rua}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Última alteração por: {produto.last_modified_by || "N/A"}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => excluirProduto(produto.id)}
+                      className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
+                    >
+                      <FaTrash /> Excluir
+                    </button>
+                    <button
+                      onClick={() => editarProduto(produto.id)}
+                      className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+                    >
+                      <FaEdit /> Editar
+                    </button>
+                  </div>
+                </li>
+              ))}
+          </ul>
+        </section>
+
+        <span className="flex items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-500 mt-10 mb-0">
+          Desenvolvido por:{" "}
+          <a
+            href="https://www.linkedin.com/in/gustavo-henrique-6b8352304/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            Gustavo Henrique
+          </a>
+        </span>
+      </main>
+    </>
   );
 }
