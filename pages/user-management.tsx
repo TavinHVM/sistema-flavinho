@@ -31,6 +31,7 @@ export default function UserManagement() {
   const [editForm, setEditForm] = useState({ nome: "", email: "", role: "", senha: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [search, setSearch] = useState("");
   const router = useRouter();
 
   const fetchUsers = async () => {
@@ -54,6 +55,11 @@ export default function UserManagement() {
 
     if (!nome || !email || !password || !role) {
       setMessage("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setMessage("A senha deve ter pelo menos 6 caracteres.");
       return;
     }
 
@@ -255,55 +261,69 @@ export default function UserManagement() {
         </div>
       )}
       <section className="mt-8 w-full max-w-4xl">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center mb-4 gap-2">
           <h2 className="font-poppins text-[1.2rem] font-semibold">
             Usuários
           </h2>
-          <button
-            onClick={fetchUsers}
-            className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
-            disabled={loading}
-          >
-            <FaSyncAlt className={loading ? "animate-spin" : ""} />
-            Atualizar Lista
-          </button>
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              placeholder="Pesquisar por nome"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm"
+              style={{ minWidth: 180 }}
+            />
+            <button
+              onClick={fetchUsers}
+              className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+              disabled={loading}
+            >
+              <FaSyncAlt className={loading ? "animate-spin" : ""} />
+              Atualizar Lista
+            </button>
+          </div>
         </div>
 
         <ul className="bg-gray-800 p-6 rounded-lg shadow-md divide-y divide-gray-700 mb-8">
           {users && users.length > 0 ? (
-            users.map((user) => (
-              <li
-                key={user.id}
-                className="py-4 flex justify-between items-center"
-              >
-                <div>
-                  <strong className="font-poppins text-[1.1rem] font-semibold">
-                    {user.nome}
-                    <br />
-                  </strong>
-                  <strong className="font-poppins text-[0.9rem] font-normal">
-                    {user.email}
-                  </strong>
-                  <p className="font-inter text-[0.9rem] font-normal text-gray-400">
-                    Cargo: {user.role}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(user)}
-                    className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
-                  >
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleDelete(user.id)}
-                    className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
-                  >
-                    Excluir
-                  </button>
-                </div>
-              </li>
-            ))
+            users
+              .filter((user) =>
+                user.nome.toLowerCase().includes(search.toLowerCase())
+              )
+              .map((user) => (
+                <li
+                  key={user.id}
+                  className="py-4 flex justify-between items-center"
+                >
+                  <div>
+                    <strong className="font-poppins text-[1.1rem] font-semibold">
+                      {user.nome}
+                      <br />
+                    </strong>
+                    <strong className="font-poppins text-[0.9rem] font-normal">
+                      {user.email}
+                    </strong>
+                    <p className="font-inter text-[0.9rem] font-normal text-gray-400">
+                      Cargo: {user.role}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(user)}
+                      className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user.id)}
+                      className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
+                    >
+                      Excluir
+                    </button>
+                  </div>
+                </li>
+              ))
           ) : (
             <li className="py-4 text-center text-gray-400">
               Nenhum usuário encontrado.

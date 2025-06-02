@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import {
@@ -32,7 +32,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [editando, setEditando] = useState<string | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const router = useRouter();
+  const exportMenuRef = useRef<HTMLDivElement>(null);
 
   const fetchProdutos = async () => {
     setLoading(true);
@@ -66,6 +68,24 @@ export default function Home() {
       setIsAdmin(user.role === "Administrador");
     }
   }, []);
+
+  useEffect(() => {
+    if (!exportMenuOpen) return;
+
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        exportMenuRef.current &&
+        !exportMenuRef.current.contains(event.target as Node)
+      ) {
+        setExportMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [exportMenuOpen]);
 
   const adicionarProduto = async () => {
     const quantidadeEmpresa = parseInt(form.quantidade_empresa);
@@ -313,11 +333,10 @@ export default function Home() {
         </div>
         <button
           onClick={editando ? atualizarProduto : adicionarProduto}
-          className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${
-            editando
+          className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${editando
               ? "bg-blue-600 hover:bg-blue-700"
               : "bg-green-600 hover:bg-green-700"
-          }`}
+            }`}
         >
           {editando ? <FaEdit /> : <FaPlus />}
           {editando ? "Atualizar Produto" : "Adicionar Produto"}
@@ -346,10 +365,18 @@ export default function Home() {
         </div>
       )}
       <section>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 gap-2">
           <h2 className="font-poppins text-[1.2rem] font-semibold">Estoque</h2>
           <div className="flex items-center gap-2">
-            <div className="relative">
+            <input
+              type="text"
+              placeholder="Pesquisar por nome"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm"
+              style={{ minWidth: 180 }}
+            />
+            <div className="relative" ref={exportMenuRef}>
               <button
                 className="flex items-center gap-2 bg-gray-700 text-white p-2 rounded hover:bg-gray-800 transition-all font-poppins text-[0.95rem] font-medium"
                 onClick={() => setExportMenuOpen((open) => !open)}
@@ -392,37 +419,41 @@ export default function Home() {
         </div>
 
         <ul className="bg-gray-800 p-6 rounded-lg shadow-md divide-y divide-gray-700">
-          {produtos.map((produto) => (
-            <li
-              key={produto.id}
-              className="py-4 flex justify-between items-center"
-            >
-              <div>
-                <strong className="font-poppins text-[1.1rem] font-semibold">
-                  {produto.nome}
-                </strong>
-                <p className="font-inter text-[0.9rem] font-normal text-gray-400">
-                  Na empresa: {produto.quantidade_empresa} | Em rota de entrega:{" "}
-                  {produto.quantidade_rua} | Total:{" "}
-                  {produto.quantidade_empresa + produto.quantidade_rua}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => excluirProduto(produto.id)}
-                  className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
-                >
-                  <FaTrash /> Excluir
-                </button>
-                <button
-                  onClick={() => editarProduto(produto.id)}
-                  className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
-                >
-                  <FaEdit /> Editar
-                </button>
-              </div>
-            </li>
-          ))}
+          {produtos
+            .filter((produto) =>
+              produto.nome.toLowerCase().includes(search.toLowerCase())
+            )
+            .map((produto) => (
+              <li
+                key={produto.id}
+                className="py-4 flex justify-between items-center"
+              >
+                <div>
+                  <strong className="font-poppins text-[1.1rem] font-semibold">
+                    {produto.nome}
+                  </strong>
+                  <p className="font-inter text-[0.9rem] font-normal text-gray-400">
+                    Na empresa: {produto.quantidade_empresa} | Em rota de entrega:{" "}
+                    {produto.quantidade_rua} | Total:{" "}
+                    {produto.quantidade_empresa + produto.quantidade_rua}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => excluirProduto(produto.id)}
+                    className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
+                  >
+                    <FaTrash /> Excluir
+                  </button>
+                  <button
+                    onClick={() => editarProduto(produto.id)}
+                    className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+                  >
+                    <FaEdit /> Editar
+                  </button>
+                </div>
+              </li>
+            ))}
         </ul>
       </section>
 
