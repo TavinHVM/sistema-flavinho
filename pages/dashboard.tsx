@@ -49,7 +49,7 @@ export default function Dashboard() {
             </div>
           </div>
         </header>
-        
+
         <div className="bg-[rgb(26,34,49)] p-8 rounded-lg shadow-lg w-full max-w-md">
           <button
             onClick={() => router.push("/")}
