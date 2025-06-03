@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { NOMEM } from "dns";
 import { FaSyncAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import "tailwindcss/tailwind.css";
-import Header from "../components/Header";
+import Header from "../components/header";
 
 type User = {
   id: string;
@@ -26,8 +26,8 @@ export default function UserManagement() {
   const [message, setMessage] = useState("");
   const [users, setUsers] = useState<
     {
-      last_modified_by: string; id: string; nome: string; email: string; role: string 
-}[]
+      last_modified_by: string; id: string; nome: string; email: string; role: string
+    }[]
   >([]);
   const [loading, setLoading] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
@@ -195,7 +195,7 @@ export default function UserManagement() {
             </div>
           </div>
         </header>
-        <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div className="bg-[rgb(26,34,49)] p-8 rounded-lg shadow-lg w-full max-w-md">
           <label htmlFor="nome" className="block text-sm font-medium mb-1">
             Nome
           </label>
@@ -205,7 +205,7 @@ export default function UserManagement() {
             placeholder="Nome do Usuário"
             value={form.nome}
             onChange={(e) => setForm({ ...form, nome: e.target.value })}
-            className="w-full border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
+            className="w-full p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
           />
 
           <label htmlFor="email" className="block text-sm font-medium mb-1">
@@ -217,7 +217,7 @@ export default function UserManagement() {
             placeholder="Email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
+            className="w-full p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
           />
 
           <label htmlFor="password" className="block text-sm font-medium mb-1">
@@ -230,7 +230,7 @@ export default function UserManagement() {
               placeholder="Senha"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-1 pr-10"
+              className="w-full p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-1 pr-10"
             />
             <button
               type="button"
@@ -252,7 +252,7 @@ export default function UserManagement() {
             id="role"
             value={form.role}
             onChange={(e) => setForm({ ...form, role: e.target.value })}
-            className="w-full border p-3 rounded bg-gray-700 text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
+            className="w-full p-3 rounded bg-gray-900 text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
           >
             <option value="">Selecione o cargo</option>
             <option value="Funcionário">Funcionário</option>
@@ -291,7 +291,7 @@ export default function UserManagement() {
                 placeholder="Pesquisar por nome"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="border p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm"
+                className="p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm"
                 style={{ minWidth: 180 }}
               />
               <button
@@ -305,30 +305,32 @@ export default function UserManagement() {
             </div>
           </div>
 
-          <ul className="bg-gray-800 p-6 rounded-lg shadow-md divide-y divide-gray-700 mb-8">
+          <ul className="bg-[rgb(26,34,49)] p-6 rounded-lg shadow-md">
             {users && users.length > 0 ? (
               users
                 .filter((user) =>
                   user.nome.toLowerCase().includes(search.toLowerCase())
                 )
-                .map((user) => (
+                .map((user, idx, arr) => (
                   <li
                     key={user.id}
-                    className="py-4 flex justify-between items-center"
+                    className={`py-4 flex justify-between items-center${idx !== arr.length - 1 ? " border-b border-gray-700" : ""}`}
                   >
                     <div>
                       <strong className="font-poppins text-[1.1rem] font-semibold">
                         {user.nome}
-                        <br />
                       </strong>
-                      <strong className="font-poppins text-[0.9rem] font-normal">
+                      <p className="font-inter text-[0.9rem] font-normal text-gray-400">
                         {user.email}
-                      </strong>
+                      </p>
                       <p className="font-inter text-[0.9rem] font-normal text-gray-400">
                         Cargo: {user.role}
                       </p>
-                      <p className="text-xs text-gray-400 mt-1">
-                        Última alteração por: {user.last_modified_by || "N/A"}
+                      <p className="text-sm text-gray-400 mt-1">
+                        Última alteração por:{" "}
+                        <strong className="text-gray-300 text-sm">
+                          {user.last_modified_by || "N/A"}
+                        </strong>
                       </p>
                     </div>
                     <div className="flex gap-2">

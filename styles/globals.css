@@ -18,6 +18,6 @@
 
 body {
   color: var(--foreground);
-  background-color: #090d1a;
+  background-color: rgb(17 24 39);
   font-family: var(--font-inter);
 }

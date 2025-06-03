@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
-import Header from "../components/Header";
+import Header from "../components/header";
 
 export default function Login() {
   const [usuario, setUsuario] = useState("");
@@ -57,7 +57,7 @@ export default function Login() {
         </header>
         <form
           onSubmit={handleLogin}
-          className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md"
+          className="bg-[rgb(26,34,49)] p-8 rounded-lg shadow-lg w-full max-w-md"
         >
           <h2 className="font-poppins text-[1.3rem] font-semibold mb-6 text-center">
             Login
@@ -73,7 +73,7 @@ export default function Login() {
             </label>
             <input
               type="text"
-              className="w-full border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter"
+              className="w-full p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter"
               value={usuario}
               onChange={(e) => setUsuario(e.target.value)}
               required
@@ -86,7 +86,7 @@ export default function Login() {
             </label>
             <input
               type="password"
-              className="w-full border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter"
+              className="w-full p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

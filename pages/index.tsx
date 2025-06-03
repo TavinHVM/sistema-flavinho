@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Header from "../components/Header";
+import Header from "../components/header";
 
 type Produto = {
   last_modified_by: string;
@@ -258,7 +258,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="p-8 max-w-4xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg mt-8 mb-8">
+      <main className="p-8 max-w-4xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-8 mb-8">
         <header className="mb-8">
           <div className="w-full flex items-center justify-between relative">
             <div className="flex-1 flex justify-start">
@@ -304,7 +304,7 @@ export default function Home() {
                 Nome
               </label>
               <input
-                className="font-poppins border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="font-poppins p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Nome do produto"
                 value={form.nome}
                 onChange={(e) => setForm({ ...form, nome: e.target.value })}
@@ -316,7 +316,7 @@ export default function Home() {
               </label>
               <input
                 type="number"
-                className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="font-inter p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Quantidade na empresa"
                 value={form.quantidade_empresa}
                 onChange={(e) =>
@@ -330,7 +330,7 @@ export default function Home() {
               </label>
               <input
                 type="number"
-                className="font-inter border p-3 rounded bg-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="font-inter p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Quantidade em rota de entrega"
                 value={form.quantidade_rua}
                 onChange={(e) =>
@@ -342,8 +342,8 @@ export default function Home() {
           <button
             onClick={editando ? atualizarProduto : adicionarProduto}
             className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${editando
-                ? "bg-blue-600 hover:bg-blue-700"
-                : "bg-green-600 hover:bg-green-700"
+              ? "bg-blue-600 hover:bg-blue-700"
+              : "bg-green-600 hover:bg-green-700"
               }`}
           >
             {editando ? <FaEdit /> : <FaPlus />}
@@ -381,7 +381,7 @@ export default function Home() {
                 placeholder="Pesquisar por nome"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="border p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm"
+                className="p-2 rounded bg-gray-900 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm"
                 style={{ minWidth: 180 }}
               />
               <div className="relative" ref={exportMenuRef}>
@@ -426,15 +426,15 @@ export default function Home() {
             </div>
           </div>
 
-          <ul className="bg-gray-800 p-6 rounded-lg shadow-md divide-y divide-gray-700">
+          <ul className="bg-gray-800 p-6 rounded-lg shadow-md">
             {produtos
               .filter((produto) =>
                 produto.nome.toLowerCase().includes(search.toLowerCase())
               )
-              .map((produto) => (
+              .map((produto, idx, arr) => (
                 <li
                   key={produto.id}
-                  className="py-4 flex justify-between items-center"
+                  className={`py-4 flex justify-between items-center${idx !== arr.length - 1 ? " border-b border-gray-700" : ""}`}
                 >
                   <div>
                     <strong className="font-poppins text-[1.1rem] font-semibold">
@@ -445,8 +445,11 @@ export default function Home() {
                       {produto.quantidade_rua} | Total:{" "}
                       {produto.quantidade_empresa + produto.quantidade_rua}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      Última alteração por: {produto.last_modified_by || "N/A"}
+                    <p className="text-sm text-gray-400 mt-1">
+                      Última alteração por:{" "}
+                      <strong className="text-gray-300 text-sm">
+                        {produto.last_modified_by || "N/A"}
+                      </strong>
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -468,7 +471,7 @@ export default function Home() {
           </ul>
         </section>
 
-        <span className="flex items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-500 mt-10 mb-0">
+        <span className="flex items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-400 mt-10 mb-0">
           Desenvolvido por:{" "}
           <a
             href="https://www.linkedin.com/in/gustavo-henrique-6b8352304/"

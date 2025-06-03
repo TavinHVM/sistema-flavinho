@@ -12,8 +12,8 @@ export default function Header() {
   }, []);
 
   return (
-    <div className="w-full bg-[#0a0a0a] text-white py-2 px-4 flex justify-end text-sm font-inter">
-      {nome && <span>Logado como: <strong>{nome}</strong></span>}
+    <div className="w-full bg-gray-900 text-white py-3 px-4 flex justify-end text-sm font-inter">
+      {nome && <span className="text-lg">Logado como: <strong>{nome}</strong></span>}
     </div>
   );
 }
