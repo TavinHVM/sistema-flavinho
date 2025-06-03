@@ -441,9 +441,20 @@ export default function Home() {
                       {produto.nome}
                     </strong>
                     <p className="font-inter text-[0.9rem] font-normal text-gray-400">
-                      Na empresa: {produto.quantidade_empresa} | Em rota de entrega:{" "}
-                      {produto.quantidade_rua} | Total:{" "}
+                      Na empresa:{" "}
+                      <strong className="text-gray-300">
+                      {produto.quantidade_empresa}
+                      </strong>
+                      {" "}
+                      | Em rota de entrega:{" "}
+                      <strong className="text-gray-300">
+                      {produto.quantidade_rua}
+                      </strong>
+                      {" "}
+                      | Total:{" "}
+                      <strong className="text-gray-300">
                       {produto.quantidade_empresa + produto.quantidade_rua}
+                      </strong>
                     </p>
                     <p className="text-sm text-gray-400 mt-1">
                       Última alteração por:{" "}

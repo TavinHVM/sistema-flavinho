@@ -324,7 +324,8 @@ export default function UserManagement() {
                         {user.email}
                       </p>
                       <p className="font-inter text-[0.9rem] font-normal text-gray-400">
-                        Cargo: {user.role}
+                        Cargo:{" "}
+                        <strong className="text-gray-300">{user.role}</strong>
                       </p>
                       <p className="text-sm text-gray-400 mt-1">
                         Última alteração por:{" "}
