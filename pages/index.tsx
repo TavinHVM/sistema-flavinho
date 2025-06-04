@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Header from "../components/header";
+import Header from "../components/Header";
 import ProdutoList from "@/components/ProdutoList";
 import ProdutoForm from "@/components/ProdutoForm";
 import ExportMenu from "@/components/ExportMenu";
@@ -39,6 +39,7 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const router = useRouter();
   const exportMenuRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const fetchProdutos = async () => {
     setLoading(true);
@@ -157,6 +158,9 @@ export default function Home() {
         quantidade_rua: data.quantidade_rua.toString(),
       });
       setEditando(id);
+      setTimeout(() => {
+        formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
     }
   };
 
@@ -260,10 +264,10 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="p-8 max-w-4xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-8 mb-8">
+      <main className="p-2 sm:p-4 md:p-8 max-w-full md:max-w-4xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 md:mt-8 mb-4 md:mb-8">
         <HeaderBar onLogout={handleLogout} />
 
-        <section className="mb-4 bg-gray-800 p-6 rounded-lg shadow-md">
+        <div ref={formRef}>
           <ProdutoForm
             form={form}
             setForm={setForm}
@@ -278,17 +282,23 @@ export default function Home() {
                 : undefined
             }
           />
-        </section>
+        </div>
+
         {isAdmin && (
-          <div className="mt-0">
+          <div className="mt-0 mb-14">
             <PainelAdminButton onClick={() => router.push("/dashboard")} />
           </div>
         )}
+
         <section>
-          <div className="flex items-center justify-between mb-4 gap-2">
-            <SectionTitle>Estoque</SectionTitle>
-            <div className="flex items-center gap-2">
-              <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Pesquisar por nome" />
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2">
+            <SectionTitle className="mt-2 md:mt-8 mb-0">Estoque</SectionTitle>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto mt-4 md:mt-8">
+              <SearchInput
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Pesquisar por nome"
+              />
               <div className="relative" ref={exportMenuRef}>
                 <ExportMenu
                   open={exportMenuOpen}

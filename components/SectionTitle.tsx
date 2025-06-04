@@ -1,9 +1,12 @@
 interface SectionTitleProps {
   children: React.ReactNode;
+  className?: string;
 }
 
-export default function SectionTitle({ children }: SectionTitleProps) {
+export default function SectionTitle({ children, className }: SectionTitleProps) {
   return (
-    <h2 className="font-poppins text-[1.2rem] font-semibold">{children}</h2>
+    <h2 className={`font-poppins text-[1.2rem] font-semibold ${className ?? ""}`.trim()}>
+      {children}
+    </h2>
   );
 }

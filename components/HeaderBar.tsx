@@ -7,7 +7,7 @@ interface HeaderBarProps {
 export default function HeaderBar({ onLogout }: HeaderBarProps) {
   return (
     <header className="mb-8">
-      <div className="w-full flex items-center justify-between relative">
+      <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 relative">
         <div className="flex-1 flex justify-start">
           <a
             href="#"

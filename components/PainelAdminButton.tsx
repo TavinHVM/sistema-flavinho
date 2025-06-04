@@ -6,9 +6,9 @@ export default function PainelAdminButton({ onClick }: PainelAdminButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-700 transition-all font-poppins text-[0.95rem] font-medium mb-8"
+      className="w-full sm:w-auto bg-blue-700 hover:bg-blue-800 text-white font-poppins py-2 px-4 rounded transition-all"
     >
-      Voltar ao Painel
+      Voltar
     </button>
   );
 }

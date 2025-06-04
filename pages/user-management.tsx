@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { NOMEM } from "dns";
 import { FaSyncAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import "tailwindcss/tailwind.css";
-import Header from "../components/header";
+import Header from "../components/Header";
 
 type User = {
   id: string;
@@ -182,8 +182,8 @@ export default function UserManagement() {
   return (
     <>
       <Header />
-      <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white">
-        <header className="mb-8 w-full max-w-md">
+      <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white px-2">
+        <header className="mb-8 w-full max-w-full sm:max-w-md">
           <div className="w-full flex items-center justify-center relative">
             <div className="flex flex-col items-center justify-center">
               <h1 className="mt-8 font-poppins text-[2rem] font-bold mb-1 text-center">
@@ -195,7 +195,7 @@ export default function UserManagement() {
             </div>
           </div>
         </header>
-        <div className="bg-[rgb(26,34,49)] p-8 rounded-lg shadow-lg w-full max-w-md">
+        <div className="bg-[rgb(26,34,49)] p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-full sm:max-w-md">
           <label htmlFor="nome" className="block text-sm font-medium mb-1">
             Nome
           </label>
@@ -280,23 +280,23 @@ export default function UserManagement() {
             {message}
           </div>
         )}
-        <section className="mt-8 w-full max-w-4xl">
-          <div className="flex justify-between items-center mb-4 gap-2">
-            <h2 className="font-poppins text-[1.2rem] font-semibold">
+        <section className="mt-8 w-full max-w-full sm:max-w-4xl px-0 sm:px-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+            <h2 className="font-poppins text-[1.1rem] sm:text-[1.2rem] font-semibold">
               Usuários
             </h2>
-            <div className="flex gap-2 items-center">
+            <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center w-full sm:w-auto">
               <input
                 type="text"
                 placeholder="Pesquisar por nome"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm"
-                style={{ minWidth: 180 }}
+                className="p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm w-full sm:w-auto"
+                style={{ minWidth: 0, flex: 1 }}
               />
               <button
                 onClick={fetchUsers}
-                className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+                className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium w-full sm:w-auto"
                 disabled={loading}
               >
                 <FaSyncAlt className={loading ? "animate-spin" : ""} />
@@ -305,7 +305,7 @@ export default function UserManagement() {
             </div>
           </div>
 
-          <ul className="bg-[rgb(26,34,49)] p-6 rounded-lg shadow-md">
+          <ul className="bg-[rgb(26,34,49)] p-2 sm:p-4 rounded-lg shadow-md">
             {users && users.length > 0 ? (
               users
                 .filter((user) =>
@@ -314,9 +314,9 @@ export default function UserManagement() {
                 .map((user, idx, arr) => (
                   <li
                     key={user.id}
-                    className={`py-4 flex justify-between items-center${idx !== arr.length - 1 ? " border-b border-gray-700" : ""}`}
+                    className={`py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center${idx !== arr.length - 1 ? " border-b border-gray-700" : ""}`}
                   >
-                    <div>
+                    <div className="mb-2 sm:mb-0">
                       <strong className="font-poppins text-[1.1rem] font-semibold">
                         {user.nome}
                       </strong>
@@ -334,7 +334,7 @@ export default function UserManagement() {
                         </strong>
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 w-full sm:w-auto">
                       <button
                         onClick={() => handleEdit(user)}
                         className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
@@ -358,7 +358,7 @@ export default function UserManagement() {
           </ul>
           {editingUserId && (
             <div
-              className={`mt-4 bg-gray-800 p-6 rounded-lg shadow-md transition-all duration-300
+              className={`mt-4 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md transition-all duration-300
               ${showEdit ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}
             `}
             >
@@ -436,7 +436,7 @@ export default function UserManagement() {
             </div>
           )}
         </section>
-        <span className="flex items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-500 mt-10 mb-4">
+        <span className="flex flex-col sm:flex-row items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-500 mt-10 mb-4 text-center">
           Desenvolvido por:{" "}
           <a
             href="https://www.linkedin.com/in/gustavo-henrique-6b8352304/"

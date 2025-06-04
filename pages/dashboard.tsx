@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import Header from "@/components/header";
+import Header from "@/components/Header";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -35,7 +35,7 @@ export default function Dashboard() {
 
   return (
     <>
-      < Header />
+      <Header />
       <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white">
         <header className="mb-8 w-full max-w-md">
           <div className="w-full flex items-center justify-center relative">
@@ -69,6 +69,9 @@ export default function Dashboard() {
           >
             Logout
           </button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {/* ...cards... */}
         </div>
         <span className="flex items-center gap-1 font-inter text-[0.9rem] font-normal text-gray-500 mt-10 mb-0">
           Desenvolvido por:{" "}
