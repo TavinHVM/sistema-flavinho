@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import { FaSyncAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import "tailwindcss/tailwind.css";
 import Header from "../components/Header";
+import UserForm from "@/components/UserForm";
+import UserList from "@/components/UserList";
 
 export default function UserManagement() {
   const [form, setForm] = useState({
@@ -184,86 +186,8 @@ export default function UserManagement() {
             </div>
           </div>
         </header>
-        <div className="bg-[rgb(26,34,49)] p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-full sm:max-w-md">
-          <label htmlFor="nome" className="block text-sm font-medium mb-1">
-            Nome
-          </label>
-          <input
-            id="nome"
-            type="text"
-            placeholder="Nome do Usuário"
-            value={form.nome}
-            onChange={(e) => setForm({ ...form, nome: e.target.value })}
-            className="w-full p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
-          />
 
-          <label htmlFor="email" className="block text-sm font-medium mb-1">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="w-full p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
-          />
-
-          <label htmlFor="password" className="block text-sm font-medium mb-1">
-            Senha
-          </label>
-          <div className="relative">
-            <input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Senha"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-1 pr-10"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 text-xl"
-              tabIndex={-1}
-            >
-              {showPassword ? <FaEye /> : <FaEyeSlash />}
-            </button>
-          </div>
-          <p className="text-xs text-gray-400 mb-3 ml-1">
-            A senha deve ter pelo menos 6 caracteres
-          </p>
-
-          <label htmlFor="role" className="block text-sm font-medium mb-1">
-            Cargo
-          </label>
-          <select
-            id="role"
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
-            className="w-full p-3 rounded bg-gray-900 text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
-          >
-            <option value="">Selecione o cargo</option>
-            <option value="Funcionário">Funcionário</option>
-            <option value="Administrador">Administrador</option>
-          </select>
-          <p className="text-xs text-gray-400 mb-3 ml-1">
-            Apenas administradores podem gerenciar usuários
-          </p>
-
-          <button
-            onClick={handleRegister}
-            className="w-full bg-blue-600 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-blue-700 transition-all flex items-center justify-center mb-4"
-          >
-            Registrar
-          </button>
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="w-full bg-gray-600 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-gray-700 transition-all flex items-center justify-center"
-          >
-            Voltar ao Painel
-          </button>
-        </div>
+        <UserForm form={form} setForm={setForm} onSubmit={handleRegister} loading={loading} />
         {message && (
           <div className="mt-4 text-center text-sm text-yellow-400">
             {message}
@@ -294,57 +218,7 @@ export default function UserManagement() {
             </div>
           </div>
 
-          <ul className="bg-[rgb(26,34,49)] p-2 sm:p-4 rounded-lg shadow-md">
-            {users && users.length > 0 ? (
-              users
-                .filter((user) =>
-                  user.nome.toLowerCase().includes(search.toLowerCase())
-                )
-                .map((user, idx, arr) => (
-                  <li
-                    key={user.id}
-                    className={`py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center${idx !== arr.length - 1 ? " border-b border-gray-700" : ""}`}
-                  >
-                    <div className="mb-2 sm:mb-0">
-                      <strong className="font-poppins text-[1.1rem] font-semibold">
-                        {user.nome}
-                      </strong>
-                      <p className="font-inter text-[0.9rem] font-normal text-gray-400">
-                        {user.email}
-                      </p>
-                      <p className="font-inter text-[0.9rem] font-normal text-gray-400">
-                        Cargo:{" "}
-                        <strong className="text-gray-300">{user.role}</strong>
-                      </p>
-                      <p className="text-sm text-gray-400 mt-1">
-                        Última alteração por:{" "}
-                        <strong className="text-gray-300 text-sm">
-                          {user.last_modified_by || "N/A"}
-                        </strong>
-                      </p>
-                    </div>
-                    <div className="flex gap-2 w-full sm:w-auto">
-                      <button
-                        onClick={() => handleEdit(user)}
-                        className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
-                      >
-                        Excluir
-                      </button>
-                    </div>
-                  </li>
-                ))
-            ) : (
-              <li className="py-4 text-center text-gray-400">
-                Nenhum usuário encontrado.
-              </li>
-            )}
-          </ul>
+          <UserList users={users} search={search} onEditar={handleEdit} onExcluir={handleDelete} />
           {editingUserId && (
             <div
               className={`mt-4 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md transition-all duration-300
