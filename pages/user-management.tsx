@@ -1,20 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
-import { NOMEM } from "dns";
 import { FaSyncAlt, FaEye, FaEyeSlash } from "react-icons/fa";
 import "tailwindcss/tailwind.css";
 import Header from "../components/Header";
-
-type User = {
-  id: string;
-  nome: string;
-  email: string;
-  senha: string;
-  role: string;
-  created_at?: string;
-  updated_at?: string;
-};
 
 export default function UserManagement() {
   const [form, setForm] = useState({
@@ -118,7 +107,7 @@ export default function UserManagement() {
   const handleUpdate = async () => {
     const { nome, email, role, senha } = editForm;
     const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       nome,
       email,
       role,
@@ -177,7 +166,7 @@ export default function UserManagement() {
     };
 
     checkAdmin();
-  }, []);
+  }, [router]);
 
   return (
     <>

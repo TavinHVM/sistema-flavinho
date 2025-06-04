@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import Header from "../components/Header";
@@ -32,11 +32,6 @@ export default function Login() {
     } else {
       router.replace("/");
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    router.replace("/login");
   };
 
   return (
