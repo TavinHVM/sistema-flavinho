@@ -7,7 +7,7 @@ export default function Login() {
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
