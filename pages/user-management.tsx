@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
-import { FaSyncAlt, FaEye, FaEyeSlash } from "react-icons/fa";
-import "tailwindcss/tailwind.css";
+import { FaSyncAlt } from "react-icons/fa";
 import Header from "../components/Header";
 import UserForm from "@/components/UserForm";
 import UserList from "@/components/UserList";
@@ -23,7 +22,6 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ nome: "", email: "", role: "", senha: "" });
-  const [showPassword, setShowPassword] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [search, setSearch] = useState("");
   const router = useRouter();
@@ -57,7 +55,7 @@ export default function UserManagement() {
       return;
     }
 
-    const { data: existing, error: findError } = await supabase
+    const { data: existing } = await supabase
       .from("profiles")
       .select("id")
       .eq("email", email)

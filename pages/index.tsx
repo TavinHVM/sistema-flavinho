@@ -30,9 +30,7 @@ export default function Home() {
     quantidade_empresa: "",
     quantidade_rua: "",
   });
-  const [userEmail, setUserEmail] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [editando, setEditando] = useState<string | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
@@ -69,7 +67,6 @@ export default function Home() {
     const userStr = localStorage.getItem("user");
     if (userStr) {
       const user = JSON.parse(userStr);
-      setUserEmail(user.email || "");
       setIsAdmin(user.role === "Administrador");
     }
   }, []);
