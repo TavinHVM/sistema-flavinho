@@ -3,10 +3,10 @@ import { useState } from "react";
 import router from "next/router";
 
 interface UserFormProps {
-    form: { nome: string; email: string; password: string; role: string };
-    setForm: (form: any) => void;
-    onSubmit: () => void;
-    loading?: boolean;
+  form: { nome: string; email: string; password: string; role: string };
+  setForm: (form: { nome: string; email: string; password: string; role: string }) => void;
+  onSubmit: () => void;
+  loading: boolean;
 }
 
 export default function UserForm({ form, setForm, onSubmit, loading }: UserFormProps) {

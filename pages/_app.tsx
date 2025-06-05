@@ -5,7 +5,9 @@ import Head from "next/head";
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
-      <Head children={undefined}></Head>
+      <Head>
+        <title>Flavinho Festas</title>
+      </Head>
       <Component {...pageProps} />
     </>
   );

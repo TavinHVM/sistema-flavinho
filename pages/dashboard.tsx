@@ -26,7 +26,7 @@ export default function Dashboard() {
     };
 
     checkAdmin();
-  }, []);
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");

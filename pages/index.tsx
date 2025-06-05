@@ -61,7 +61,7 @@ export default function Home() {
     };
 
     checkSession();
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");

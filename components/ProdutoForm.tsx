@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 
 interface ProdutoFormProps {
   form: { nome: string; quantidade_empresa: string; quantidade_rua: string };
-  setForm: (form: any) => void;
+  setForm: (form: { nome: string; quantidade_empresa: string; quantidade_rua: string }) => void;
   onSubmit: () => void;
   editando: boolean;
   onCancel?: () => void;
@@ -84,5 +84,7 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
     );
   }
 );
+
+ProdutoForm.displayName = "ProdutoForm";
 
 export default ProdutoForm;
