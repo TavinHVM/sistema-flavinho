@@ -273,9 +273,9 @@ export default function Home() {
             onCancel={
               editando
                 ? () => {
-                    setEditando(null);
-                    setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
-                  }
+                  setEditando(null);
+                  setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
+                }
                 : undefined
             }
           />
@@ -316,7 +316,9 @@ export default function Home() {
           />
         </section>
 
-        <Footer />
+        <div className="flex justify-center text-xs text-gray-400 text-center">
+          <Footer />
+        </div>
       </main>
     </>
   );
