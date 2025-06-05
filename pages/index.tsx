@@ -294,7 +294,7 @@ export default function Home() {
               <SearchInput
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Pesquisar por nome"
+                placeholder="Pesquisar por nomee"
               />
               <div className="relative" ref={exportMenuRef}>
                 <ExportMenu
