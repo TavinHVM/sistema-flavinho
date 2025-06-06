@@ -67,7 +67,7 @@ export default function Home() {
     const userStr = localStorage.getItem("user");
     if (userStr) {
       const user = JSON.parse(userStr);
-      setIsAdmin(user.role === "Administrador");
+      setIsAdmin(user.role === "Administrador" || user.role === "Funcionario");
     }
   }, []);
 
@@ -294,7 +294,7 @@ export default function Home() {
               <SearchInput
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Pesquisar por nomee"
+                placeholder="Pesquisar por nome"
               />
               <div className="relative" ref={exportMenuRef}>
                 <ExportMenu

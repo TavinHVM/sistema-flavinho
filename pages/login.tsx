@@ -27,10 +27,8 @@ export default function Login() {
 
     localStorage.setItem("user", JSON.stringify(user));
 
-    if (user.role === "Administrador") {
+    if (user.role === "Administrador" || "Funcionario") {
       router.replace("/dashboard");
-    } else {
-      router.replace("/");
     }
   };
 

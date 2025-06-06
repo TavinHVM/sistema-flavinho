@@ -12,8 +12,8 @@ export default function Header() {
   }, []);
 
   return (
-    <div className="w-full bg-gray-900 text-white py-3 px-4 flex justify-center text-sm font-inter">
-      {nome && <span className="text-lg">Usuário: <strong>{nome}</strong></span>}
+    <div className="w-full bg-gray-900 text-white py-3 px-4 flex justify-center text-sm font-inter mt-2">
+      {nome && <span className="text-[15px]">Usuário: <strong>{nome}</strong></span>}
     </div>
   );
 }
