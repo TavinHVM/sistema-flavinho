@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
-import Header from "../components/Header";
+import Header from "@/components/header";
 
 export default function Login() {
   const [usuario, setUsuario] = useState("");
