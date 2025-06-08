@@ -43,6 +43,14 @@ interface Pedido {
   created_at: string;
 }
 
+interface OrderListProps {
+  pedidos: Pedido[];
+  search: string;
+  onEditarPedido: (pedido: any) => void;
+  onExcluirPedido: (id: any) => Promise<void>;
+  onExportarPedidoPDF: (pedido: { numero: any; cliente: any; }) => void;
+}
+
 export default function Orders() {
   const [form, setForm] = useState<any>({
     numero: "",
@@ -182,6 +190,83 @@ export default function Orders() {
     doc.save(`Pedidos - Flavinho Festas.pdf`);
   };
 
+  const handleEditarPedido = (pedido: any) => {
+    setForm(pedido);
+  };
+
+  const handleExcluirPedido = async (id: any) => {
+    if (window.confirm("Tem certeza que deseja excluir este pedido?")) {
+      await supabase.from("pedidos").delete().eq("id", id);
+      fetchPedidos();
+    }
+  };
+
+  const exportarPedidoPDF = (pedido: any) => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(`CONTRATO DE LOCAÇÃO`, 14, 14);
+    doc.setFontSize(12);
+    doc.text(`Contrato Nº: ${pedido.numero}`, 14, 24);
+    doc.text(`Data da Locação: ${pedido.data_locacao || ""}`, 14, 32);
+    doc.text(`Data do Evento: ${pedido.data_evento || ""}`, 14, 40);
+    doc.text(`Data de Retirada: ${pedido.data_retirada || ""}`, 14, 48);
+    doc.text(`Data de Devolução: ${pedido.data_devolucao || ""}`, 14, 56);
+    doc.text(`Cliente: ${pedido.cliente || ""}`, 14, 64);
+    doc.text(`CPF: ${pedido.cpf || ""}`, 14, 72);
+    doc.text(`Endereço: ${pedido.endereco || ""}`, 14, 80);
+    doc.text(`Telefone: ${pedido.telefone || ""}`, 14, 88);
+    doc.text(`Residencial: ${pedido.residencial || ""}`, 14, 96);
+    doc.text(`Referência: ${pedido.referencia || ""}`, 14, 104);
+
+    // Materiais
+    doc.setFontSize(13);
+    doc.text("Materiais:", 14, 114);
+    doc.setFontSize(11);
+    let y = 120;
+    doc.text("Qtd", 14, y);
+    doc.text("Material", 30, y);
+    doc.text("V. Unit.", 120, y);
+    doc.text("V. Total", 150, y);
+    y += 6;
+    pedido.materiais.forEach((mat: any) => {
+      doc.text(String(mat.quantidade), 14, y);
+      doc.text(mat.nome, 30, y);
+      doc.text(`R$ ${(mat.valor_unit || 0).toFixed(2)}`, 120, y);
+      doc.text(`R$ ${(mat.valor_total || 0).toFixed(2)}`, 150, y);
+      y += 6;
+    });
+    y += 2;
+    doc.setFontSize(12);
+    doc.text(`Valor Pago: R$ ${(pedido.valor_pago || 0).toFixed(2)}`, 14, y);
+    y += 6;
+    doc.text(`Valor Total: R$ ${(pedido.valor_total || 0).toFixed(2)}`, 14, y);
+    y += 8;
+    doc.setFontSize(11);
+    doc.text(`Entrega: ${pedido.entrega || ""}`, 14, y);
+    y += 6;
+    doc.text(`Busca: ${pedido.busca || ""}`, 14, y);
+    y += 8;
+    doc.setFontSize(12);
+    doc.text("Responsáveis:", 14, y);
+    y += 6;
+    doc.setFontSize(11);
+    doc.text(`Entregou: ${pedido.responsavel_entregou || ""}   Data: ${pedido.data_entregou || ""}`, 14, y);
+    y += 6;
+    doc.text(`Recebeu: ${pedido.responsavel_recebeu || ""}   Data: ${pedido.data_recebeu || ""}`, 14, y);
+    y += 6;
+    doc.text(`Buscou: ${pedido.responsavel_buscou || ""}   Data: ${pedido.data_buscou || ""}`, 14, y);
+    y += 6;
+    doc.text(`Conferiu Forro: ${pedido.responsavel_conferiu_forro || ""}`, 14, y);
+    y += 6;
+    doc.text(`Conferiu Utensílio: ${pedido.responsavel_conferiu_utensilio || ""}`, 14, y);
+    y += 12;
+    doc.setFontSize(11);
+    doc.text("CERTIFICO QUE EU CONFERI TODO MATERIAL E RESPONSABILIZO POR TODO E QUALQUER MATERIAL PRESCRITO NESTE CONTRATO.", 14, y, { maxWidth: 180 });
+    y += 16;
+    doc.text("Assinatura: ___________________________________________", 14, y);
+    doc.save(`Pedido_${pedido.numero}.pdf`);
+  };
+
   // Filtro
   const pedidosFiltrados = pedidos.filter((p) =>
     p.cliente.toLowerCase().includes(search.toLowerCase())
@@ -213,7 +298,13 @@ export default function Orders() {
           <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Pesquisar por cliente" />
           <OrderExportMenu onExportarPDF={exportarPDF} />
         </div>
-        <OrderList pedidos={pedidos} search={search} />
+        <OrderList
+          pedidos={pedidos}
+          search={search}
+          onEditar={handleEditarPedido}
+          onExcluir={handleExcluirPedido}
+          onExportarPDF={exportarPedidoPDF}
+        />
       </main>
     </>
   );
