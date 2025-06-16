@@ -1,13 +1,11 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Header from "@/components/header";
+import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
-import SearchInput from "@/components/SearchInput";
 import OrderForm from "@/components/OrderForm";
 import OrderList from "@/components/OrderList";
-import OrderExportMenu from "@/components/OrderExportMenu";
 import { useRouter } from "next/router";
 
 interface PedidoItem {
@@ -23,7 +21,9 @@ interface Pedido {
   data_locacao: string;
   data_evento: string;
   data_retirada: string;
+  data_devolucao: string;
   cliente: string;
+  cpf: string;
   endereco: string;
   telefone: string;
   residencial: string;
@@ -34,21 +34,17 @@ interface Pedido {
   pagamento: string;
   valor_pago: number;
   valor_total: number;
+  desconto: number;
   responsavel_entregou: string;
+  data_entregou: string;
   responsavel_recebeu: string;
+  data_recebeu: string;
   responsavel_buscou: string;
+  data_buscou: string;
   responsavel_conferiu_forro: string;
   responsavel_conferiu_utensilio: string;
   assinatura: string;
   created_at: string;
-}
-
-interface OrderListProps {
-  pedidos: Pedido[];
-  search: string;
-  onEditarPedido: (pedido: any) => void;
-  onExcluirPedido: (id: any) => Promise<void>;
-  onExportarPedidoPDF: (pedido: { numero: any; cliente: any; }) => void;
 }
 
 export default function Orders() {
@@ -57,7 +53,9 @@ export default function Orders() {
     data_locacao: "",
     data_evento: "",
     data_retirada: "",
+    data_devolucao: "",
     cliente: "",
+    cpf: "",
     endereco: "",
     telefone: "",
     residencial: "",
@@ -68,9 +66,13 @@ export default function Orders() {
     pagamento: "",
     valor_pago: "",
     valor_total: "",
+    desconto: "",
     responsavel_entregou: "",
+    data_entregou: "",
     responsavel_recebeu: "",
+    data_recebeu: "",
     responsavel_buscou: "",
+    data_buscou: "",
     responsavel_conferiu_forro: "",
     responsavel_conferiu_utensilio: "",
     assinatura: "",
@@ -79,7 +81,6 @@ export default function Orders() {
   const [produtos, setProdutos] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const formRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -132,12 +133,13 @@ export default function Orders() {
       }
     }
     // Calcular valor total
-    const valor_total = form.materiais.reduce((acc: number, m: any) => acc + (m.valor_total || 0), 0);
+    const valor_total = form.materiais.reduce((acc: number, m: any) => acc + (m.valor_total || 0), 0) - parseFloat(form.desconto || 0);
     // Salvar pedido
     const pedidoParaSalvar = {
       ...form,
       valor_total,
       valor_pago: parseFloat(form.valor_pago || 0),
+      desconto: parseFloat(form.desconto || 0),
       created_at: new Date().toISOString(),
     };
     const { error } = await supabase.from("pedidos").insert([pedidoParaSalvar]);
@@ -148,7 +150,9 @@ export default function Orders() {
         data_locacao: "",
         data_evento: "",
         data_retirada: "",
+        data_devolucao: "",
         cliente: "",
+        cpf: "",
         endereco: "",
         telefone: "",
         residencial: "",
@@ -159,9 +163,13 @@ export default function Orders() {
         pagamento: "",
         valor_pago: "",
         valor_total: "",
+        desconto: "",
         responsavel_entregou: "",
+        data_entregou: "",
         responsavel_recebeu: "",
+        data_recebeu: "",
         responsavel_buscou: "",
+        data_buscou: "",
         responsavel_conferiu_forro: "",
         responsavel_conferiu_utensilio: "",
         assinatura: "",
@@ -172,99 +180,81 @@ export default function Orders() {
     }
   };
 
-  // Exportar PDF
-  const exportarPDF = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("Pedidos - Flavinho Festas", 14, 14);
-    autoTable(doc, {
-      startY: 20,
-      head: [["Cliente", "Data Locação", "Itens", "Total"]],
-      body: pedidos.map((p) => [
-        p.cliente,
-        p.data_locacao,
-        p.materiais.map((m: any) => `${m.nome} (${m.quantidade})`).join(", "),
-        `R$ ${p.valor_total?.toFixed(2)}`,
-      ]),
-    });
-    doc.save(`Pedidos - Flavinho Festas.pdf`);
-  };
-
-  const handleEditarPedido = (pedido: any) => {
-    setForm(pedido);
-  };
-
-  const handleExcluirPedido = async (id: any) => {
-    if (window.confirm("Tem certeza que deseja excluir este pedido?")) {
-      await supabase.from("pedidos").delete().eq("id", id);
-      fetchPedidos();
-    }
-  };
-
+  // PDF fiel ao contrato
   const exportarPedidoPDF = (pedido: any) => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text(`CONTRATO DE LOCAÇÃO`, 14, 14);
-    doc.setFontSize(12);
-    doc.text(`Contrato Nº: ${pedido.numero}`, 14, 24);
-    doc.text(`Data da Locação: ${pedido.data_locacao || ""}`, 14, 32);
-    doc.text(`Data do Evento: ${pedido.data_evento || ""}`, 14, 40);
-    doc.text(`Data de Retirada: ${pedido.data_retirada || ""}`, 14, 48);
-    doc.text(`Data de Devolução: ${pedido.data_devolucao || ""}`, 14, 56);
-    doc.text(`Cliente: ${pedido.cliente || ""}`, 14, 64);
-    doc.text(`CPF: ${pedido.cpf || ""}`, 14, 72);
-    doc.text(`Endereço: ${pedido.endereco || ""}`, 14, 80);
-    doc.text(`Telefone: ${pedido.telefone || ""}`, 14, 88);
-    doc.text(`Residencial: ${pedido.residencial || ""}`, 14, 96);
-    doc.text(`Referência: ${pedido.referencia || ""}`, 14, 104);
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    // --- LOGO ---
+    // Para adicionar a logo, converta o favicon.ico para base64 PNG e substitua abaixo:
+    // Exemplo: const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANS...";
+    // doc.addImage(logoBase64, 'PNG', 10, 6, 28, 18);
 
-    // Materiais
+    // --- Cabeçalho ---
     doc.setFontSize(13);
-    doc.text("Materiais:", 14, 114);
-    doc.setFontSize(11);
-    let y = 120;
-    doc.text("Qtd", 14, y);
-    doc.text("Material", 30, y);
-    doc.text("V. Unit.", 120, y);
-    doc.text("V. Total", 150, y);
-    y += 6;
-    pedido.materiais.forEach((mat: any) => {
-      doc.text(String(mat.quantidade), 14, y);
-      doc.text(mat.nome, 30, y);
-      doc.text(`R$ ${(mat.valor_unit || 0).toFixed(2)}`, 120, y);
-      doc.text(`R$ ${(mat.valor_total || 0).toFixed(2)}`, 150, y);
-      y += 6;
+    doc.setFont('helvetica', 'bold');
+    doc.text("FLAVINHO Espaço Locações & Festa", 42, 14);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text("CNPJ 25.192.935/0001-48 PIX", 42, 19);
+    doc.text("Av. Bela Vista Qd. 18 Lt. 03 - Parque Trindade I - Ap. de Goiânia - GO", 42, 24);
+    doc.setFontSize(10);
+    doc.setTextColor(200, 0, 0);
+    doc.text("ATENÇÃO: TODOS OS MATERIAIS DEVEM SER CONFERIDOS PELO CLIENTE NO RECEBIMENTO DO MESMO.", 10, 30);
+    doc.setFontSize(8);
+    doc.setTextColor(80, 80, 80);
+    doc.text("OBS.: QUALQUER DEFEITO NOS MESMOS SERÁ COBRADO O VALOR DO MESMO OU REPOSIÇÃO COM OUTRO DO MESMO MODELO.", 10, 34);
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.text("CONTRATO DE LOCAÇÃO", 80, 40);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    // --- Dados principais ---
+    doc.text(`DATA DA LOCAÇÃO: ${pedido.data_locacao || ""}`, 10, 48);
+    doc.text(`DATA DO EVENTO: ${pedido.data_evento || ""}`, 80, 48);
+    doc.text(`DEVOLVER: ${pedido.data_devolucao || ""}`, 150, 48);
+    doc.text(`NOME: ${pedido.cliente || ""}`, 10, 54);
+    doc.text(`CPF: ${pedido.cpf || ""}`, 150, 54);
+    doc.text(`LOCAL DO EVENTO: ${pedido.endereco || ""}`, 10, 60);
+    doc.text(`FONE CELULAR: ${pedido.telefone || ""}`, 150, 60);
+    doc.text(`END. RESIDENCIAL: ${pedido.residencial || ""}`, 10, 66);
+    doc.text(`FONE REFERÊNCIA: ${pedido.referencia || ""}`, 150, 66);
+    // --- Materiais ---
+    autoTable(doc, {
+      startY: 72,
+      head: [["QUANT.", "MATERIAL", "VALOR UNIT.", "VALOR TOTAL"]],
+      body: pedido.materiais.map((mat: any) => [
+        mat.quantidade,
+        mat.nome,
+        `R$ ${(mat.valor_unit || 0).toFixed(2)}`,
+        `R$ ${(mat.valor_total || 0).toFixed(2)}`,
+      ]),
+      styles: { fontSize: 9 },
+      headStyles: { fillColor: [26, 34, 49], textColor: 255, fontStyle: 'bold' },
+      columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 90 }, 2: { cellWidth: 30 }, 3: { cellWidth: 30 } },
+      margin: { left: 10, right: 10 },
+      theme: 'grid',
+      tableWidth: 170,
     });
-    y += 2;
-    doc.setFontSize(12);
-    doc.text(`Valor Pago: R$ ${(pedido.valor_pago || 0).toFixed(2)}`, 14, y);
+    let y = (doc as any).lastAutoTable.finalY + 6;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`RESP. ENTREGOU: ${pedido.responsavel_entregou || ""}   DATA: ${pedido.data_entregou || ""}   HORÁRIO: ______   DESCONTO: R$ ${(pedido.desconto || 0).toFixed(2)}`, 10, y);
     y += 6;
-    doc.text(`Valor Total: R$ ${(pedido.valor_total || 0).toFixed(2)}`, 14, y);
-    y += 8;
-    doc.setFontSize(11);
-    doc.text(`Entrega: ${pedido.entrega || ""}`, 14, y);
+    doc.text(`RESP. RECEBEU: ${pedido.responsavel_recebeu || ""}   DATA: ${pedido.data_recebeu || ""}   HORÁRIO: ______`, 10, y);
     y += 6;
-    doc.text(`Busca: ${pedido.busca || ""}`, 14, y);
-    y += 8;
-    doc.setFontSize(12);
-    doc.text("Responsáveis:", 14, y);
+    doc.text(`RESP. BUSCOU: ${pedido.responsavel_buscou || ""}   DATA: ${pedido.data_buscou || ""}   HORÁRIO: ______   TOTAL: R$ ${(pedido.valor_total || 0).toFixed(2)}`, 10, y);
     y += 6;
-    doc.setFontSize(11);
-    doc.text(`Entregou: ${pedido.responsavel_entregou || ""}   Data: ${pedido.data_entregou || ""}`, 14, y);
+    doc.text(`RESP. CONFERIU FORRO: ${pedido.responsavel_conferiu_forro || ""}`, 10, y);
     y += 6;
-    doc.text(`Recebeu: ${pedido.responsavel_recebeu || ""}   Data: ${pedido.data_recebeu || ""}`, 14, y);
-    y += 6;
-    doc.text(`Buscou: ${pedido.responsavel_buscou || ""}   Data: ${pedido.data_buscou || ""}`, 14, y);
-    y += 6;
-    doc.text(`Conferiu Forro: ${pedido.responsavel_conferiu_forro || ""}`, 14, y);
-    y += 6;
-    doc.text(`Conferiu Utensílio: ${pedido.responsavel_conferiu_utensilio || ""}`, 14, y);
+    doc.text(`RESP. CONFERIU UTENSÍLIO: ${pedido.responsavel_conferiu_utensilio || ""}`, 10, y);
+    y += 10;
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text("CERTIFICO QUE EU CONFERI TODO MATERIAL E RESPONSABILIZO POR TODO E QUALQUER MATERIAL PRESCRITO NESTE CONTRATO.", 10, y, { maxWidth: 180 });
     y += 12;
-    doc.setFontSize(11);
-    doc.text("CERTIFICO QUE EU CONFERI TODO MATERIAL E RESPONSABILIZO POR TODO E QUALQUER MATERIAL PRESCRITO NESTE CONTRATO.", 14, y, { maxWidth: 180 });
-    y += 16;
-    doc.text("Assinatura: ___________________________________________", 14, y);
-    doc.save(`Pedido_${pedido.numero}.pdf`);
+    doc.setFont('helvetica', 'normal');
+    doc.text("ASSINATURA: ____________________________   CPF/RG: ____________________________", 10, y);
+    doc.save(`Pedido_${pedido.numero || pedido.cliente}.pdf`);
   };
 
   // Filtro
@@ -275,7 +265,7 @@ export default function Orders() {
   return (
     <>
       <Header />
-      <main className="p-2 sm:p-4 max-w-full md:max-w-2xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 mb-4">
+      <main className="p-2 sm:p-4 max-w-full md:max-w-3xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 mb-4">
         <button
           className="mb-4 bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
           onClick={() => router.push("/dashboard")}
@@ -294,15 +284,17 @@ export default function Orders() {
           loading={loading}
         />
         <SectionTitle className="mt-8 mb-2">Pedidos</SectionTitle>
-        <div className="flex flex-col sm:flex-row gap-2 mb-2">
-          <SearchInput value={search} onChange={e => setSearch(e.target.value)} placeholder="Pesquisar por cliente" />
-          <OrderExportMenu onExportarPDF={exportarPDF} />
-        </div>
+        <input
+          className="rounded p-2 text-black mb-2 w-full"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Pesquisar por cliente"
+        />
         <OrderList
-          pedidos={pedidos}
+          pedidos={pedidosFiltrados}
           search={search}
-          onEditar={handleEditarPedido}
-          onExcluir={handleExcluirPedido}
+          onEditar={setForm}
+          onExcluir={async (id) => { await supabase.from("pedidos").delete().eq("id", id); fetchPedidos(); }}
           onExportarPDF={exportarPedidoPDF}
         />
       </main>

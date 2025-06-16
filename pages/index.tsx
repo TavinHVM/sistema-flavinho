@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Header from "@/components/header";
+import Header from "@/components/Header";
 import ProdutoList from "@/components/ProdutoList";
 import ProdutoForm from "@/components/ProdutoForm";
 import ExportMenu from "@/components/ExportMenu";

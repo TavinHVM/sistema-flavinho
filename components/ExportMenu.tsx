@@ -18,7 +18,7 @@ export default function ExportMenu({
         onClick={() => setOpen(!open)}
         type="button"
       >
-        Exportar <span className="ml-1">⏷</span>
+        Imprimir <span className="ml-1">⏷</span>
       </button>
       {open && (
         <div className="absolute right-0 mt-1 min-w-[120px] w-32 bg-gray-800 border border-gray-700 rounded shadow-lg z-10">
