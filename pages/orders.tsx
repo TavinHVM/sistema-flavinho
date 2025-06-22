@@ -5,46 +5,15 @@ import autoTable from "jspdf-autotable";
 import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
 import OrderForm from "@/components/OrderForm";
-import OrderList from "@/components/OrderList";
+import OrderListV2 from "@/components/OrderList";
 import { useRouter } from "next/router";
+import { Pedido } from "../types/Pedido";
 
 interface PedidoItem {
   nome: string;
   quantidade: number;
   valor_unit: number;
   valor_total: number;
-}
-
-interface Pedido {
-  id: string;
-  numero: string;
-  data_locacao: string;
-  data_evento: string;
-  data_retirada: string;
-  data_devolucao: string;
-  cliente: string;
-  cpf: string;
-  endereco: string;
-  telefone: string;
-  residencial: string;
-  referencia: string;
-  materiais: PedidoItem[];
-  entrega: string;
-  busca: string;
-  pagamento: string;
-  valor_pago: number;
-  valor_total: number;
-  desconto: number;
-  responsavel_entregou: string;
-  data_entregou: string;
-  responsavel_recebeu: string;
-  data_recebeu: string;
-  responsavel_buscou: string;
-  data_buscou: string;
-  responsavel_conferiu_forro: string;
-  responsavel_conferiu_utensilio: string;
-  assinatura: string;
-  created_at: string;
 }
 
 export default function Orders() {
@@ -290,7 +259,7 @@ export default function Orders() {
           onChange={e => setSearch(e.target.value)}
           placeholder="Pesquisar por cliente"
         />
-        <OrderList
+        <OrderListV2
           pedidos={pedidosFiltrados}
           search={search}
           onEditar={setForm}
