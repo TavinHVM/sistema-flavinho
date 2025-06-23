@@ -2,7 +2,9 @@
 import React from "react";
 import { Document, Page, View, Text, StyleSheet, Image } from "@react-pdf/renderer";
 import { Pedido } from "../types/Pedido";
+import { formatDateBR } from "../lib/formatDate";
 import logoBase64 from "./logoBase64";
+import qrcodeBase64 from "./qrcodeBase64";
 
 const styles = StyleSheet.create({
   page: {
@@ -13,19 +15,25 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 4,
   },
+  infoEmpresa: {
+    flex: 1,
+    marginLeft: 8,
+  },
   title: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginVertical: 2,
-    marginTop: 24, // margem superior aumentada
-    marginBottom: 10
+    marginVertical: 4,
+  },
+  clausulas: {
+    fontSize: 10,
+    marginVertical: 4,
   },
   section: {
     marginVertical: 2,
+    textAlign: 'justify',
   },
   table: {
     display: 'flex',
@@ -41,38 +49,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   tableColHeader: {
-    width: '25%',
     borderStyle: 'solid',
     borderBottomWidth: 1,
     borderRightWidth: 1,
-    backgroundColor: '#222',
-    color: '#fff',
     fontWeight: 'bold',
     padding: 2,
     textAlign: 'center',
   },
-  logo: {
-    width: 80, // ajuste conforme necessário
-    height: 80, // ajuste conforme necessário
-  },
   tableCol: {
-    width: '25%',
     borderStyle: 'solid',
     borderBottomWidth: 1,
     borderRightWidth: 1,
     padding: 2,
     textAlign: 'center',
   },
-  obs: {
-    fontSize: 8,
-    color: '#444',
-    marginTop: 4,
-  },
   assinatura: {
     marginTop: 16,
     fontSize: 10,
-    textAlign: 'left',
+    textAlign: 'justify',
   },
+  boldLine: {
+    marginTop: 4,
+    fontSize: 9,
+    fontWeight: 'bold',
+    color: 'red',
+    textAlign: 'center',
+  }
 });
 
 interface PedidoPDFProps {
@@ -82,57 +84,122 @@ interface PedidoPDFProps {
 const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
   <Document>
     <Page size="A4" style={styles.page}>
+      {/* Header */}
       <View style={styles.header}>
-        {logoBase64 ? (
-          <Image src={logoBase64} style={styles.logo} />
-        ) : (
-          <View style={{ width: 70, height: 40, backgroundColor: '#eee', justifyContent: 'center', alignItems: 'center' }}>
-            <Text>LOGO</Text>
-          </View>
-        )}
-        <View style={{ flex: 1, marginLeft: 8 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 12 }}>FLAVINHO Espaço Locações & Festa</Text>
+        {logoBase64 && <Image src={logoBase64} style={{ width: 70, height: 70 }} />}
+        <View style={{ width: 70, height: 70 }}>
+          <Image src={qrcodeBase64} style={{ width: 70, height: 70 }} />
+        </View>
+        <View style={styles.infoEmpresa}>
+          <Text style={{ fontWeight: 'bold', fontSize: 10 }}>FLAVINHO Espaço Locações & Festa</Text>
+          <Text>joaoflavio.20@hotmail.com</Text>
+          <Text>(62) 3273-4463  (62) 99137-9037</Text>
           <Text>CNPJ 25.192.935/0001-48 PIX</Text>
           <Text>Av. Bela Vista Qd. 18 Lt. 03 - Parque Trindade I - Ap. de Goiânia - GO</Text>
         </View>
       </View>
-      <Text style={{ color: 'red', fontWeight: 'bold', fontSize: 10, marginBottom: 2 }}>
-        ATENÇÃO: TODOS OS MATERIAIS DEVEM SER CONFERIDOS PELO CLIENTE NO RECEBIMENTO DO MESMO.
-      </Text>
-      <Text style={styles.obs}>
-        OBS.: QUALQUER DEFEITO NOS MESMOS SERÁ COBRADO O VALOR DO MESMO OU REPOSIÇÃO COM OUTRO DO MESMO MODELO.
-      </Text>
+
+      {/* Atenção */}
+      <Text style={{ fontWeight: 'bold', fontSize: 12, textAlign: 'center', marginVertical: 4 }}>ATENÇÃO</Text>
+      <Text style={{ fontSize: 9, textAlign: 'center' }}>*TODOS OS MATERIAIS DEVERÃO SER CONFERIDOS PELO CLIENTE NO RECEBIMENTO DO MESMO.</Text>
+      <Text style={{ fontSize: 8, textAlign: 'center', marginBottom: 2 }}>OBS.: QUALQUER DEFEITO NOS MESMOS SERÁ COBRADO O VALOR DO MESMO OU REPOSIÇÃO COM OUTRO DO MESMO MODELO.</Text>
+      <Text style={{ fontWeight: 'bold', fontSize: 12, textAlign: 'center', marginVertical: 4, marginTop: 16 }}>CLÁUSULAS DO CONTRATO</Text>
+      <View style={styles.clausulas}>
+        <Text>1 - O material será cobrado aluguel de 12 em 12 horas</Text>
+        <Text>2 - Somente materiais de cozinha receberão limpos e deverão devolver limpos(O mesmo não entregue limpo, será cobrado taxa de limpeza)</Text>
+        <Text>3 - O material só será recebido em perfeito estado</Text>
+        <Text>4 - Todos os materiais deverão ser conferidos, Não aceitamos reclamações posteriores</Text>
+        <Text>5 - Deposita ao cliente qualificado, devidamente comprovado através de quitação devida recebida</Text>
+        <Text>6 - O material alocado, incide contrato de art. 1256 do CC. Suplantado-se de oposição de responsabilidade do Fide Depositário, exegível conforme art. 901-902 CPC</Text>
+        <Text>7 - O material danificado poderá ser substituído por outro do mesmo modelo igual e na mesma. Caso isso não ocorra, será cobrado o valor do produto.</Text>
+      </View>
+
+      {/* Dados */}
       <Text style={styles.title}>CONTRATO DE LOCAÇÃO</Text>
       <View style={styles.section}>
-        <Text>DATA DA LOCAÇÃO: {pedido.data_locacao}   DATA DO EVENTO: {pedido.data_evento}   DEVOLVER: {pedido.data_devolucao}</Text>
-        <Text>NOME: {pedido.cliente}   CPF: {pedido.cpf}</Text>
+        <Text>DATA DA LOCAÇÃO: {formatDateBR(pedido.data_locacao)}   DATA DO EVENTO: {formatDateBR(pedido.data_evento)}   DEVOLVER: {formatDateBR(pedido.data_devolucao)}</Text>
+        <Text>NOME: {pedido.cliente}</Text>
         <Text>LOCAL DO EVENTO: {pedido.endereco}   FONE CELULAR: {pedido.telefone}</Text>
         <Text>END. RESIDENCIAL: {pedido.residencial}   FONE REFERÊNCIA: {pedido.referencia}</Text>
       </View>
+
+      {/* Tabela */}
       <View style={styles.table}>
         <View style={styles.tableRow}>
-          <Text style={styles.tableColHeader}>QUANT.</Text>
-          <Text style={styles.tableColHeader}>MATERIAL</Text>
-          <Text style={styles.tableColHeader}>VALOR UNIT.</Text>
-          <Text style={styles.tableColHeader}>VALOR TOTAL</Text>
+          <Text style={{ ...styles.tableColHeader, width: '15%' }}>QUANT.</Text>
+          <Text style={{ ...styles.tableColHeader, width: '45%' }}>MATERIAL</Text>
+          <Text style={{ ...styles.tableColHeader, width: '20%' }}>VALOR UNIT.</Text>
+          <Text style={{ ...styles.tableColHeader, width: '20%' }}>VALOR TOTAL</Text>
         </View>
         {pedido.materiais.map((mat, idx) => (
           <View style={styles.tableRow} key={idx}>
-            <Text style={styles.tableCol}>{mat.quantidade}</Text>
-            <Text style={styles.tableCol}>{mat.nome}</Text>
-            <Text style={styles.tableCol}>R$ {mat.valor_unit?.toFixed(2)}</Text>
-            <Text style={styles.tableCol}>R$ {mat.valor_total?.toFixed(2)}</Text>
+            <Text style={{ ...styles.tableCol, width: '15%' }}>{mat.quantidade}</Text>
+            <Text style={{ ...styles.tableCol, width: '45%' }}>{mat.nome}</Text>
+            <Text style={{ ...styles.tableCol, width: '20%' }}>R$ {mat.valor_unit?.toFixed(2)}</Text>
+            <Text style={{ ...styles.tableCol, width: '20%' }}>R$ {mat.valor_total?.toFixed(2)}</Text>
           </View>
         ))}
       </View>
+
+      {/* Rodapé */}
       <View style={styles.section}>
-        <Text>RESP. ENTREGOU: {pedido.responsavel_entregou}   DATA: {pedido.data_entregou}   HORÁRIO: ______   DESCONTO: R$ {pedido.desconto?.toFixed(2)}</Text>
-        <Text>RESP. RECEBEU: {pedido.responsavel_recebeu}   DATA: {pedido.data_recebeu}   HORÁRIO: ______</Text>
-        <Text>RESP. BUSCOU: {pedido.responsavel_buscou}   DATA: {pedido.data_buscou}   HORÁRIO: ______   TOTAL: R$ {pedido.valor_total?.toFixed(2)}</Text>
-        <Text>RESP. CONFERIU FORRO: {pedido.responsavel_conferiu_forro}</Text>
-        <Text>RESP. CONFERIU UTENSÍLIO: {pedido.responsavel_conferiu_utensilio}</Text>
+        {/* Linha 1: ENTREGOU (esquerda), DATA (centro), HORÁRIO (direita), DESCONTO (direita) */}
+        <View style={{ flexDirection: 'row', marginBottom: 2 }}>
+          <Text style={{ flex: 2, textAlign: 'left' }}>
+            RESP. ENTREGOU: {pedido.responsavel_entregou}
+          </Text>
+          <Text style={{ flex: 1, textAlign: 'center' }}>
+            DATA: {formatDateBR(pedido.data_entregou)}
+          </Text>
+          <Text style={{ flex: 1, textAlign: 'center' }}>
+            HORÁRIO: ______
+          </Text>
+          <Text style={{ flex: 1, textAlign: 'right' }}>
+            DESCONTO: R$ {pedido.desconto?.toFixed(2)}
+          </Text>
+        </View>
+        {/* Linha 2: RECEBEU (esquerda), DATA (centro), HORÁRIO (direita) */}
+        <View style={{ flexDirection: 'row', marginBottom: 2 }}>
+          <Text style={{ flex: 2, textAlign: 'left' }}>
+            RESP. RECEBEU: {pedido.responsavel_recebeu}
+          </Text>
+          <Text style={{ flex: 1, textAlign: 'center' }}>
+            DATA: {formatDateBR(pedido.data_recebeu)}
+          </Text>
+          <Text style={{ flex: 2, textAlign: 'left' }}>
+            HORÁRIO: ______
+          </Text>
+        </View>
+        {/* Linha 3: BUSCOU (esquerda), DATA (centro), HORÁRIO (direita), TOTAL (direita) */}
+        <View style={{ flexDirection: 'row', marginBottom: 2 }}>
+          <Text style={{ flex: 2, textAlign: 'left' }}>
+            RESP. BUSCOU: {pedido.responsavel_buscou}
+          </Text>
+          <Text style={{ flex: 1, textAlign: 'center' }}>
+            DATA: {formatDateBR(pedido.data_buscou)}
+          </Text>
+          <Text style={{ flex: 1, textAlign: 'center' }}>
+            HORÁRIO: ______
+          </Text>
+          <Text style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>
+            TOTAL: R$ {pedido.valor_total?.toFixed(2)}
+          </Text>
+        </View>
+        {/* Linha 4: CONFERIU FORRO */}
+        <View style={{ flexDirection: 'row', marginBottom: 2 }}>
+          <Text style={{ flex: 1, textAlign: 'left' }}>
+            RESP. CONFERIU FORRO: {pedido.responsavel_conferiu_forro}
+          </Text>
+        </View>
+        {/* Linha 5: CONFERIU UTENSÍLIO */}
+        <View style={{ flexDirection: 'row', marginBottom: 2 }}>
+          <Text style={{ flex: 1, textAlign: 'left' }}>
+            RESP. CONFERIU UTENSÍLIO: {pedido.responsavel_conferiu_utensilio}
+          </Text>
+        </View>
       </View>
-      <Text style={styles.assinatura}>
+
+      <Text style={{ ...styles.assinatura, fontWeight: 'bold', marginTop: 16 }}>
         CERTIFICO QUE EU CONFERI TODO MATERIAL E RESPONSABILIZO POR TODO E QUALQUER MATERIAL PRESCRITO NESTE CONTRATO.
       </Text>
       <Text style={styles.assinatura}>

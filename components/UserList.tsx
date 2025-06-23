@@ -1,4 +1,5 @@
 import { FaTrash, FaEdit } from "react-icons/fa";
+import { formatDateBR } from "../lib/formatDate";
 
 interface User {
   id: string;
@@ -6,6 +7,7 @@ interface User {
   email: string;
   role: string;
   last_modified_by: string;
+  last_modified_at: string;
 }
 
 interface UserListProps {
@@ -28,6 +30,7 @@ export default function UserList({ users, search, onEditar, onExcluir }: UserLis
             <th className="py-3 px-4 text-left">Nome</th>
             <th className="py-3 px-4 text-left">Email</th>
             <th className="py-3 px-4 text-left">Cargo</th>
+            <th className="py-3 px-4 text-left">Última Modificação</th>
             <th className="py-3 px-4 text-left">Ações</th>
           </tr>
         </thead>
@@ -37,6 +40,9 @@ export default function UserList({ users, search, onEditar, onExcluir }: UserLis
               <td className="py-4 px-4">{user.nome}</td>
               <td className="py-4 px-4">{user.email}</td>
               <td className="py-4 px-4">{user.role}</td>
+              <td className="py-4 px-4">
+                {user.last_modified_at ? formatDateBR(user.last_modified_at) : '-'}
+              </td>
               <td className="py-4 px-4">
                 <div className="flex gap-2">
                   <button

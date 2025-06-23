@@ -8,6 +8,7 @@ import OrderForm from "@/components/OrderForm";
 import OrderList from "@/components/OrderList";
 import { useRouter } from "next/router";
 import { Pedido } from "../types/Pedido";
+import { formatDateBR } from "../lib/formatDate";
 
 interface PedidoItem {
   nome: string;
@@ -178,9 +179,9 @@ export default function Orders() {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     // --- Dados principais ---
-    doc.text(`DATA DA LOCAÇÃO: ${pedido.data_locacao || ""}`, 10, 48);
-    doc.text(`DATA DO EVENTO: ${pedido.data_evento || ""}`, 80, 48);
-    doc.text(`DEVOLVER: ${pedido.data_devolucao || ""}`, 150, 48);
+    doc.text(`DATA DA LOCAÇÃO: ${formatDateBR(pedido.data_locacao)}`, 10, 48);
+    doc.text(`DATA DO EVENTO: ${formatDateBR(pedido.data_evento)}`, 80, 48);
+    doc.text(`DEVOLVER: ${formatDateBR(pedido.data_devolucao)}`, 150, 48);
     doc.text(`NOME: ${pedido.cliente || ""}`, 10, 54);
     doc.text(`CPF: ${pedido.cpf || ""}`, 150, 54);
     doc.text(`LOCAL DO EVENTO: ${pedido.endereco || ""}`, 10, 60);
@@ -207,11 +208,11 @@ export default function Orders() {
     let y = (doc as any).lastAutoTable.finalY + 6;
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`RESP. ENTREGOU: ${pedido.responsavel_entregou || ""}   DATA: ${pedido.data_entregou || ""}   HORÁRIO: ______   DESCONTO: R$ ${(pedido.desconto || 0).toFixed(2)}`, 10, y);
+    doc.text(`RESP. ENTREGOU: ${pedido.responsavel_entregou || ""}   DATA: ${formatDateBR(pedido.data_entregou)}   HORÁRIO: ______   DESCONTO: R$ ${(pedido.desconto || 0).toFixed(2)}`, 10, y);
     y += 6;
-    doc.text(`RESP. RECEBEU: ${pedido.responsavel_recebeu || ""}   DATA: ${pedido.data_recebeu || ""}   HORÁRIO: ______`, 10, y);
+    doc.text(`RESP. RECEBEU: ${pedido.responsavel_recebeu || ""}   DATA: ${formatDateBR(pedido.data_recebeu)}   HORÁRIO: ______`, 10, y);
     y += 6;
-    doc.text(`RESP. BUSCOU: ${pedido.responsavel_buscou || ""}   DATA: ${pedido.data_buscou || ""}   HORÁRIO: ______   TOTAL: R$ ${(pedido.valor_total || 0).toFixed(2)}`, 10, y);
+    doc.text(`RESP. BUSCOU: ${pedido.responsavel_buscou || ""}   DATA: ${formatDateBR(pedido.data_buscou)}   HORÁRIO: ______   TOTAL: R$ ${(pedido.valor_total || 0).toFixed(2)}`, 10, y);
     y += 6;
     doc.text(`RESP. CONFERIU FORRO: ${pedido.responsavel_conferiu_forro || ""}`, 10, y);
     y += 6;

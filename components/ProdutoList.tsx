@@ -1,4 +1,5 @@
 import { FaTrash, FaEdit } from "react-icons/fa";
+import { formatDateBR } from "../lib/formatDate";
 
 type Produto = {
   id: string;
@@ -6,6 +7,7 @@ type Produto = {
   quantidade_empresa: number;
   quantidade_rua: number;
   last_modified_by: string;
+  last_modified_at: string;
 };
 
 interface ProdutoListProps {
@@ -54,7 +56,7 @@ export default function ProdutoList({
                   {produto.quantidade_empresa + produto.quantidade_rua}
                 </td>
                 <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">
-                  {produto.last_modified_by || "N/A"}
+                  {produto.last_modified_at ? formatDateBR(produto.last_modified_at) : "-"}
                 </td>
                 <td className="py-4 px-4">
                   <div className="flex gap-2">

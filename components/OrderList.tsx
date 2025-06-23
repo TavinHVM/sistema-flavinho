@@ -4,6 +4,7 @@ import OrderDetailsModal from "./OrderDetailsModal";
 import { Pedido } from "../types/Pedido";
 import { pdf } from "@react-pdf/renderer";
 import PedidoPDF from "./PedidoPDF";
+import { formatDateBR } from "../lib/formatDate";
 
 interface OrderListProps {
   pedidos: Pedido[];
@@ -87,8 +88,8 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
             <tr key={p.id || p.numero || idx} className="border-b border-gray-800">
               <td className="p-2">{p.numero}</td>
               <td className="p-2">{p.cliente}</td>
-              <td className="p-2">{p.data_locacao}</td>
-              <td className="p-2">{p.data_evento || '-'}</td>
+              <td className="p-2">{formatDateBR(p.data_locacao)}</td>
+              <td className="p-2">{formatDateBR(p.data_evento) || '-'}</td>
               <td className="p-2">{p.endereco || '-'}</td>
               <td className="p-2">R$ {p.valor_total?.toFixed(2)}</td>
               <td className="p-2">

@@ -13,13 +13,15 @@ import SectionTitle from "@/components/SectionTitle";
 import SearchInput from "@/components/SearchInput";
 import RefreshButton from "@/components/RefreshButton";
 import PainelAdminButton from "@/components/PainelAdminButton";
+import { formatDateBR } from "../lib/formatDate";
 
 type Produto = {
-  last_modified_by: string;
   id: string;
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
+  last_modified_by: string;
+  last_modified_at: string;
   created_at: string;
 };
 

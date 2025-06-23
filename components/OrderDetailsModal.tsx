@@ -1,6 +1,7 @@
 import React from "react";
 import OrderMaterialsList from "./OrderMaterialsList";
 import { Pedido } from "../types/Pedido";
+import { formatDateBR } from "../lib/formatDate";
 
 interface Props {
   pedido: Pedido | null;
@@ -19,10 +20,10 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose }) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-white">
           <div><b>Nº:</b> {pedido.numero}</div>
-          <div><b>Data Locação:</b> {pedido.data_locacao}</div>
-          <div><b>Data Evento:</b> {pedido.data_evento}</div>
-          <div><b>Data Retirada:</b> {pedido.data_retirada}</div>
-          <div><b>Data Devolução:</b> {pedido.data_devolucao}</div>
+          <div><b>Data Locação:</b> {formatDateBR(pedido.data_locacao)}</div>
+          <div><b>Data Evento:</b> {formatDateBR(pedido.data_evento)}</div>
+          <div><b>Data Retirada:</b> {formatDateBR(pedido.data_retirada)}</div>
+          <div><b>Data Devolução:</b> {formatDateBR(pedido.data_devolucao)}</div>
           <div><b>Cliente:</b> {pedido.cliente}</div>
           <div><b>CPF:</b> {pedido.cpf}</div>
           <div><b>Telefone:</b> {pedido.telefone}</div>
@@ -41,9 +42,9 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose }) => {
           <OrderMaterialsList materiais={pedido.materiais} />
         </div>
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-white">
-          <div><b>Resp. Entregou:</b> {pedido.responsavel_entregou} <b>Data:</b> {pedido.data_entregou}</div>
-          <div><b>Resp. Recebeu:</b> {pedido.responsavel_recebeu} <b>Data:</b> {pedido.data_recebeu}</div>
-          <div><b>Resp. Buscou:</b> {pedido.responsavel_buscou} <b>Data:</b> {pedido.data_buscou}</div>
+          <div><b>Resp. Entregou:</b> {pedido.responsavel_entregou} <b>Data:</b> {formatDateBR(pedido.data_entregou)}</div>
+          <div><b>Resp. Recebeu:</b> {pedido.responsavel_recebeu} <b>Data:</b> {formatDateBR(pedido.data_recebeu)}</div>
+          <div><b>Resp. Buscou:</b> {pedido.responsavel_buscou} <b>Data:</b> {formatDateBR(pedido.data_buscou)}</div>
           <div><b>Resp. Conferiu Forro:</b> {pedido.responsavel_conferiu_forro}</div>
           <div><b>Resp. Conferiu Utensílio:</b> {pedido.responsavel_conferiu_utensilio}</div>
           <div><b>Assinatura:</b> {pedido.assinatura}</div>

@@ -16,7 +16,12 @@ export default function UserManagement() {
   const [message, setMessage] = useState("");
   const [users, setUsers] = useState<
     {
-      last_modified_by: string; id: string; nome: string; email: string; role: string
+      last_modified_by: string; 
+      id: string; 
+      nome: string; 
+      email: string; 
+      role: string; 
+      last_modified_at: string;
     }[]
   >([]);
   const [loading, setLoading] = useState(false);
@@ -33,7 +38,17 @@ export default function UserManagement() {
       setMessage("Erro ao buscar usuários: " + error.message);
       setUsers([]);
     } else {
-      setUsers(data);
+      // Ensure last_modified_at is present for each user
+      setUsers(
+        (data || []).map((user: any) => ({
+          id: user.id,
+          nome: user.nome,
+          email: user.email,
+          role: user.role,
+          last_modified_by: user.last_modified_by,
+          last_modified_at: user.last_modified_at || "",
+        }))
+      );
     }
     setLoading(false);
   };
