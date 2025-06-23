@@ -1,11 +1,24 @@
 import React from "react";
+import { Pedido } from "../types/Pedido";
+
+interface Material {
+  nome: string;
+  quantidade: number;
+  valor_unit: number;
+  valor_total: number;
+}
+
+interface Produto {
+  id: string;
+  nome: string;
+}
 
 interface OrderFormProps {
-  form: any;
-  setForm: (f: any) => void;
-  produtos: any[];
+  form: Pedido & { materiais: Material[] };
+  setForm: (f: Pedido & { materiais: Material[] }) => void;
+  produtos: Produto[];
   onSubmit: () => void;
-  handleMaterialChange: (idx: number, field: string, value: any) => void;
+  handleMaterialChange: (idx: number, field: string, value: string | number) => void;
   addMaterial: () => void;
   removeMaterial: (idx: number) => void;
   loading?: boolean;
@@ -134,15 +147,15 @@ const OrderForm: React.FC<OrderFormProps> = ({
       <div className="flex flex-col md:flex-row gap-2 mt-2">
         <div className="flex-1">
           <label className="text-xs text-gray-300 font-semibold">Valor Pago (R$)</label>
-          <input className="rounded p-2 text-black w-full" type="number" value={form.valor_pago} onChange={e => setForm({ ...form, valor_pago: e.target.value })} />
+          <input className="rounded p-2 text-black w-full" type="number" value={form.valor_pago} onChange={e => setForm({ ...form, valor_pago: Number(e.target.value) })} />
         </div>
         <div className="flex-1">
           <label className="text-xs text-gray-300 font-semibold">Desconto (R$)</label>
-          <input className="rounded p-2 text-black w-full" type="number" value={form.desconto} onChange={e => setForm({ ...form, desconto: e.target.value })} />
+          <input className="rounded p-2 text-black w-full" type="number" value={form.desconto} onChange={e => setForm({ ...form, desconto: Number(e.target.value) })} />
         </div>
         <div className="flex-1">
           <label className="text-xs text-gray-300 font-semibold">Valor Total (R$)</label>
-          <input className="rounded p-2 text-black w-full" type="number" value={form.valor_total} onChange={e => setForm({ ...form, valor_total: e.target.value })} />
+          <input className="rounded p-2 text-black w-full" type="number" value={form.valor_total} onChange={e => setForm({ ...form, valor_total: Number(e.target.value) })} />
         </div>
       </div>
       {/* Linha 7: Responsáveis */}

@@ -6,12 +6,19 @@ import { pdf } from "@react-pdf/renderer";
 import PedidoPDF from "./PedidoPDF";
 import { formatDateBR } from "../lib/formatDate";
 
+interface Material {
+  nome: string;
+  quantidade: number;
+  valor_unit: number;
+  valor_total: number;
+}
+
 interface OrderListProps {
-  pedidos: Pedido[];
+  pedidos: (Pedido & { materiais: Material[] })[];
   search: string;
-  onEditar?: (pedido: Pedido) => void;
+  onEditar?: (pedido: Pedido & { materiais: Material[] }) => void;
   onExcluir?: (id: string) => void;
-  onExportarPDF?: (pedido: Pedido) => void;
+  onExportarPDF?: (pedido: Pedido & { materiais: Material[] }) => void;
 }
 
 const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir }) => {

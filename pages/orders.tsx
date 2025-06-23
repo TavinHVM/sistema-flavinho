@@ -7,11 +7,11 @@ import SectionTitle from "@/components/SectionTitle";
 import OrderForm from "@/components/OrderForm";
 import OrderList from "@/components/OrderList";
 import { useRouter } from "next/router";
-import { Pedido } from "../types/Pedido";
+import { Pedido, PedidoItem } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 
 export default function Orders() {
-  const [form, setForm] = useState<any>({
+  const [form, setForm] = useState<Pedido & { materiais: PedidoItem[] }>({
     numero: "",
     data_locacao: "",
     data_evento: "",
@@ -27,9 +27,9 @@ export default function Orders() {
     entrega: "",
     busca: "",
     pagamento: "",
-    valor_pago: "",
-    valor_total: "",
-    desconto: "",
+    valor_pago: 0,
+    valor_total: 0,
+    desconto: 0,
     responsavel_entregou: "",
     data_entregou: "",
     responsavel_recebeu: "",
@@ -41,7 +41,7 @@ export default function Orders() {
     assinatura: "",
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  const [produtos, setProdutos] = useState<any[]>([]);
+  const [produtos, setProdutos] = useState<{ id: string; nome: string; quantidade_empresa: number; quantidade_rua: number }[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -64,7 +64,11 @@ export default function Orders() {
 
   const handleMaterialChange = (idx: number, field: string, value: any) => {
     const materiais = [...form.materiais];
-    materiais[idx][field] = value;
+    if (field === "quantidade" || field === "valor_unit" || field === "valor_total") {
+      (materiais[idx] as any)[field] = Number(value);
+    } else {
+      (materiais[idx] as any)[field] = value;
+    }
     if (field === "quantidade" || field === "valor_unit") {
       materiais[idx].valor_total = (materiais[idx].quantidade || 0) * (materiais[idx].valor_unit || 0);
     }
@@ -96,13 +100,13 @@ export default function Orders() {
       }
     }
     // Calcular valor total
-    const valor_total = form.materiais.reduce((acc: number, m: any) => acc + (m.valor_total || 0), 0) - parseFloat(form.desconto || 0);
+    const valor_total = form.materiais.reduce((acc: number, m: any) => acc + (m.valor_total || 0), 0) - parseFloat(form.desconto?.toString() || "0");
     // Salvar pedido
     const pedidoParaSalvar = {
       ...form,
       valor_total,
-      valor_pago: parseFloat(form.valor_pago || 0),
-      desconto: parseFloat(form.desconto || 0),
+      valor_pago: parseFloat(form.valor_pago?.toString() || "0"),
+      desconto: parseFloat(form.desconto?.toString() || "0"),
       created_at: new Date().toISOString(),
     };
     const { error } = await supabase.from("pedidos").insert([pedidoParaSalvar]);
@@ -124,9 +128,9 @@ export default function Orders() {
         entrega: "",
         busca: "",
         pagamento: "",
-        valor_pago: "",
-        valor_total: "",
-        desconto: "",
+        valor_pago: 0,
+        valor_total: 0,
+        desconto: 0,
         responsavel_entregou: "",
         data_entregou: "",
         responsavel_recebeu: "",
@@ -256,7 +260,17 @@ export default function Orders() {
         <OrderList
           pedidos={pedidosFiltrados}
           search={search}
-          onEditar={setForm}
+          onEditar={(pedido) => {
+            setForm({
+              ...pedido,
+              materiais: pedido.materiais.map((mat: PedidoItem) => ({
+                nome: mat.nome,
+                quantidade: mat.quantidade,
+                valor_unit: mat.valor_unit,
+                valor_total: mat.valor_total,
+              })),
+            });
+          }}
           onExcluir={async (id) => { await supabase.from("pedidos").delete().eq("id", id); fetchPedidos(); }}
           onExportarPDF={exportarPedidoPDF}
         />

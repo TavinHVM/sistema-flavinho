@@ -86,9 +86,9 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
     <Page size="A4" style={styles.page}>
       {/* Header */}
       <View style={styles.header}>
-        {logoBase64 && <Image src={logoBase64} style={{ width: 70, height: 70 }} />}
+        {logoBase64 && <Image src={logoBase64} style={{ width: 70, height: 70 }} alt="" />}
         <View style={{ width: 70, height: 70 }}>
-          <Image src={qrcodeBase64} style={{ width: 70, height: 70 }} />
+          <Image src={qrcodeBase64} style={{ width: 70, height: 70 }} alt="" />
         </View>
         <View style={styles.infoEmpresa}>
           <Text style={{ fontWeight: 'bold', fontSize: 10 }}>FLAVINHO Espaço Locações & Festa</Text>

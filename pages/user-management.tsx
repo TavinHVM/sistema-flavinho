@@ -6,6 +6,15 @@ import Header from "../components/Header";
 import UserForm from "@/components/UserForm";
 import UserList from "@/components/UserList";
 
+interface User {
+  last_modified_by: string;
+  id: string;
+  nome: string;
+  email: string;
+  role: string;
+  last_modified_at: string;
+}
+
 export default function UserManagement() {
   const [form, setForm] = useState({
     nome: "",
@@ -14,16 +23,7 @@ export default function UserManagement() {
     role: "",
   });
   const [message, setMessage] = useState("");
-  const [users, setUsers] = useState<
-    {
-      last_modified_by: string; 
-      id: string; 
-      nome: string; 
-      email: string; 
-      role: string; 
-      last_modified_at: string;
-    }[]
-  >([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ nome: "", email: "", role: "", senha: "" });

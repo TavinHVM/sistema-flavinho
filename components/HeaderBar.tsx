@@ -1,4 +1,5 @@
 import { FaSignOutAlt } from "react-icons/fa";
+import Image from "next/image";
 
 interface HeaderBarProps {
   onLogout: () => void;
@@ -30,9 +31,11 @@ export default function HeaderBar({ onLogout }: HeaderBarProps) {
           </p>
         </div>
         <div className="flex-1 flex justify-end">
-          <img
+          <Image
             src="/favicon.ico"
             alt="Favicon"
+            width={112}
+            height={112}
             className="w-28 h-28 ml-0 mr-0"
           />
         </div>
