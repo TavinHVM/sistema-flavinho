@@ -1,12 +1,5 @@
 import React from "react";
 
-interface PedidoItem {
-  nome: string;
-  quantidade: number;
-  valor_unit: number;
-  valor_total: number;
-}
-
 interface OrderFormProps {
   form: any;
   setForm: (f: any) => void;

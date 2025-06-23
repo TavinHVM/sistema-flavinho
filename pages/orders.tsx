@@ -10,13 +10,6 @@ import { useRouter } from "next/router";
 import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 
-interface PedidoItem {
-  nome: string;
-  quantidade: number;
-  valor_unit: number;
-  valor_total: number;
-}
-
 export default function Orders() {
   const [form, setForm] = useState<any>({
     numero: "",

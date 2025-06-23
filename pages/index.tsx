@@ -13,7 +13,6 @@ import SectionTitle from "@/components/SectionTitle";
 import SearchInput from "@/components/SearchInput";
 import RefreshButton from "@/components/RefreshButton";
 import PainelAdminButton from "@/components/PainelAdminButton";
-import { formatDateBR } from "../lib/formatDate";
 
 type Produto = {
   id: string;

@@ -14,7 +14,7 @@ interface OrderListProps {
   onExportarPDF?: (pedido: Pedido) => void;
 }
 
-const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir, onExportarPDF }) => {
+const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir }) => {
   const [modalPedido, setModalPedido] = useState<Pedido | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
