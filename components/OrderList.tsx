@@ -13,7 +13,7 @@ interface OrderListProps {
   onExportarPDF?: (pedido: Pedido) => void;
 }
 
-const OrderListV2: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir, onExportarPDF }) => {
+const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir, onExportarPDF }) => {
   const [modalPedido, setModalPedido] = useState<Pedido | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -83,8 +83,8 @@ const OrderListV2: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onEx
           </tr>
         </thead>
         <tbody>
-          {pedidosFiltrados.map((p) => (
-            <tr key={p.id} className="border-b border-gray-800">
+          {pedidosFiltrados.map((p, idx) => (
+            <tr key={p.id || p.numero || idx} className="border-b border-gray-800">
               <td className="p-2">{p.numero}</td>
               <td className="p-2">{p.cliente}</td>
               <td className="p-2">{p.data_locacao}</td>
@@ -120,4 +120,4 @@ const OrderListV2: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onEx
   );
 };
 
-export default OrderListV2;
+export default OrderList;

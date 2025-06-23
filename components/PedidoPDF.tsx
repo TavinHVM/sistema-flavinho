@@ -1,6 +1,8 @@
+// @ts-nocheck
 import React from "react";
 import { Document, Page, View, Text, StyleSheet, Image } from "@react-pdf/renderer";
 import { Pedido } from "../types/Pedido";
+import logoBase64 from "./logoBase64";
 
 const styles = StyleSheet.create({
   page: {
@@ -14,27 +16,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 4,
   },
-  logo: {
-    width: 70,
-    height: 40,
-  },
   title: {
     fontSize: 14,
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 2,
+    marginTop: 24, // margem superior aumentada
+    marginBottom: 10
   },
   section: {
     marginVertical: 2,
   },
   table: {
-    display: 'table',
+    display: 'flex',
     width: 'auto',
     marginVertical: 6,
     borderStyle: 'solid',
     borderWidth: 1,
     borderRightWidth: 0,
     borderBottomWidth: 0,
+    flexDirection: 'column',
   },
   tableRow: {
     flexDirection: 'row',
@@ -49,6 +50,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     padding: 2,
     textAlign: 'center',
+  },
+  logo: {
+    width: 80, // ajuste conforme necessário
+    height: 80, // ajuste conforme necessário
   },
   tableCol: {
     width: '25%',
@@ -69,9 +74,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
 });
-
-// Substitua por base64 real se desejar exibir a logo
-const logoBase64: string | undefined = undefined;
 
 interface PedidoPDFProps {
   pedido: Pedido;

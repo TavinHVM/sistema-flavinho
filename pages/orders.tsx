@@ -5,7 +5,7 @@ import autoTable from "jspdf-autotable";
 import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
 import OrderForm from "@/components/OrderForm";
-import OrderListV2 from "@/components/OrderList";
+import OrderList from "@/components/OrderList";
 import { useRouter } from "next/router";
 import { Pedido } from "../types/Pedido";
 
@@ -259,7 +259,7 @@ export default function Orders() {
           onChange={e => setSearch(e.target.value)}
           placeholder="Pesquisar por cliente"
         />
-        <OrderListV2
+        <OrderList
           pedidos={pedidosFiltrados}
           search={search}
           onEditar={setForm}

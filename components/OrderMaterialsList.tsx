@@ -18,7 +18,7 @@ const OrderMaterialsList: React.FC<Props> = ({ materiais }) => {
       </thead>
       <tbody>
         {materiais.map((mat, idx) => (
-          <tr key={idx}>
+          <tr key={mat.nome + '-' + idx}>
             <td className="border px-2 py-1 text-center">{mat.quantidade}</td>
             <td className="border px-2 py-1">{mat.nome}</td>
             <td className="border px-2 py-1 text-right">R$ {mat.valor_unit?.toFixed(2)}</td>
