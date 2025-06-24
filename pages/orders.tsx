@@ -12,6 +12,10 @@ import { formatDateBR } from "../lib/formatDate";
 
 type PedidoItemField = keyof PedidoItem;
 
+interface JsPDFWithAutoTable extends jsPDF {
+  lastAutoTable?: { finalY: number };
+}
+
 export default function Orders() {
   const [form, setForm] = useState<Pedido & { materiais: PedidoItem[] }>({
     numero: "",
@@ -71,9 +75,9 @@ export default function Orders() {
   ) => {
     const materiais = [...form.materiais];
     if (field === "quantidade" || field === "valor_unit" || field === "valor_total") {
-      materiais[idx][field] = Number(value) as any;
+      materiais[idx][field] = Number(value) as PedidoItem[typeof field];
     } else if (field === "nome") {
-      materiais[idx][field] = value as any;
+      materiais[idx][field] = value as PedidoItem[typeof field];
     }
     if (field === "quantidade" || field === "valor_unit") {
       materiais[idx].valor_total = (materiais[idx].quantidade || 0) * (materiais[idx].valor_unit || 0);
@@ -208,7 +212,8 @@ export default function Orders() {
       theme: 'grid',
       tableWidth: 170,
     });
-    let y = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 6 : 78;
+    const docWithTable = doc as JsPDFWithAutoTable;
+    let y = docWithTable.lastAutoTable?.finalY ? docWithTable.lastAutoTable.finalY + 6 : 78;
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`RESP. ENTREGOU: ${pedido.responsavel_entregou || ""}   DATA: ${formatDateBR(pedido.data_entregou)}   HORÁRIO: ______   DESCONTO: R$ ${(pedido.desconto || 0).toFixed(2)}`, 10, y);
