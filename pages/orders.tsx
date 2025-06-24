@@ -10,6 +10,8 @@ import { useRouter } from "next/router";
 import { Pedido, PedidoItem } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 
+type PedidoItemField = keyof PedidoItem;
+
 export default function Orders() {
   const [form, setForm] = useState<Pedido & { materiais: PedidoItem[] }>({
     numero: "",
@@ -62,12 +64,16 @@ export default function Orders() {
   };
   useEffect(() => { fetchPedidos(); }, []);
 
-  const handleMaterialChange = (idx: number, field: string, value: string | number) => {
+  const handleMaterialChange = (
+    idx: number,
+    field: PedidoItemField,
+    value: string | number
+  ) => {
     const materiais = [...form.materiais];
     if (field === "quantidade" || field === "valor_unit" || field === "valor_total") {
-      (materiais[idx] as any)[field] = Number(value);
+      materiais[idx][field] = Number(value) as any;
     } else if (field === "nome") {
-      (materiais[idx] as any)[field] = value;
+      materiais[idx][field] = value as any;
     }
     if (field === "quantidade" || field === "valor_unit") {
       materiais[idx].valor_total = (materiais[idx].quantidade || 0) * (materiais[idx].valor_unit || 0);
@@ -245,7 +251,9 @@ export default function Orders() {
           setForm={setForm}
           produtos={produtos}
           onSubmit={salvarPedido}
-          handleMaterialChange={handleMaterialChange}
+          handleMaterialChange={
+            handleMaterialChange as (idx: number, field: string, value: string | number) => void
+          }
           addMaterial={addMaterial}
           removeMaterial={removeMaterial}
           loading={loading}
