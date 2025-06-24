@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Footer from "../components/Footer";
-import Header from "../components/Header"
+import Header from "../components/Header";
 
 export default function Dashboard() {
   const router = useRouter();
