@@ -40,7 +40,7 @@ export default function UserManagement() {
     } else {
       // Ensure last_modified_at is present for each user
       setUsers(
-        (data || []).map((user: any) => ({
+        (data || []).map((user: User) => ({
           id: user.id,
           nome: user.nome,
           email: user.email,

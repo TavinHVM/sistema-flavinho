@@ -62,11 +62,11 @@ export default function Orders() {
   };
   useEffect(() => { fetchPedidos(); }, []);
 
-  const handleMaterialChange = (idx: number, field: string, value: any) => {
+  const handleMaterialChange = (idx: number, field: string, value: string | number) => {
     const materiais = [...form.materiais];
     if (field === "quantidade" || field === "valor_unit" || field === "valor_total") {
       (materiais[idx] as any)[field] = Number(value);
-    } else {
+    } else if (field === "nome") {
       (materiais[idx] as any)[field] = value;
     }
     if (field === "quantidade" || field === "valor_unit") {
@@ -100,7 +100,7 @@ export default function Orders() {
       }
     }
     // Calcular valor total
-    const valor_total = form.materiais.reduce((acc: number, m: any) => acc + (m.valor_total || 0), 0) - parseFloat(form.desconto?.toString() || "0");
+    const valor_total = form.materiais.reduce((acc: number, m: PedidoItem) => acc + (m.valor_total || 0), 0) - parseFloat(form.desconto?.toString() || "0");
     // Salvar pedido
     const pedidoParaSalvar = {
       ...form,
@@ -148,7 +148,7 @@ export default function Orders() {
   };
 
   // PDF fiel ao contrato
-  const exportarPedidoPDF = (pedido: any) => {
+  const exportarPedidoPDF = (pedido: Pedido) => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     // --- LOGO ---
     // Para adicionar a logo, converta o favicon.ico para base64 PNG e substitua abaixo:
@@ -189,7 +189,7 @@ export default function Orders() {
     autoTable(doc, {
       startY: 72,
       head: [["QUANT.", "MATERIAL", "VALOR UNIT.", "VALOR TOTAL"]],
-      body: pedido.materiais.map((mat: any) => [
+      body: pedido.materiais.map((mat: PedidoItem) => [
         mat.quantidade,
         mat.nome,
         `R$ ${(mat.valor_unit || 0).toFixed(2)}`,
@@ -202,7 +202,7 @@ export default function Orders() {
       theme: 'grid',
       tableWidth: 170,
     });
-    let y = (doc as any).lastAutoTable.finalY + 6;
+    let y = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 6 : 78;
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`RESP. ENTREGOU: ${pedido.responsavel_entregou || ""}   DATA: ${formatDateBR(pedido.data_entregou)}   HORÁRIO: ______   DESCONTO: R$ ${(pedido.desconto || 0).toFixed(2)}`, 10, y);

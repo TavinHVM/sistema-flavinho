@@ -99,7 +99,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
               </tr>
             </thead>
             <tbody>
-              {form.materiais.map((mat: any, idx: number) => (
+              {form.materiais.map((mat: Material, idx: number) => (
                 <tr key={mat.nome + '-' + idx} className="border-b border-gray-500">
                   <td className="p-1">
                     <input className="rounded p-1 text-black w-16" type="number" min={1} value={mat.quantidade} onChange={e => handleMaterialChange(idx, "quantidade", parseInt(e.target.value))} />
