@@ -1,27 +1,9 @@
-import { FaSignOutAlt } from "react-icons/fa";
 import Image from "next/image";
 
-interface HeaderBarProps {
-  onLogout: () => void;
-}
-
-export default function HeaderBar({ onLogout }: HeaderBarProps) {
+export default function HeaderBar() {
   return (
     <header className="mb-8">
       <div className="w-full flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 relative">
-        <div className="flex-1 flex justify-start">
-          <a
-            href="#"
-            onClick={e => {
-              e.preventDefault();
-              onLogout();
-            }}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-poppins font-medium px-2 py-2 rounded transition-all ml-0"
-          >
-            <FaSignOutAlt />
-            Logout
-          </a>
-        </div>
         <div className="flex flex-col items-center justify-center">
           <h1 className="font-poppins text-[2rem] font-bold mb-1 text-center">
             Flavinho Festas
