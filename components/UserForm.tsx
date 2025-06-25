@@ -1,12 +1,13 @@
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
 import router from "next/router";
+import PainelAdminButton from "./PainelAdminButton";
 
 interface UserFormProps {
-  form: { nome: string; email: string; password: string; role: string };
-  setForm: (form: { nome: string; email: string; password: string; role: string }) => void;
-  onSubmit: () => void;
-  loading: boolean;
+    form: { nome: string; email: string; password: string; role: string };
+    setForm: (form: { nome: string; email: string; password: string; role: string }) => void;
+    onSubmit: () => void;
+    loading: boolean;
 }
 
 export default function UserForm({ form, setForm, onSubmit, loading }: UserFormProps) {
@@ -88,12 +89,7 @@ export default function UserForm({ form, setForm, onSubmit, loading }: UserFormP
                 Registrar
             </button>
 
-            <button
-                onClick={() => router.push("/dashboard")}
-                className="w-full bg-gray-600 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-gray-700 transition-all flex items-center justify-center"
-            >
-                Voltar ao Painel
-            </button>
+            <PainelAdminButton />
         </div>
     );
 }

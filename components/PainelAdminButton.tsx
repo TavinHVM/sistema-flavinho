@@ -28,7 +28,7 @@ export default function PainelAdminButton({ onClick }: PainelAdminButtonProps) {
   return (
     <button
       onClick={handleClick}
-      className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white font-poppins py-2 px-4 rounded transition-all"
+      className="w-full bg-gray-600 hover:bg-gray-700 text-white font-poppins py-2 px-4 rounded transition-all"
     >
       Voltar ao Painel
     </button>

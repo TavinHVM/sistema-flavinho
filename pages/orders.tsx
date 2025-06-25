@@ -9,6 +9,7 @@ import OrderList from "@/components/OrderList";
 import { useRouter } from "next/router";
 import { Pedido, PedidoItem } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
+import PainelAdminButton from "@/components/PainelAdminButton";
 
 type PedidoItemField = keyof PedidoItem;
 
@@ -258,12 +259,7 @@ export default function Orders() {
     <>
       <Header />
       <main className="p-2 sm:p-4 max-w-full md:max-w-3xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 mb-4">
-        <button
-          className="mb-4 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
-          onClick={() => router.push("/dashboard")}
-        >
-          Voltar ao Painel
-        </button>
+        <PainelAdminButton />
         <SectionTitle className="mt-2 mb-2">Novo Pedido</SectionTitle>
         <OrderForm
           form={form}
