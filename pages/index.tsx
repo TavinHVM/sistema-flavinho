@@ -259,7 +259,6 @@ export default function Home() {
       <Header />
       <main className="p-2 sm:p-4 md:p-8 max-w-full md:max-w-4xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 md:mt-8 mb-4 md:mb-8">
         <HeaderBar />
-
         <div ref={formRef}>
           <ProdutoForm
             form={form}

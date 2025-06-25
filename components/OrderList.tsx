@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaTrash, FaEdit, FaFilePdf, FaEye } from "react-icons/fa";
+import { FaTrash, FaEdit, FaFilePdf, FaEye, FaSortUp, FaSortDown } from "react-icons/fa";
 import OrderDetailsModal from "./OrderDetailsModal";
 import { Pedido } from "../types/Pedido";
 import { pdf } from "@react-pdf/renderer";
@@ -21,9 +21,36 @@ interface OrderListProps {
   onExportarPDF?: (pedido: Pedido & { materiais: Material[] }) => void;
 }
 
+type SortKey = "numero" | "cliente" | "data_locacao" | "data_evento" | "endereco" | "valor_total" | null;
+type SortOrder = "asc" | "desc" | null;
+
 const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir }) => {
   const [modalPedido, setModalPedido] = useState<Pedido | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const [sortKey, setSortKey] = useState<SortKey>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey !== key) {
+      setSortKey(key);
+      setSortOrder("asc");
+    } else if (sortOrder === "asc") {
+      setSortOrder("desc");
+    } else if (sortOrder === "desc") {
+      setSortKey(null);
+      setSortOrder(null);
+    } else {
+      setSortOrder("asc");
+    }
+  };
+
+  const getSortIcon = (key: SortKey) => {
+    if (sortKey !== key || !sortOrder) return null;
+    if (sortOrder === "asc") return <FaSortUp className="inline ml-1" />;
+    if (sortOrder === "desc") return <FaSortDown className="inline ml-1" />;
+    return null;
+  };
 
   const handleVerMais = (pedido: Pedido) => {
     setModalPedido(pedido);
@@ -75,22 +102,101 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
     p.cliente.toLowerCase().includes(search.toLowerCase())
   );
 
+  const pedidosOrdenados = (() => {
+    if (!sortKey || !sortOrder) return pedidosFiltrados;
+    return [...pedidosFiltrados].sort((a, b) => {
+      let aValue: any = a[sortKey as keyof typeof a];
+      let bValue: any = b[sortKey as keyof typeof b];
+
+      // Para valor_total, garantir número
+      if (sortKey === "valor_total") {
+        aValue = Number(aValue) || 0;
+        bValue = Number(bValue) || 0;
+        return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+      }
+      // Para datas, comparar como string
+      if (sortKey === "data_locacao" || sortKey === "data_evento") {
+        aValue = aValue || "";
+        bValue = bValue || "";
+        return sortOrder === "asc"
+          ? String(aValue).localeCompare(String(bValue))
+          : String(bValue).localeCompare(String(aValue));
+      }
+      // Para número do pedido (pode ser string ou número)
+      if (sortKey === "numero") {
+        aValue = aValue || "";
+        bValue = bValue || "";
+        return sortOrder === "asc"
+          ? String(aValue).localeCompare(String(bValue), undefined, { numeric: true })
+          : String(bValue).localeCompare(String(aValue), undefined, { numeric: true });
+      }
+      // Para strings
+      aValue = (aValue || "").toString().toLowerCase();
+      bValue = (bValue || "").toString().toLowerCase();
+      return sortOrder === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    });
+  })();
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs bg-gray-900 rounded">
         <thead>
           <tr className="bg-gray-700">
-            <th className="p-2">Nº</th>
-            <th className="p-2">Cliente</th>
-            <th className="p-2">Data Locação</th>
-            <th className="p-2">Data Evento</th>
-            <th className="p-2">Local do Evento</th>
-            <th className="p-2">Total</th>
-            <th className="p-2">Ações</th>
+            <th
+              className="p-2 cursor-pointer select-none min-w-[60px]"
+              onClick={() => handleSort("numero")}
+            >
+              <span className="flex items-center gap-1">
+                Nº {getSortIcon("numero")}
+              </span>
+            </th>
+            <th
+              className="p-2 cursor-pointer select-none min-w-[140px]"
+              onClick={() => handleSort("cliente")}
+            >
+              <span className="flex items-center gap-1">
+                Cliente {getSortIcon("cliente")}
+              </span>
+            </th>
+            <th
+              className="p-2 cursor-pointer select-none min-w-[110px]"
+              onClick={() => handleSort("data_locacao")}
+            >
+              <span className="flex items-center gap-1">
+                Data Locação {getSortIcon("data_locacao")}
+              </span>
+            </th>
+            <th
+              className="p-2 cursor-pointer select-none min-w-[110px]"
+              onClick={() => handleSort("data_evento")}
+            >
+              <span className="flex items-center gap-1">
+                Data Evento {getSortIcon("data_evento")}
+              </span>
+            </th>
+            <th
+              className="p-2 cursor-pointer select-none min-w-[140px]"
+              onClick={() => handleSort("endereco")}
+            >
+              <span className="flex items-center gap-1">
+                Local do Evento {getSortIcon("endereco")}
+              </span>
+            </th>
+            <th
+              className="p-2 cursor-pointer select-none min-w-[80px]"
+              onClick={() => handleSort("valor_total")}
+            >
+              <span className="flex items-center gap-1">
+                Total {getSortIcon("valor_total")}
+              </span>
+            </th>
+            <th className="p-2 min-w-[110px]">Ações</th>
           </tr>
         </thead>
         <tbody>
-          {pedidosFiltrados.map((p, idx) => (
+          {pedidosOrdenados.map((p, idx) => (
             <tr key={p.id || p.numero || idx} className="border-b border-gray-800">
               <td className="p-2">{p.numero}</td>
               <td className="p-2">{p.cliente}</td>
@@ -100,19 +206,37 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
               <td className="p-2">R$ {p.valor_total?.toFixed(2)}</td>
               <td className="p-2">
                 <div className="flex gap-1 flex-wrap">
-                  <button className="bg-gray-700 text-white rounded px-2 py-1 text-xs flex items-center gap-1" title="Exportar PDF" onClick={() => handleDownloadPDF(p)}>
+                  <button
+                    className="bg-gray-700 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
+                    title="Exportar PDF"
+                    onClick={() => handleDownloadPDF(p)}
+                  >
                     <FaFilePdf /> PDF
                   </button>
-                  <button className="bg-gray-600 text-white rounded px-2 py-1 text-xs flex items-center gap-1" onClick={() => handleVerMais(p)} title="Ver mais">
+                  <button
+                    className="bg-gray-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
+                    onClick={() => handleVerMais(p)}
+                    title="Ver mais"
+                  >
                     <FaEye /> Ver mais
                   </button>
                   {onEditar && (
-                    <button key="edit" className="bg-blue-600 text-white rounded px-2 py-1 text-xs flex items-center gap-1" onClick={() => onEditar(p)} title="Editar">
+                    <button
+                      key="edit"
+                      className="bg-blue-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
+                      onClick={() => onEditar(p)}
+                      title="Editar"
+                    >
                       <FaEdit /> Editar
                     </button>
                   )}
                   {onExcluir && p.id && (
-                    <button key="delete" className="bg-red-600 text-white rounded px-2 py-1 text-xs flex items-center gap-1" onClick={() => onExcluir(String(p.id))} title="Excluir">
+                    <button
+                      key="delete"
+                      className="bg-red-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
+                      onClick={() => onExcluir(String(p.id))}
+                      title="Excluir"
+                    >
                       <FaTrash /> Excluir
                     </button>
                   )}
