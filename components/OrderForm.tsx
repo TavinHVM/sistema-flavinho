@@ -1,5 +1,6 @@
 import React from "react";
 import { Pedido } from "../types/Pedido";
+import SectionTitle from "./SectionTitle";
 
 interface Material {
   nome: string;
@@ -35,7 +36,10 @@ const OrderForm: React.FC<OrderFormProps> = ({
   loading
 }) => {
   return (
-    <div className="bg-gray-800 rounded-lg p-3 flex flex-col gap-2">
+    <div className="mt-8 bg-gray-800 rounded-lg p-3 flex flex-col gap-2">
+      <div className="flex items-center justify-center mb-3">
+        <SectionTitle className="text-2xl">Novo Pedido</SectionTitle>
+      </div>
       {/* Linha 1: Datas */}
       <div className="flex flex-col md:flex-row gap-2">
         <div className="flex-1">

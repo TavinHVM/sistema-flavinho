@@ -98,7 +98,7 @@ export default function Orders() {
   const addMaterial = () => {
     setForm({ ...form, materiais: [...form.materiais, { nome: "", quantidade: 1, valor_unit: 0, valor_total: 0 }] });
   };
-  
+
   const removeMaterial = (idx: number) => {
     const materiais = [...form.materiais];
     materiais.splice(idx, 1);
@@ -260,19 +260,20 @@ export default function Orders() {
       <Header />
       <main className="p-2 sm:p-4 max-w-full md:max-w-3xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 mb-4">
         <PainelAdminButton />
-        <SectionTitle className="mt-2 mb-2">Novo Pedido</SectionTitle>
-        <OrderForm
-          form={form}
-          setForm={setForm}
-          produtos={produtos}
-          onSubmit={salvarPedido}
-          handleMaterialChange={
-            handleMaterialChange as (idx: number, field: string, value: string | number) => void
-          }
-          addMaterial={addMaterial}
-          removeMaterial={removeMaterial}
-          loading={loading}
-        />
+        <div className="flex justify-center">
+          <OrderForm
+            form={form}
+            setForm={setForm}
+            produtos={produtos}
+            onSubmit={salvarPedido}
+            handleMaterialChange={
+              handleMaterialChange as (idx: number, field: string, value: string | number) => void
+            }
+            addMaterial={addMaterial}
+            removeMaterial={removeMaterial}
+            loading={loading}
+          />
+        </div>
         <SectionTitle className="mt-8 mb-2">Pedidos</SectionTitle>
         <input
           className="rounded p-2 text-black mb-2 w-full"
