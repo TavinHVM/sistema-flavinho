@@ -52,20 +52,20 @@ export default function ProdutoList({
   };
 
   const sortedProdutos = (() => {
-    let filtered = produtos.filter((produto) =>
+    const filtered = produtos.filter((produto) =>
       produto.nome.toLowerCase().includes(search.toLowerCase())
     );
     if (!sortKey || !sortOrder) return filtered;
     return [...filtered].sort((a, b) => {
-      let aValue: any;
-      let bValue: any;
+      let aValue: unknown;
+      let bValue: unknown;
 
       if (sortKey === "total") {
         aValue = a.quantidade_empresa + a.quantidade_rua;
         bValue = b.quantidade_empresa + b.quantidade_rua;
         return sortOrder === "asc"
-          ? aValue - bValue
-          : bValue - aValue;
+          ? (aValue as number) - (bValue as number)
+          : (bValue as number) - (aValue as number);
       } else if (sortKey && sortKey in a && sortKey in b) {
         aValue = a[sortKey as keyof Produto];
         bValue = b[sortKey as keyof Produto];
@@ -76,27 +76,29 @@ export default function ProdutoList({
 
       // Para datas, comparar como datas
       if (sortKey === "last_modified_at") {
-        aValue = aValue || "";
-        bValue = bValue || "";
+        const aStr = (aValue ?? "") as string;
+        const bStr = (bValue ?? "") as string;
         return sortOrder === "asc"
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
+          ? aStr.localeCompare(bStr)
+          : bStr.localeCompare(aStr);
       }
       // Para números
       if (
         sortKey === "quantidade_empresa" ||
         sortKey === "quantidade_rua"
       ) {
+        const aNum = typeof aValue === "number" ? aValue : Number(aValue) || 0;
+        const bNum = typeof bValue === "number" ? bValue : Number(bValue) || 0;
         return sortOrder === "asc"
-          ? aValue - bValue
-          : bValue - aValue;
+          ? aNum - bNum
+          : bNum - aNum;
       }
       // Para strings
-      aValue = (aValue || "").toString().toLowerCase();
-      bValue = (bValue || "").toString().toLowerCase();
+      const aStr = (aValue ?? "").toString().toLowerCase();
+      const bStr = (bValue ?? "").toString().toLowerCase();
       return sortOrder === "asc"
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
+        ? aStr.localeCompare(bStr)
+        : bStr.localeCompare(aStr);
     });
   })();
 

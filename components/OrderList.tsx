@@ -105,37 +105,37 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
   const pedidosOrdenados = (() => {
     if (!sortKey || !sortOrder) return pedidosFiltrados;
     return [...pedidosFiltrados].sort((a, b) => {
-      let aValue: any = a[sortKey as keyof typeof a];
-      let bValue: any = b[sortKey as keyof typeof b];
+      let aValue: unknown = a[sortKey as keyof typeof a];
+      let bValue: unknown = b[sortKey as keyof typeof b];
 
       // Para valor_total, garantir número
       if (sortKey === "valor_total") {
-        aValue = Number(aValue) || 0;
-        bValue = Number(bValue) || 0;
-        return sortOrder === "asc" ? aValue - bValue : bValue - aValue;
+        const aNum = typeof aValue === "number" ? aValue : Number(aValue) || 0;
+        const bNum = typeof bValue === "number" ? bValue : Number(bValue) || 0;
+        return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
       }
       // Para datas, comparar como string
       if (sortKey === "data_locacao" || sortKey === "data_evento") {
-        aValue = aValue || "";
-        bValue = bValue || "";
+        const aStr = (aValue ?? "") as string;
+        const bStr = (bValue ?? "") as string;
         return sortOrder === "asc"
-          ? String(aValue).localeCompare(String(bValue))
-          : String(bValue).localeCompare(String(aValue));
+          ? String(aStr).localeCompare(String(bStr))
+          : String(bStr).localeCompare(String(aStr));
       }
       // Para número do pedido (pode ser string ou número)
       if (sortKey === "numero") {
-        aValue = aValue || "";
-        bValue = bValue || "";
+        const aStr = (aValue ?? "") as string;
+        const bStr = (bValue ?? "") as string;
         return sortOrder === "asc"
-          ? String(aValue).localeCompare(String(bValue), undefined, { numeric: true })
-          : String(bValue).localeCompare(String(aValue), undefined, { numeric: true });
+          ? String(aStr).localeCompare(String(bStr), undefined, { numeric: true })
+          : String(bStr).localeCompare(String(aStr), undefined, { numeric: true });
       }
       // Para strings
-      aValue = (aValue || "").toString().toLowerCase();
-      bValue = (bValue || "").toString().toLowerCase();
+      const aStr = (aValue ?? "").toString().toLowerCase();
+      const bStr = (bValue ?? "").toString().toLowerCase();
       return sortOrder === "asc"
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
+        ? aStr.localeCompare(bStr)
+        : bStr.localeCompare(aStr);
     });
   })();
 

@@ -1,6 +1,5 @@
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useState } from "react";
-import router from "next/router";
 import PainelAdminButton from "./PainelAdminButton";
 
 interface UserFormProps {
