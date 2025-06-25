@@ -245,7 +245,7 @@ export default function Orders() {
       <Header />
       <main className="p-2 sm:p-4 max-w-full md:max-w-3xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 mb-4">
         <button
-          className="mb-4 bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
+          className="mb-4 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
           onClick={() => router.push("/dashboard")}
         >
           Voltar ao Painel
