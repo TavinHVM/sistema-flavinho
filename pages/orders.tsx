@@ -16,9 +16,19 @@ interface JsPDFWithAutoTable extends jsPDF {
   lastAutoTable?: { finalY: number };
 }
 
+// Função utilitária para converter data pt-BR para ISO (yyyy-mm-dd)
+function toISODate(dateStr: string): string {
+  if (!dateStr) return "";
+  // Se já estiver no formato yyyy-mm-dd, retorna direto
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  // Se estiver no formato dd/mm/yyyy
+  const [d, m, y] = dateStr.split("/");
+  if (d && m && y) return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+  return dateStr;
+}
+
 export default function Orders() {
   const [form, setForm] = useState<Pedido & { materiais: PedidoItem[] }>({
-    numero: "",
     data_locacao: "",
     data_evento: "",
     data_retirada: "",
@@ -44,7 +54,6 @@ export default function Orders() {
     data_buscou: "",
     responsavel_conferiu_forro: "",
     responsavel_conferiu_utensilio: "",
-    assinatura: "",
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [produtos, setProdutos] = useState<{ id: string; nome: string; quantidade_empresa: number; quantidade_rua: number }[]>([]);
@@ -114,6 +123,13 @@ export default function Orders() {
     // Salvar pedido
     const pedidoParaSalvar = {
       ...form,
+      data_locacao: form.data_locacao ? toISODate(form.data_locacao) : null,
+      data_evento: form.data_evento ? toISODate(form.data_evento) : null,
+      data_retirada: form.data_retirada ? toISODate(form.data_retirada) : null,
+      data_devolucao: form.data_devolucao ? toISODate(form.data_devolucao) : null,
+      data_entregou: form.data_entregou ? toISODate(form.data_entregou) : null,
+      data_recebeu: form.data_recebeu ? toISODate(form.data_recebeu) : null,
+      data_buscou: form.data_buscou ? toISODate(form.data_buscou) : null,
       valor_total,
       valor_pago: parseFloat(form.valor_pago?.toString() || "0"),
       desconto: parseFloat(form.desconto?.toString() || "0"),
@@ -123,7 +139,6 @@ export default function Orders() {
     if (!error) {
       alert("Pedido salvo!");
       setForm({
-        numero: "",
         data_locacao: "",
         data_evento: "",
         data_retirada: "",
@@ -149,7 +164,6 @@ export default function Orders() {
         data_buscou: "",
         responsavel_conferiu_forro: "",
         responsavel_conferiu_utensilio: "",
-        assinatura: "",
       });
       fetchPedidos();
     } else {

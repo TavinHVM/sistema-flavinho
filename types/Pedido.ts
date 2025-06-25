@@ -7,7 +7,7 @@ export interface PedidoItem {
 
 export interface Pedido {
   id?: string;
-  numero: string;
+  numero?: string;
   data_locacao: string;
   data_evento: string;
   data_retirada?: string;
@@ -33,6 +33,5 @@ export interface Pedido {
   data_buscou?: string;
   responsavel_conferiu_forro?: string;
   responsavel_conferiu_utensilio?: string;
-  assinatura?: string;
   created_at?: string;
 }

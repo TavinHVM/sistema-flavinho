@@ -107,9 +107,12 @@ const OrderForm: React.FC<OrderFormProps> = ({
                   <td className="p-1">
                     <select className="rounded p-1 text-black w-full" value={mat.nome} onChange={e => handleMaterialChange(idx, "nome", e.target.value)}>
                       <option value="">Selecione</option>
-                      {produtos.map((p) => (
-                        <option key={p.id} value={p.nome}>{p.nome}</option>
-                      ))}
+                      {produtos
+                        .slice()
+                        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+                        .map((p) => (
+                          <option key={p.id} value={p.nome}>{p.nome}</option>
+                        ))}
                     </select>
                   </td>
                   <td className="p-1">
@@ -195,17 +198,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <input className="rounded p-2 text-black w-full" value={form.responsavel_conferiu_utensilio} onChange={e => setForm({ ...form, responsavel_conferiu_utensilio: e.target.value })} />
         </div>
       </div>
-      {/* Linha 8: Assinatura removida da tela, permanece apenas no PDF */}
-      {/* <div className="flex flex-col md:flex-row gap-2 mt-4 items-end">
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Assinatura</label>
-          <input className="rounded p-2 text-black w-full" value={form.assinatura} onChange={e => setForm({ ...form, assinatura: e.target.value })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">CPF/RG</label>
-          <input className="rounded p-2 text-black w-full" value={form.cpf} onChange={e => setForm({ ...form, cpf: e.target.value })} />
-        </div>
-      </div> */}
       <button className="bg-green-600 text-white rounded p-2 mt-4 font-bold" type="button" onClick={onSubmit} disabled={loading}>Salvar Pedido</button>
     </div>
   );

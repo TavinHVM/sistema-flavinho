@@ -47,7 +47,6 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
         data_buscou: pedido.data_buscou || "",
         responsavel_conferiu_forro: pedido.responsavel_conferiu_forro || "",
         responsavel_conferiu_utensilio: pedido.responsavel_conferiu_utensilio || "",
-        assinatura: pedido.assinatura || "",
         telefone: pedido.telefone || "",
         residencial: pedido.residencial || "",
         referencia: pedido.referencia || "",

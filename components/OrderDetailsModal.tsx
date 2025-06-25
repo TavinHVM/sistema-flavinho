@@ -47,7 +47,6 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose }) => {
           <div><b>Resp. Buscou:</b> {pedido.responsavel_buscou} <b>Data:</b> {formatDateBR(pedido.data_buscou)}</div>
           <div><b>Resp. Conferiu Forro:</b> {pedido.responsavel_conferiu_forro}</div>
           <div><b>Resp. Conferiu Utensílio:</b> {pedido.responsavel_conferiu_utensilio}</div>
-          <div><b>Assinatura:</b> {pedido.assinatura}</div>
         </div>
       </div>
     </div>

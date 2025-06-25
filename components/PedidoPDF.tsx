@@ -198,9 +198,6 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
         </View>
       </View>
 
-      <Text style={{ ...styles.assinatura, fontWeight: 'bold', marginTop: 16 }}>
-        CERTIFICO QUE EU CONFERI TODO MATERIAL E RESPONSABILIZO POR TODO E QUALQUER MATERIAL PRESCRITO NESTE CONTRATO.
-      </Text>
       <Text style={styles.assinatura}>
         ASSINATURA: ____________________________   CPF/RG: ____________________________
       </Text>
