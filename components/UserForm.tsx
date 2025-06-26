@@ -13,7 +13,20 @@ export default function UserForm({ form, setForm, onSubmit, loading }: UserFormP
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <div className="bg-[rgb(26,34,49)] p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-full sm:max-w-md">
+        <div className="bg-[rgb(26,34,49)] p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-full sm:max-w-md mt-2">
+            {/* Título e subtítulo adicionados aqui */}
+            <div className="flex flex-col items-center justify-center mb-6">
+                <div className="mb-4 w-full mb-8 mt-2">
+                    <PainelAdminButton />
+                </div>
+                <h1 className="font-poppins text-[2rem] font-bold mb-1 text-center">
+                    Gerenciamento de Usuários
+                </h1>
+                <p className="font-inter text-[1rem] font-normal text-gray-400 text-center mt-0">
+                    Adicione, edite ou exclua usuários do sistema
+                </p>
+            </div>
+
             <label htmlFor="nome" className="block text-sm font-medium mb-1">
                 Nome
             </label>
@@ -87,8 +100,6 @@ export default function UserForm({ form, setForm, onSubmit, loading }: UserFormP
             >
                 Registrar
             </button>
-
-            <PainelAdminButton />
         </div>
     );
 }

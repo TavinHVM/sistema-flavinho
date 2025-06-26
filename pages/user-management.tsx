@@ -5,6 +5,7 @@ import { FaSyncAlt } from "react-icons/fa";
 import Header from "../components/Header";
 import UserForm from "@/components/UserForm";
 import UserList from "@/components/UserList";
+import PainelAdminButton from "@/components/PainelAdminButton";
 
 interface User {
   last_modified_by: string;
@@ -187,20 +188,7 @@ export default function UserManagement() {
     <>
       <Header />
       <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white px-2">
-        <header className="mb-8 w-full max-w-full sm:max-w-md">
-          <div className="w-full flex items-center justify-center relative">
-            <div className="flex flex-col items-center justify-center">
-              <h1 className="mt-8 font-poppins text-[2rem] font-bold mb-1 text-center">
-                Gerenciamento de Usuários
-              </h1>
-              <p className="font-inter text-[1rem] font-normal text-gray-400 text-center mt-0">
-                Adicione, edite ou exclua usuários do sistema
-              </p>
-            </div>
-          </div>
-        </header>
-
-        <UserForm form={form} setForm={setForm} onSubmit={handleRegister} loading={loading} />
+        <UserForm form={form} setForm={setForm} onSubmit={handleRegister} loading={loading}/>
         {message && (
           <div className="mt-4 text-center text-sm text-yellow-400">
             {message}

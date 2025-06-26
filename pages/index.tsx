@@ -257,7 +257,12 @@ export default function Home() {
   return (
     <>
       <Header />
-      <main className="p-2 sm:p-4 md:p-8 max-w-full md:max-w-4xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 md:mt-8 mb-4 md:mb-8">
+      <main className="min-h-screen flex flex-col justify-between bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-0 md:mt-0 mb-0 md:mb-0 p-2 sm:p-4 md:p-8 max-w-full md:max-w-4xl mx-auto">
+        {isAdmin && (
+          <div className="mt-0 mb-14">
+            <PainelAdminButton onClick={() => router.push('/dashboard')} />
+          </div>
+        )}
         <HeaderBar />
         <div ref={formRef}>
           <ProdutoForm
@@ -268,24 +273,17 @@ export default function Home() {
             onCancel={
               editando
                 ? () => {
-                  setEditando(null);
-                  setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
-                }
+                    setEditando(null);
+                    setForm({ nome: '', quantidade_empresa: '', quantidade_rua: '' });
+                  }
                 : undefined
             }
           />
         </div>
-
-        {isAdmin && (
-          <div className="mt-0 mb-14">
-            <PainelAdminButton onClick={() => router.push("/dashboard")} />
-          </div>
-        )}
-
-        <section>
+        <section className="flex-1 flex flex-col justify-between">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2">
-            <SectionTitle className="mt-2 md:mt-8 mb-0">Estoque</SectionTitle>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto mt-4 md:mt-8">
+            <SectionTitle className="w-full text-center md:text-left">Estoque</SectionTitle>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto mt- md:mt-8">
               <SearchInput
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -302,7 +300,6 @@ export default function Home() {
               <RefreshButton onClick={fetchProdutos} loading={loading} />
             </div>
           </div>
-
           <ProdutoList
             produtos={produtos}
             search={search}
@@ -310,8 +307,7 @@ export default function Home() {
             onExcluir={excluirProduto}
           />
         </section>
-
-        <div className="flex justify-center text-xs text-gray-400 text-center">
+        <div className="flex justify-center text-xs text-gray-400 text-center mt-auto">
           <Footer />
         </div>
       </main>

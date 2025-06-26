@@ -7,35 +7,53 @@ export default function Login() {
   const [usuario, setUsuario] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    const { data: user, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("email", usuario)
-      .eq("senha", password)
-      .single();
+    // Autenticação usando Supabase Auth
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: usuario,
+      password: password,
+    });
 
-    if (error || !user) {
+    if (authError || !data?.user) {
       setError("Usuário ou senha inválidos.");
+      setLoading(false);
       return;
     }
 
-    localStorage.setItem("user", JSON.stringify(user));
+    // Buscar perfil do usuário na tabela user_profiles pelo id do usuário autenticado
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", data.user.id)
+      .single();
 
-    if (user.role === "Administrador" || "Funcionario") {
-      router.replace("/dashboard");
+    if (profileError || !profile) {
+      setError("Perfil do usuário não encontrado.");
+      setLoading(false);
+      return;
     }
+
+    localStorage.setItem("user", JSON.stringify(profile));
+
+    if (profile.role === "Administrador" || profile.role === "Funcionario") {
+      router.replace("/dashboard");
+    } else {
+      setError("Usuário sem permissão.");
+    }
+    setLoading(false);
   };
 
   return (
     <>
       <Header />
-      <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white">
+      <main className="h-screen flex flex-col justify-center items-center bg-gray-900 text-white">
         <header className="mb-8 w-full max-w-md">
           <div className="w-full flex items-center justify-center relative">
             <div className="flex flex-col items-center justify-center">

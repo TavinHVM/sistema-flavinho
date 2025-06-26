@@ -21,3 +21,7 @@ body {
   background-color: rgb(17 24 39);
   font-family: var(--font-inter);
 }
+
+body, html, #__next {
+  /* Removido overflow e height global para permitir scroll nas páginas que precisam */
+}
