@@ -6,7 +6,6 @@ import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
 import OrderForm from "@/components/OrderForm";
 import OrderList from "@/components/OrderList";
-import { useRouter } from "next/router";
 import { Pedido, PedidoItem } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 import PainelAdminButton from "@/components/PainelAdminButton";

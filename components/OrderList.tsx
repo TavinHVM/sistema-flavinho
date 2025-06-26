@@ -105,8 +105,8 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
   const pedidosOrdenados = (() => {
     if (!sortKey || !sortOrder) return pedidosFiltrados;
     return [...pedidosFiltrados].sort((a, b) => {
-      let aValue: unknown = a[sortKey as keyof typeof a];
-      let bValue: unknown = b[sortKey as keyof typeof b];
+      const aValue: unknown = a[sortKey as keyof typeof a];
+      const bValue: unknown = b[sortKey as keyof typeof b];
 
       // Para valor_total, garantir número
       if (sortKey === "valor_total") {

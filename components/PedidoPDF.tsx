@@ -85,8 +85,11 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
     <Page size="A4" style={styles.page}>
       {/* Header */}
       <View style={styles.header}>
+        {/* Logo da empresa */}
+        {/* O componente Image do @react-pdf/renderer não suporta alt */}
         {logoBase64 && <Image src={logoBase64} style={{ width: 70, height: 70 }} />}
         <View style={{ width: 70, height: 70 }}>
+          {/* QR Code do pedido */}
           <Image src={qrcodeBase64} style={{ width: 70, height: 70 }} />
         </View>
         <View style={styles.infoEmpresa}>
