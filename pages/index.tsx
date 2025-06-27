@@ -306,7 +306,7 @@ export default function Home() {
         <section className="flex-1 flex flex-col justify-between">
           {/* Agora ocupa toda a largura da tabela */}
           <div className="flex flex-col items-stretch gap-2 mb-2 w-full">
-            <SectionTitle className="w-full text-center">Estoque</SectionTitle>
+            <SectionTitle className="w-full text-center mt-10">Estoque</SectionTitle>
             <div className="relative w-full" ref={exportMenuRef}>
               <ExportMenu
                 open={exportMenuOpen}
