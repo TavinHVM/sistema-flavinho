@@ -19,8 +19,6 @@ type Produto = {
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
-  last_modified_by: string;
-  last_modified_at: string;
   created_at: string;
 };
 
@@ -108,8 +106,6 @@ export default function Home() {
       nome: form.nome,
       quantidade_empresa: quantidadeEmpresa,
       quantidade_rua: quantidadeRua,
-      last_modified_by: JSON.parse(localStorage.getItem("user") || "{}").nome || "",
-      last_modified_at: new Date().toISOString(),
     };
 
     const { error } = await supabase
@@ -177,8 +173,6 @@ export default function Home() {
       nome: form.nome,
       quantidade_empresa: quantidadeEmpresa,
       quantidade_rua: quantidadeRua,
-      last_modified_by: JSON.parse(localStorage.getItem("user") || "{}").nome || "",
-      last_modified_at: new Date().toISOString(),
     };
 
     const { error } = await supabase

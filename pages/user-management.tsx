@@ -5,15 +5,12 @@ import { FaSyncAlt } from "react-icons/fa";
 import Header from "../components/Header";
 import UserForm from "@/components/UserForm";
 import UserList from "@/components/UserList";
-import PainelAdminButton from "@/components/PainelAdminButton";
 
 interface User {
-  last_modified_by: string;
   id: string;
   nome: string;
   email: string;
   role: string;
-  last_modified_at: string;
 }
 
 export default function UserManagement() {
@@ -39,15 +36,12 @@ export default function UserManagement() {
       setMessage("Erro ao buscar usuários: " + error.message);
       setUsers([]);
     } else {
-      // Ensure last_modified_at is present for each user
       setUsers(
         (data || []).map((user: User) => ({
           id: user.id,
           nome: user.nome,
           email: user.email,
           role: user.role,
-          last_modified_by: user.last_modified_by,
-          last_modified_at: user.last_modified_at || "",
         }))
       );
     }
@@ -58,6 +52,7 @@ export default function UserManagement() {
     fetchUsers();
   }, []);
 
+  // Função para inserir usuário apenas na tabela profiles (sem integração com Auth)
   const handleRegister = async () => {
     const { nome, email, password, role } = form;
 
@@ -71,28 +66,23 @@ export default function UserManagement() {
       return;
     }
 
-    const { data: existing } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("email", email)
-      .single();
+    // Verifica se já existe usuário
+    const { data: existing } = await supabase.from("profiles").select("id").eq("email", email).single();
 
     if (existing) {
       setMessage("Já existe um usuário com este email.");
       return;
     }
 
-    const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-    const { error } = await supabase
-      .from("profiles")
-      .insert([{
+    // Insere apenas na tabela profiles
+    const { error } = await supabase.from("profiles").insert([
+      {
         nome,
         email,
-        senha: password,
         role,
-        last_modified_by: currentUser.nome || currentUser.email || "",
-        last_modified_at: new Date().toISOString(),
-      }]);
+        created_at: new Date().toISOString(),
+      },
+    ]);
 
     if (error) {
       setMessage("Erro ao registrar usuário: " + error.message);
@@ -120,45 +110,56 @@ export default function UserManagement() {
     }
   };
 
+  // Atualizar usuário (exceto senha)
   const handleUpdate = async () => {
     const { nome, email, role, senha } = editForm;
-    const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
-    const updateData: Record<string, unknown> = {
-      nome,
-      email,
-      role,
-      last_modified_by: currentUser.nome || currentUser.email || "",
-      last_modified_at: new Date().toISOString(),
-    };
-    if (senha && senha.length >= 6) updateData.senha = senha;
+    const updateData: Record<string, unknown> = { nome, email, role };
 
-    const { error } = await supabase
-      .from("profiles")
-      .update(updateData)
-      .eq("id", editingUserId);
+    // Atualiza perfil
+    const { error: profileError } = await supabase.from("profiles").update(updateData).eq("id", editingUserId);
 
-    if (!error) {
-      setMessage("Usuário atualizado com sucesso!");
-      setEditingUserId(null);
-      fetchUsers();
-    } else {
-      setMessage("Erro ao atualizar usuário: " + error.message);
+    if (profileError) {
+      setMessage("Erro ao atualizar usuário: " + profileError.message);
+      return;
     }
+
+    // Atualiza senha se fornecida
+    if (senha && senha.length >= 6) {
+      const { error: passError } = await supabase.auth.admin.updateUserById(editingUserId!, { password: senha });
+      if (passError) {
+        setMessage("Usuário atualizado, mas erro ao atualizar senha: " + passError.message);
+        setEditingUserId(null);
+        fetchUsers();
+        return;
+      }
+    }
+
+    setMessage("Usuário atualizado com sucesso!");
+    setEditingUserId(null);
+    fetchUsers();
   };
 
+  // Excluir usuário do Auth e do profiles
   const handleDelete = async (id: string) => {
-    const confirmar = window.confirm(
-      "Tem certeza que deseja excluir este usuário?"
-    );
+    const confirmar = window.confirm("Tem certeza que deseja excluir este usuário?");
     if (!confirmar) return;
 
-    const { error } = await supabase.from("profiles").delete().eq("id", id);
-    if (!error) {
-      setMessage("Usuário excluído com sucesso!");
-      fetchUsers();
-    } else {
-      setMessage("Erro ao excluir usuário: " + error.message);
+    // Remove do Auth
+    const { error: authError } = await supabase.auth.admin.deleteUser(id);
+    if (authError) {
+      setMessage("Erro ao excluir usuário do Auth: " + authError.message);
+      return;
     }
+
+    // Remove do profiles
+    const { error: profileError } = await supabase.from("profiles").delete().eq("id", id);
+    if (profileError) {
+      setMessage("Erro ao excluir usuário do profiles: " + profileError.message);
+      return;
+    }
+
+    setMessage("Usuário excluído com sucesso!");
+    fetchUsers();
   };
 
   useEffect(() => {

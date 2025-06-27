@@ -7,8 +7,6 @@ type Produto = {
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
-  last_modified_by: string;
-  last_modified_at: string;
 };
 
 interface ProdutoListProps {
@@ -74,14 +72,6 @@ export default function ProdutoList({
         bValue = "";
       }
 
-      // Para datas, comparar como datas
-      if (sortKey === "last_modified_at") {
-        const aStr = (aValue ?? "") as string;
-        const bStr = (bValue ?? "") as string;
-        return sortOrder === "asc"
-          ? aStr.localeCompare(bStr)
-          : bStr.localeCompare(aStr);
-      }
       // Para números
       if (
         sortKey === "quantidade_empresa" ||
@@ -131,12 +121,6 @@ export default function ProdutoList({
             >
               Total {getSortIcon("total")}
             </th>
-            <th
-              className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("last_modified_at")}
-            >
-              Última alteração {getSortIcon("last_modified_at")}
-            </th>
             <th className="py-3 px-4 text-left">Ações</th>
           </tr>
         </thead>
@@ -154,9 +138,6 @@ export default function ProdutoList({
               </td>
               <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">
                 {produto.quantidade_empresa + produto.quantidade_rua}
-              </td>
-              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">
-                {produto.last_modified_at ? formatDateBR(produto.last_modified_at) : "-"}
               </td>
               <td className="py-4 px-4">
                 <div className="flex gap-2">
