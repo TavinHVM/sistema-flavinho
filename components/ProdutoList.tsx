@@ -1,5 +1,4 @@
 import { FaTrash, FaEdit, FaSortUp, FaSortDown } from "react-icons/fa";
-import { formatDateBR } from "../lib/formatDate";
 import { useState } from "react";
 
 type Produto = {
