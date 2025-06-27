@@ -59,13 +59,16 @@ export default function ProdutoList({
       let aValue: unknown;
       let bValue: unknown;
 
+      // Ordenação numérica para total
       if (sortKey === "total") {
-        aValue = a.quantidade_empresa + a.quantidade_rua;
-        bValue = b.quantidade_empresa + b.quantidade_rua;
+        const aTotal = Number(a.quantidade_empresa) + Number(a.quantidade_rua);
+        const bTotal = Number(b.quantidade_empresa) + Number(b.quantidade_rua);
         return sortOrder === "asc"
-          ? (aValue as number) - (bValue as number)
-          : (bValue as number) - (aValue as number);
-      } else if (sortKey && sortKey in a && sortKey in b) {
+          ? aTotal - bTotal
+          : bTotal - aTotal;
+      }
+
+      if (sortKey && sortKey in a && sortKey in b) {
         aValue = a[sortKey as keyof Produto];
         bValue = b[sortKey as keyof Produto];
       } else {
@@ -73,17 +76,9 @@ export default function ProdutoList({
         bValue = "";
       }
 
-      // Ordenação numérica para numero
-      if (sortKey === "numero") {
-        const aNum = typeof aValue === "number" ? aValue : Number(aValue) || 0;
-        const bNum = typeof bValue === "number" ? bValue : Number(bValue) || 0;
-        return sortOrder === "asc"
-          ? aNum - bNum
-          : bNum - aNum;
-      }
-
-      // Para números
+      // Ordenação numérica para numero, quantidade_empresa, quantidade_rua
       if (
+        sortKey === "numero" ||
         sortKey === "quantidade_empresa" ||
         sortKey === "quantidade_rua"
       ) {
@@ -93,6 +88,7 @@ export default function ProdutoList({
           ? aNum - bNum
           : bNum - aNum;
       }
+
       // Para strings
       const aStr = (aValue ?? "").toString().toLowerCase();
       const bStr = (bValue ?? "").toString().toLowerCase();

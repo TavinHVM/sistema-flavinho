@@ -296,32 +296,31 @@ export default function Home() {
             onCancel={
               editando
                 ? () => {
-                    setEditando(null);
-                    setForm({ nome: '', quantidade_empresa: '', quantidade_rua: '' });
-                  }
+                  setEditando(null);
+                  setForm({ nome: '', quantidade_empresa: '', quantidade_rua: '' });
+                }
                 : undefined
             }
           />
         </div>
         <section className="flex-1 flex flex-col justify-between">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-2 mb-2">
-            <SectionTitle className="w-full text-center md:text-left">Estoque</SectionTitle>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto mt- md:mt-8">
-              <SearchInput
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Pesquisar por nome"
+          {/* Agora ocupa toda a largura da tabela */}
+          <div className="flex flex-col items-stretch gap-2 mb-2 w-full">
+            <SectionTitle className="w-full text-center">Estoque</SectionTitle>
+            <div className="relative w-full" ref={exportMenuRef}>
+              <ExportMenu
+                open={exportMenuOpen}
+                setOpen={setExportMenuOpen}
+                onExportarPDF={exportarPDF}
+                onExportarCSV={exportarCSV}
               />
-              <div className="relative" ref={exportMenuRef}>
-                <ExportMenu
-                  open={exportMenuOpen}
-                  setOpen={setExportMenuOpen}
-                  onExportarPDF={exportarPDF}
-                  onExportarCSV={exportarCSV}
-                />
-              </div>
-              <RefreshButton onClick={fetchProdutos} loading={loading} />
             </div>
+            <RefreshButton onClick={fetchProdutos} loading={loading} />
+            <SearchInput
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Pesquisar por nome"
+            />
           </div>
           <ProdutoList
             produtos={produtos.map((p, idx) => ({ ...p, numero: idx + 1 }))}
