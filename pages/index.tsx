@@ -43,10 +43,21 @@ export default function Home() {
     setLoading(true);
     const { data, error } = await supabase
       .from("produtos")
-      .select("*")
-      .order("created_at", { ascending: false });
+      .select("*"); // Remova a ordenação do Supabase, pois faremos no frontend
 
-    if (!error && data) setProdutos(data);
+    if (!error && data) {
+      // Ordenação numérica extraindo o número do nome (ex: "Produto 10")
+      const sorted = [...data].sort((a, b) => {
+        const regex = /(\d+)/;
+        const aMatch = a.nome.match(regex);
+        const bMatch = b.nome.match(regex);
+        if (aMatch && bMatch) {
+          return Number(aMatch[1]) - Number(bMatch[1]);
+        }
+        return a.nome.localeCompare(b.nome, 'pt-BR');
+      });
+      setProdutos(sorted);
+    }
     setLoading(false);
   };
 
@@ -313,7 +324,7 @@ export default function Home() {
             </div>
           </div>
           <ProdutoList
-            produtos={produtos}
+            produtos={produtos.map((p, idx) => ({ ...p, numero: idx + 1 }))}
             search={search}
             onEditar={editarProduto}
             onExcluir={excluirProduto}

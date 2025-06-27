@@ -7,6 +7,7 @@ type Produto = {
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
+  numero: number;
 };
 
 interface ProdutoListProps {
@@ -72,6 +73,15 @@ export default function ProdutoList({
         bValue = "";
       }
 
+      // Ordenação numérica para numero
+      if (sortKey === "numero") {
+        const aNum = typeof aValue === "number" ? aValue : Number(aValue) || 0;
+        const bNum = typeof bValue === "number" ? bValue : Number(bValue) || 0;
+        return sortOrder === "asc"
+          ? aNum - bNum
+          : bNum - aNum;
+      }
+
       // Para números
       if (
         sortKey === "quantidade_empresa" ||
@@ -97,6 +107,11 @@ export default function ProdutoList({
       <table className="min-w-full bg-gray-800 text-white text-sm">
         <thead>
           <tr className="bg-gray-700 text-gray-300">
+            <th
+              className="py-3 px-4 text-left cursor-pointer select-none"
+              onClick={() => handleSort("numero")}>
+              N° {getSortIcon("numero")}
+            </th>
             <th
               className="py-3 px-4 text-left cursor-pointer select-none"
               onClick={() => handleSort("nome")}
@@ -127,6 +142,9 @@ export default function ProdutoList({
         <tbody>
           {sortedProdutos.map((produto) => (
             <tr key={produto.id} className="border-b border-gray-700">
+              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">
+                {produto.numero}
+              </td>
               <td className="py-4 px-4 font-poppins text-[1rem] font-semibold">
                 {produto.nome}
               </td>
