@@ -11,23 +11,41 @@ export default function Dashboard() {
     email?: string;
     role?: string;
   } | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");
     if (!userStr) {
-      alert("Você precisa estar logado para acessar esta página.");
+      setIsLoggedIn(false);
       router.replace("/login");
       return;
     }
     const userObj = JSON.parse(userStr);
     setUser(userObj);
     if (userObj.role !== "Administrador" && userObj.role !== "Funcionario") {
-      alert("Acesso negado.");
+      setIsLoggedIn(false);
       router.replace("/login");
+      return;
     }
+    setIsLoggedIn(true);
   }, [router]);
 
   const isAdmin = user?.role === "Administrador";
+
+  if (isLoggedIn === null) {
+    // Em verificação
+    return null;
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <main className="h-screen flex flex-col justify-center items-center bg-gray-900 text-white px-2">
+        <div className="mt-10 text-center text-lg text-yellow-400">
+          {"Você precisa estar logado para acessar esta página."}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>

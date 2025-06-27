@@ -59,6 +59,17 @@ export default function Orders() {
   const [produtos, setProdutos] = useState<{ id: string; nome: string; quantidade_empresa: number; quantidade_rua: number }[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem("user");
+    if (!userStr) {
+      setIsLoggedIn(false);
+      window.location.replace("/login");
+      return;
+    }
+    setIsLoggedIn(true);
+  }, []);
 
   useEffect(() => {
     const fetchProdutos = async () => {
@@ -252,6 +263,21 @@ export default function Orders() {
   const pedidosFiltrados = pedidos.filter((p) =>
     p.cliente.toLowerCase().includes(search.toLowerCase())
   );
+
+  if (isLoggedIn === null) {
+    // Em verificação
+    return null;
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <main className="min-h-screen flex flex-col justify-center items-center bg-[rgb(26,34,49)] text-white px-2">
+        <div className="mt-10 text-center text-lg text-yellow-400">
+          {"Você precisa estar logado para acessar esta página."}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>

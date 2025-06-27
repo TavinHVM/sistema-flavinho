@@ -27,6 +27,7 @@ export default function UserManagement() {
   const [editForm, setEditForm] = useState({ nome: "", email: "", role: "", senha: "" });
   const [showEdit, setShowEdit] = useState(false);
   const [search, setSearch] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const router = useRouter();
 
   const fetchUsers = async () => {
@@ -52,7 +53,7 @@ export default function UserManagement() {
     fetchUsers();
   }, []);
 
-  // Função para inserir usuário apenas na tabela profiles (sem integração com Auth)
+  // Função para inserir usuário na tabela profiles E no Auth
   const handleRegister = async () => {
     const { nome, email, password, role } = form;
 
@@ -68,24 +69,22 @@ export default function UserManagement() {
 
     // Verifica se já existe usuário
     const { data: existing } = await supabase.from("profiles").select("id").eq("email", email).single();
-
     if (existing) {
       setMessage("Já existe um usuário com este email.");
       return;
     }
 
-    // Insere apenas na tabela profiles
-    const { error } = await supabase.from("profiles").insert([
-      {
-        nome,
-        email,
-        role,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+    // Cria usuário no Auth (frontend, método signUp)
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { nome, role } // Campos extras para o trigger preencher em profiles
+      }
+    });
 
-    if (error) {
-      setMessage("Erro ao registrar usuário: " + error.message);
+    if (signUpError || !signUpData?.user?.id) {
+      setMessage("Erro ao criar usuário: " + (signUpError?.message || "Erro desconhecido"));
       return;
     }
 
@@ -144,17 +143,18 @@ export default function UserManagement() {
     const confirmar = window.confirm("Tem certeza que deseja excluir este usuário?");
     if (!confirmar) return;
 
-    // Remove do Auth
-    const { error: authError } = await supabase.auth.admin.deleteUser(id);
-    if (authError) {
-      setMessage("Erro ao excluir usuário do Auth: " + authError.message);
-      return;
-    }
+    setLoading(true);
+    // Chama a API interna protegida
+    const res = await fetch("/api/delete-user", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const result = await res.json();
+    setLoading(false);
 
-    // Remove do profiles
-    const { error: profileError } = await supabase.from("profiles").delete().eq("id", id);
-    if (profileError) {
-      setMessage("Erro ao excluir usuário do profiles: " + profileError.message);
+    if (!res.ok) {
+      setMessage("Erro ao excluir usuário: " + (result.error || "Erro desconhecido"));
       return;
     }
 
@@ -166,30 +166,46 @@ export default function UserManagement() {
     const checkAdmin = async () => {
       const userStr = localStorage.getItem("user");
       if (!userStr) {
-        alert(
-          "Você precisa estar logado como administrador para acessar esta página."
-        );
+        setMessage("Você precisa estar logado como administrador para acessar esta página.");
+        setIsLoggedIn(false);
         router.replace("/login");
         return;
       }
       const user = JSON.parse(userStr);
       const role = user.role;
       if (role !== "Administrador") {
-        alert(
-          "Acesso negado. Apenas administradores podem acessar esta página."
-        );
+        setMessage("Acesso negado. Apenas administradores podem acessar esta página.");
+        setIsLoggedIn(false);
         router.replace("/login");
+        return;
       }
+      setIsLoggedIn(true);
     };
 
     checkAdmin();
   }, [router]);
 
+  if (isLoggedIn === null) {
+    // Em verificação, pode mostrar um loading ou nada
+    return null;
+  }
+
+  if (!isLoggedIn) {
+    // Usuário não autorizado, não mostra nada (ou pode mostrar uma mensagem)
+    return (
+      <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white px-2">
+        <div className="mt-10 text-center text-lg text-yellow-400">
+          {message || "Acesso restrito."}
+        </div>
+      </main>
+    );
+  }
+
   return (
     <>
       <Header />
       <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white px-2">
-        <UserForm form={form} setForm={setForm} onSubmit={handleRegister} loading={loading}/>
+        <UserForm form={form} setForm={setForm} onSubmit={handleRegister} loading={loading} />
         {message && (
           <div className="mt-4 text-center text-sm text-yellow-400">
             {message}

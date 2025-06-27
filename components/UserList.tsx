@@ -16,6 +16,8 @@ interface UserListProps {
 
 export default function UserList({ users, search, onEditar, onExcluir }: UserListProps) {
   const filtered = users.filter((user) =>
+    typeof user.nome === "string" &&
+    user.nome &&
     user.nome.toLowerCase().includes(search.toLowerCase())
   );
 

@@ -34,6 +34,7 @@ export default function Home() {
   const [editando, setEditando] = useState<string | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const router = useRouter();
   const exportMenuRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
@@ -53,9 +54,11 @@ export default function Home() {
     const checkSession = async () => {
       const userStr = localStorage.getItem("user");
       if (!userStr) {
+        setIsLoggedIn(false);
         router.replace("/login");
         return;
       }
+      setIsLoggedIn(true);
       fetchProdutos();
     };
 
@@ -247,6 +250,21 @@ export default function Home() {
     });
     doc.save(`Estoque - Flavinho Festas ${dataHora}.pdf`);
   };
+
+  if (isLoggedIn === null) {
+    // Em verificação
+    return null;
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <main className="min-h-screen flex flex-col justify-center items-center bg-[rgb(26,34,49)] text-white px-2">
+        <div className="mt-10 text-center text-lg text-yellow-400">
+          {"Você precisa estar logado para acessar esta página."}
+        </div>
+      </main>
+    );
+  }
 
   return (
     <>
