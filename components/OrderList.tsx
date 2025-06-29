@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { FaTrash, FaEdit, FaFilePdf, FaEye, FaSortUp, FaSortDown } from "react-icons/fa";
+import { FaTrash, FaEdit, FaSortUp, FaSortDown } from "react-icons/fa";
 import OrderDetailsModal from "./OrderDetailsModal";
 import { Pedido } from "../types/Pedido";
-import { pdf } from "@react-pdf/renderer";
-import PedidoPDF from "./PedidoPDF";
 import { formatDateBR } from "../lib/formatDate";
 
 interface Material {
@@ -17,8 +15,7 @@ interface OrderListProps {
   pedidos: (Pedido & { materiais: Material[] })[];
   search: string;
   onEditar?: (pedido: Pedido & { materiais: Material[] }) => void;
-  onExcluir?: (id: string) => void;
-  onExportarPDF?: (pedido: Pedido & { materiais: Material[] }) => void;
+  onExcluir?: (id: number) => void;
 }
 
 type SortKey = "numero" | "cliente" | "data_locacao" | "data_evento" | "endereco" | "valor_total" | null;
@@ -60,42 +57,6 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
   const handleCloseModal = () => {
     setModalOpen(false);
     setModalPedido(null);
-  };
-
-  const handleDownloadPDF = async (pedido: Pedido) => {
-    const blob = await pdf(
-      <PedidoPDF pedido={{
-        ...pedido,
-        responsavel_entregou: pedido.responsavel_entregou || "",
-        data_entregou: pedido.data_entregou || "",
-        responsavel_recebeu: pedido.responsavel_recebeu || "",
-        data_recebeu: pedido.data_recebeu || "",
-        responsavel_buscou: pedido.responsavel_buscou || "",
-        data_buscou: pedido.data_buscou || "",
-        responsavel_conferiu_forro: pedido.responsavel_conferiu_forro || "",
-        responsavel_conferiu_utensilio: pedido.responsavel_conferiu_utensilio || "",
-        telefone: pedido.telefone || "",
-        residencial: pedido.residencial || "",
-        referencia: pedido.referencia || "",
-        endereco: pedido.endereco || "",
-        cpf: pedido.cpf || "",
-        data_devolucao: pedido.data_devolucao || "",
-        data_evento: pedido.data_evento || "",
-        cliente: pedido.cliente || "",
-        numero: pedido.numero || "",
-        materiais: pedido.materiais || [],
-        valor_total: pedido.valor_total || 0,
-        desconto: pedido.desconto || 0,
-      }} />
-    ).toBlob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Pedido_${pedido.numero || pedido.cliente}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
   };
 
   const pedidosFiltrados = pedidos.filter((p) =>
@@ -197,44 +158,58 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
         </thead>
         <tbody>
           {pedidosOrdenados.map((p, idx) => (
-            <tr key={p.id || p.numero || idx} className="border-b border-gray-800">
+            <tr key={p.id || p.numero || idx} className="border-b border-gray-800 hover:bg-gray-800 cursor-pointer" onClick={() => handleVerMais(p)}>
               <td className="p-2">{p.numero}</td>
               <td className="p-2">{p.cliente}</td>
               <td className="p-2">{formatDateBR(p.data_locacao)}</td>
               <td className="p-2">{formatDateBR(p.data_evento) || '-'}</td>
               <td className="p-2">{p.endereco || '-'}</td>
               <td className="p-2">R$ {p.valor_total?.toFixed(2)}</td>
-              <td className="p-2">
+              <td className="p-2" onClick={e => e.stopPropagation()}>
                 <div className="flex gap-1 flex-wrap">
-                  <button
-                    className="bg-gray-700 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
-                    title="Exportar PDF"
-                    onClick={() => handleDownloadPDF(p)}
-                  >
-                    <FaFilePdf /> PDF
-                  </button>
-                  <button
-                    className="bg-gray-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
-                    onClick={() => handleVerMais(p)}
-                    title="Ver mais"
-                  >
-                    <FaEye /> Ver mais
-                  </button>
                   {onEditar && (
                     <button
                       key="edit"
                       className="bg-blue-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
-                      onClick={() => onEditar(p)}
+                      onClick={() => onEditar({
+                        ...p,
+                        materiais: p.materiais ?? [],
+                        numero: typeof p.numero === "string" ? p.numero : String(p.numero),
+                        data_locacao: p.data_locacao ?? "",
+                        data_evento: p.data_evento ?? "",
+                        data_retirada: p.data_retirada ?? "",
+                        data_devolucao: p.data_devolucao ?? "",
+                        cliente: p.cliente ?? "",
+                        cpf: p.cpf ?? "",
+                        endereco: p.endereco ?? "",
+                        telefone: p.telefone ?? "",
+                        residencial: p.residencial ?? "",
+                        referencia: p.referencia ?? "",
+                        entrega: p.entrega ?? "",
+                        busca: p.busca ?? "",
+                        pagamento: p.pagamento ?? "",
+                        valor_pago: p.valor_pago ?? 0,
+                        valor_total: p.valor_total ?? 0,
+                        responsavel_entregou: p.responsavel_entregou ?? "",
+                        data_entregou: p.data_entregou ?? "",
+                        responsavel_recebeu: p.responsavel_recebeu ?? "",
+                        data_recebeu: p.data_recebeu ?? "",
+                        responsavel_buscou: p.responsavel_buscou ?? "",
+                        data_buscou: p.data_buscou ?? "",
+                        responsavel_conferiu_forro: p.responsavel_conferiu_forro ?? "",
+                        responsavel_conferiu_utensilio: p.responsavel_conferiu_utensilio ?? "",
+                        desconto: p.desconto ?? 0,
+                      })}
                       title="Editar"
                     >
                       <FaEdit /> Editar
                     </button>
                   )}
-                  {onExcluir && p.id && (
+                  {onExcluir && p.numero && (
                     <button
                       key="delete"
                       className="bg-red-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
-                      onClick={() => onExcluir(String(p.id))}
+                      onClick={() => onExcluir(Number(p.numero))}
                       title="Excluir"
                     >
                       <FaTrash /> Excluir

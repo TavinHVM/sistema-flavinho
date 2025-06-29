@@ -23,6 +23,8 @@ interface OrderFormProps {
   addMaterial: () => void;
   removeMaterial: (idx: number) => void;
   loading?: boolean;
+  isEditing?: boolean;
+  onCancelEdit?: () => void;
 }
 
 const OrderForm: React.FC<OrderFormProps> = ({
@@ -33,10 +35,12 @@ const OrderForm: React.FC<OrderFormProps> = ({
   handleMaterialChange,
   addMaterial,
   removeMaterial,
-  loading
+  loading,
+  isEditing = false,
+  onCancelEdit,
 }) => {
   return (
-    <div className="mt-8 bg-gray-800 rounded-lg p-3 flex flex-col gap-2">
+    <div className="mt-8 bg-gray-800 rounded-lg p-3 flex flex-col gap-2" id="order-form-scroll">
       <div className="flex items-center justify-center mb-3">
         <SectionTitle className="text-2xl">Novo Pedido</SectionTitle>
       </div>
@@ -202,7 +206,23 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <input className="rounded p-2 text-black w-full" value={form.responsavel_conferiu_utensilio} onChange={e => setForm({ ...form, responsavel_conferiu_utensilio: e.target.value })} />
         </div>
       </div>
-      <button className="bg-green-600 text-white rounded p-2 mt-4 font-bold" type="button" onClick={onSubmit} disabled={loading}>Salvar Pedido</button>
+      <button
+        className={`${isEditing ? 'bg-blue-600' : 'bg-green-600'} text-white rounded p-2 mt-4 font-bold`}
+        type="button"
+        onClick={onSubmit}
+        disabled={loading}
+      >
+        {isEditing ? 'Atualizar Pedido' : 'Salvar Pedido'}
+      </button>
+      {isEditing && (
+        <button
+          className="bg-gray-500 text-white rounded p-2 mt-2 font-bold"
+          type="button"
+          onClick={onCancelEdit}
+        >
+          Cancelar
+        </button>
+      )}
     </div>
   );
 };

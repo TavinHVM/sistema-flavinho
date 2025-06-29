@@ -6,6 +6,8 @@ import OrderForm from "@/components/OrderForm";
 import OrderList from "@/components/OrderList";
 import { Pedido, PedidoItem } from "../types/Pedido";
 import PainelAdminButton from "@/components/PainelAdminButton";
+import Toast from "@/components/Toast";
+import ConfirmModal from "@/components/ConfirmModal";
 
 type PedidoItemField = keyof PedidoItem;
 // Função utilitária para converter data pt-BR para ISO (yyyy-mm-dd)
@@ -52,6 +54,9 @@ export default function Orders() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");
@@ -119,7 +124,7 @@ export default function Orders() {
 
   const salvarPedido = async () => {
     if (!form.cliente || form.materiais.length === 0) {
-      alert("Preencha o nome do cliente e pelo menos um item.");
+      setToast({ type: 'error', message: 'Preencha o nome do cliente e pelo menos um item.' });
       return;
     }
     // Atualizar estoque
@@ -131,14 +136,10 @@ export default function Orders() {
         await supabase.from("produtos").update({ quantidade_empresa: novaEmpresa, quantidade_rua: novaRua }).eq("numero", produto.numero);
       }
     }
-    // Buscar o maior numero atual
-    const { data: maxNumeroData } = await supabase.from("pedidos").select("numero").order("numero", { ascending: false }).limit(1);
-    const nextNumero = (maxNumeroData && maxNumeroData[0] && maxNumeroData[0].numero ? Number(maxNumeroData[0].numero) : 0) + 1;
     // Calcular valor total
     const valor_total = form.materiais.reduce((acc: number, m: PedidoItem) => acc + (m.valor_total || 0), 0) - parseFloat(form.desconto?.toString() || "0");
-    // Salvar pedido
+    // Se for edição (form.numero existe em pedidos), faz update
     const pedidoParaSalvar = {
-      numero: nextNumero,
       data_locacao: form.data_locacao ? toISODate(form.data_locacao) : null,
       data_evento: form.data_evento ? toISODate(form.data_evento) : null,
       data_retirada: form.data_retirada ? toISODate(form.data_retirada) : null,
@@ -163,9 +164,19 @@ export default function Orders() {
       data_buscou: form.data_buscou ? toISODate(form.data_buscou) : null,
       created_at: new Date().toISOString(),
     };
-    const { error } = await supabase.from("pedidos").insert([pedidoParaSalvar]);
+    const numeroPedido = form.numero ? Number(form.numero) : null;
+    let error;
+    if (numeroPedido && pedidos.some(p => Number(p.numero) === numeroPedido)) {
+      // Update
+      ({ error } = await supabase.from("pedidos").update(pedidoParaSalvar).eq("numero", numeroPedido));
+    } else {
+      // Buscar o maior numero atual
+      const { data: maxNumeroData } = await supabase.from("pedidos").select("numero").order("numero", { ascending: false }).limit(1);
+      const nextNumero = (maxNumeroData && maxNumeroData[0] && maxNumeroData[0].numero ? Number(maxNumeroData[0].numero) : 0) + 1;
+      ({ error } = await supabase.from("pedidos").insert([{ ...pedidoParaSalvar, numero: nextNumero }]));
+    }
     if (!error) {
-      alert("Pedido salvo!");
+      setToast({ type: 'success', message: isEditing ? 'Pedido atualizado!' : 'Pedido salvo!' });
       setForm({
         data_locacao: "",
         data_evento: "",
@@ -193,9 +204,10 @@ export default function Orders() {
         responsavel_conferiu_forro: "",
         responsavel_conferiu_utensilio: "",
       });
+      setIsEditing(false);
       fetchPedidos();
     } else {
-      alert("Erro ao salvar pedido!");
+      setToast({ type: 'error', message: 'Erro ao salvar pedido!' });
     }
   };
 
@@ -222,6 +234,20 @@ export default function Orders() {
   return (
     <>
       <Header />
+      <Toast toast={toast} onClose={() => setToast(null)} />
+      <ConfirmModal
+        open={confirmDelete.open}
+        onConfirm={async () => {
+          if (confirmDelete.id) {
+            await supabase.from("pedidos").delete().eq("numero", confirmDelete.id);
+            fetchPedidos();
+            setToast({ type: 'success', message: 'Pedido excluído com sucesso!' });
+          }
+          setConfirmDelete({ open: false, id: null });
+        }}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        message="Tem certeza que deseja excluir este pedido?"
+      />
       <main className="p-2 sm:p-4 max-w-full md:max-w-3xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 mb-4">
         <PainelAdminButton />
         <div className="flex justify-center">
@@ -236,6 +262,37 @@ export default function Orders() {
             addMaterial={addMaterial}
             removeMaterial={removeMaterial}
             loading={loading}
+            isEditing={isEditing}
+            onCancelEdit={() => {
+              setForm({
+                data_locacao: "",
+                data_evento: "",
+                data_retirada: "",
+                data_devolucao: "",
+                cliente: "",
+                cpf: "",
+                endereco: "",
+                telefone: "",
+                residencial: "",
+                referencia: "",
+                materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0 }],
+                entrega: "",
+                busca: "",
+                pagamento: "",
+                valor_pago: 0,
+                valor_total: 0,
+                desconto: 0,
+                responsavel_entregou: "",
+                data_entregou: "",
+                responsavel_recebeu: "",
+                data_recebeu: "",
+                responsavel_buscou: "",
+                data_buscou: "",
+                responsavel_conferiu_forro: "",
+                responsavel_conferiu_utensilio: "",
+              });
+              setIsEditing(false);
+            }}
           />
         </div>
         <SectionTitle className="mt-8 mb-2">Pedidos</SectionTitle>
@@ -258,8 +315,13 @@ export default function Orders() {
                 valor_total: mat.valor_total,
               })),
             });
+            setIsEditing(true);
+            setTimeout(() => {
+              const formEl = document.querySelector('#order-form-scroll');
+              if (formEl) formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
           }}
-          onExcluir={async (id) => { await supabase.from("pedidos").delete().eq("id", id); fetchPedidos(); }}
+          onExcluir={(id) => setConfirmDelete({ open: true, id })}
         />
       </main>
     </>
