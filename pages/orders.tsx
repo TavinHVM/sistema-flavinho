@@ -48,7 +48,7 @@ export default function Orders() {
     responsavel_conferiu_utensilio: "",
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  const [produtos, setProdutos] = useState<{ id: string; nome: string; quantidade_empresa: number; quantidade_rua: number }[]>([]);
+  const [produtos, setProdutos] = useState<{ id: string; numero: string; nome: string; quantidade_empresa: number; quantidade_rua: number }[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
@@ -66,7 +66,18 @@ export default function Orders() {
   useEffect(() => {
     const fetchProdutos = async () => {
       const { data } = await supabase.from("produtos").select("*");
-      if (data) setProdutos(data);
+      if (data) {
+        // Garantir que cada produto tenha a propriedade 'id'
+        setProdutos(
+          data.map((p: any) => ({
+            id: p.id ? String(p.id) : String(p.numero), // usa id se existir, senão usa numero como fallback
+            numero: p.numero,
+            nome: p.nome,
+            quantidade_empresa: p.quantidade_empresa,
+            quantidade_rua: p.quantidade_rua,
+          }))
+        );
+      }
     };
     fetchProdutos();
   }, []);
@@ -117,24 +128,39 @@ export default function Orders() {
       if (produto) {
         const novaEmpresa = produto.quantidade_empresa - item.quantidade;
         const novaRua = produto.quantidade_rua + item.quantidade;
-        await supabase.from("produtos").update({ quantidade_empresa: novaEmpresa, quantidade_rua: novaRua }).eq("id", produto.id);
+        await supabase.from("produtos").update({ quantidade_empresa: novaEmpresa, quantidade_rua: novaRua }).eq("numero", produto.numero);
       }
     }
+    // Buscar o maior numero atual
+    const { data: maxNumeroData } = await supabase.from("pedidos").select("numero").order("numero", { ascending: false }).limit(1);
+    const nextNumero = (maxNumeroData && maxNumeroData[0] && maxNumeroData[0].numero ? Number(maxNumeroData[0].numero) : 0) + 1;
     // Calcular valor total
     const valor_total = form.materiais.reduce((acc: number, m: PedidoItem) => acc + (m.valor_total || 0), 0) - parseFloat(form.desconto?.toString() || "0");
     // Salvar pedido
     const pedidoParaSalvar = {
-      ...form,
+      numero: nextNumero,
       data_locacao: form.data_locacao ? toISODate(form.data_locacao) : null,
       data_evento: form.data_evento ? toISODate(form.data_evento) : null,
       data_retirada: form.data_retirada ? toISODate(form.data_retirada) : null,
       data_devolucao: form.data_devolucao ? toISODate(form.data_devolucao) : null,
-      data_entregou: form.data_entregou ? toISODate(form.data_entregou) : null,
-      data_recebeu: form.data_recebeu ? toISODate(form.data_recebeu) : null,
-      data_buscou: form.data_buscou ? toISODate(form.data_buscou) : null,
-      valor_total,
+      cliente: form.cliente,
+      cpf: form.cpf,
+      endereco: form.endereco,
+      telefone: form.telefone,
+      residencial: form.residencial,
+      referencia: form.referencia,
+      entrega: form.entrega,
+      busca: form.busca,
+      pagamento: form.pagamento,
       valor_pago: parseFloat(form.valor_pago?.toString() || "0"),
+      valor_total,
       desconto: parseFloat(form.desconto?.toString() || "0"),
+      responsavel_entregou: form.responsavel_entregou,
+      data_entregou: form.data_entregou ? toISODate(form.data_entregou) : null,
+      responsavel_recebeu: form.responsavel_recebeu,
+      data_recebeu: form.data_recebeu ? toISODate(form.data_recebeu) : null,
+      responsavel_buscou: form.responsavel_buscou,
+      data_buscou: form.data_buscou ? toISODate(form.data_buscou) : null,
       created_at: new Date().toISOString(),
     };
     const { error } = await supabase.from("pedidos").insert([pedidoParaSalvar]);
