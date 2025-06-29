@@ -1,21 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
 import OrderForm from "@/components/OrderForm";
 import OrderList from "@/components/OrderList";
 import { Pedido, PedidoItem } from "../types/Pedido";
-import { formatDateBR } from "../lib/formatDate";
 import PainelAdminButton from "@/components/PainelAdminButton";
 
 type PedidoItemField = keyof PedidoItem;
-
-interface JsPDFWithAutoTable extends jsPDF {
-  lastAutoTable?: { finalY: number };
-}
-
 // Função utilitária para converter data pt-BR para ISO (yyyy-mm-dd)
 function toISODate(dateStr: string): string {
   if (!dateStr) return "";
@@ -181,84 +173,6 @@ export default function Orders() {
     }
   };
 
-  // PDF fiel ao contrato
-  const exportarPedidoPDF = (pedido: Pedido) => {
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    // --- LOGO ---
-    // Para adicionar a logo, converta o favicon.ico para base64 PNG e substitua abaixo:
-    // Exemplo: const logoBase64 = "data:image/png;base64,iVBORw0KGgoAAAANS...";
-    // doc.addImage(logoBase64, 'PNG', 10, 6, 28, 18);
-
-    // --- Cabeçalho ---
-    doc.setFontSize(13);
-    doc.setFont('helvetica', 'bold');
-    doc.text("FLAVINHO Espaço Locações & Festa", 42, 14);
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text("CNPJ 25.192.935/0001-48 PIX", 42, 19);
-    doc.text("Av. Bela Vista Qd. 18 Lt. 03 - Parque Trindade I - Ap. de Goiânia - GO", 42, 24);
-    doc.setFontSize(10);
-    doc.setTextColor(200, 0, 0);
-    doc.text("ATENÇÃO: TODOS OS MATERIAIS DEVEM SER CONFERIDOS PELO CLIENTE NO RECEBIMENTO DO MESMO.", 10, 30);
-    doc.setFontSize(8);
-    doc.setTextColor(80, 80, 80);
-    doc.text("OBS.: QUALQUER DEFEITO NOS MESMOS SERÁ COBRADO O VALOR DO MESMO OU REPOSIÇÃO COM OUTRO DO MESMO MODELO.", 10, 34);
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.setFont('helvetica', 'bold');
-    doc.text("CONTRATO DE LOCAÇÃO", 80, 40);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    // --- Dados principais ---
-    doc.text(`DATA DA LOCAÇÃO: ${formatDateBR(pedido.data_locacao)}`, 10, 48);
-    doc.text(`DATA DO EVENTO: ${formatDateBR(pedido.data_evento)}`, 80, 48);
-    doc.text(`DEVOLVER: ${formatDateBR(pedido.data_devolucao)}`, 150, 48);
-    doc.text(`NOME: ${pedido.cliente || ""}`, 10, 54);
-    doc.text(`CPF: ${pedido.cpf || ""}`, 150, 54);
-    doc.text(`LOCAL DO EVENTO: ${pedido.endereco || ""}`, 10, 60);
-    doc.text(`FONE CELULAR: ${pedido.telefone || ""}`, 150, 60);
-    doc.text(`END. RESIDENCIAL: ${pedido.residencial || ""}`, 10, 66);
-    doc.text(`FONE REFERÊNCIA: ${pedido.referencia || ""}`, 150, 66);
-    // --- Materiais ---
-    autoTable(doc, {
-      startY: 72,
-      head: [["QUANT.", "MATERIAL", "VALOR UNIT.", "VALOR TOTAL"]],
-      body: pedido.materiais.map((mat: PedidoItem) => [
-        mat.quantidade,
-        mat.nome,
-        `R$ ${(mat.valor_unit || 0).toFixed(2)}`,
-        `R$ ${(mat.valor_total || 0).toFixed(2)}`,
-      ]),
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [26, 34, 49], textColor: 255, fontStyle: 'bold' },
-      columnStyles: { 0: { cellWidth: 20 }, 1: { cellWidth: 90 }, 2: { cellWidth: 30 }, 3: { cellWidth: 30 } },
-      margin: { left: 10, right: 10 },
-      theme: 'grid',
-      tableWidth: 170,
-    });
-    const docWithTable = doc as JsPDFWithAutoTable;
-    let y = docWithTable.lastAutoTable?.finalY ? docWithTable.lastAutoTable.finalY + 6 : 78;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`RESP. ENTREGOU: ${pedido.responsavel_entregou || ""}   DATA: ${formatDateBR(pedido.data_entregou)}   HORÁRIO: ______   DESCONTO: R$ ${(pedido.desconto || 0).toFixed(2)}`, 10, y);
-    y += 6;
-    doc.text(`RESP. RECEBEU: ${pedido.responsavel_recebeu || ""}   DATA: ${formatDateBR(pedido.data_recebeu)}   HORÁRIO: ______`, 10, y);
-    y += 6;
-    doc.text(`RESP. BUSCOU: ${pedido.responsavel_buscou || ""}   DATA: ${formatDateBR(pedido.data_buscou)}   HORÁRIO: ______   TOTAL: R$ ${(pedido.valor_total || 0).toFixed(2)}`, 10, y);
-    y += 6;
-    doc.text(`RESP. CONFERIU FORRO: ${pedido.responsavel_conferiu_forro || ""}`, 10, y);
-    y += 6;
-    doc.text(`RESP. CONFERIU UTENSÍLIO: ${pedido.responsavel_conferiu_utensilio || ""}`, 10, y);
-    y += 10;
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text("CERTIFICO QUE EU CONFERI TODO MATERIAL E RESPONSABILIZO POR TODO E QUALQUER MATERIAL PRESCRITO NESTE CONTRATO.", 10, y, { maxWidth: 180 });
-    y += 12;
-    doc.setFont('helvetica', 'normal');
-    doc.text("ASSINATURA: ____________________________   CPF/RG: ____________________________", 10, y);
-    doc.save(`Pedido_${pedido.numero || pedido.cliente}.pdf`);
-  };
-
   // Filtro
   const pedidosFiltrados = pedidos.filter((p) =>
     p.cliente.toLowerCase().includes(search.toLowerCase())
@@ -320,7 +234,6 @@ export default function Orders() {
             });
           }}
           onExcluir={async (id) => { await supabase.from("pedidos").delete().eq("id", id); fetchPedidos(); }}
-          onExportarPDF={exportarPedidoPDF}
         />
       </main>
     </>
