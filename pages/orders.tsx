@@ -21,6 +21,14 @@ function toISODate(dateStr: string): string {
   return dateStr;
 }
 
+type ProdutoLocal = {
+  id: string;
+  numero: string;
+  nome: string;
+  quantidade_empresa: number;
+  quantidade_rua: number;
+};
+
 export default function Orders() {
   const [form, setForm] = useState<Pedido & { materiais: PedidoItem[] }>({
     data_locacao: "",
@@ -50,7 +58,7 @@ export default function Orders() {
     responsavel_conferiu_utensilio: "",
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  const [produtos, setProdutos] = useState<{ id: string; numero: string; nome: string; quantidade_empresa: number; quantidade_rua: number }[]>([]);
+  const [produtos, setProdutos] = useState<ProdutoLocal[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
@@ -72,14 +80,13 @@ export default function Orders() {
     const fetchProdutos = async () => {
       const { data } = await supabase.from("produtos").select("*");
       if (data) {
-        // Garantir que cada produto tenha a propriedade 'id'
         setProdutos(
-          data.map((p: any) => ({
-            id: p.id ? String(p.id) : String(p.numero), // usa id se existir, senão usa numero como fallback
-            numero: p.numero,
-            nome: p.nome,
-            quantidade_empresa: p.quantidade_empresa,
-            quantidade_rua: p.quantidade_rua,
+          data.map((p: Record<string, unknown>) => ({
+            id: p.id ? String(p.id) : String(p.numero),
+            numero: String(p.numero ?? ""),
+            nome: String(p.nome ?? ""),
+            quantidade_empresa: Number(p.quantidade_empresa ?? 0),
+            quantidade_rua: Number(p.quantidade_rua ?? 0),
           }))
         );
       }
