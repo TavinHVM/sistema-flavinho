@@ -13,6 +13,8 @@ import SectionTitle from "@/components/SectionTitle";
 import SearchInput from "@/components/SearchInput";
 import RefreshButton from "@/components/RefreshButton";
 import PainelAdminButton from "@/components/PainelAdminButton";
+import Toast from "@/components/Toast";
+import ConfirmModal from "@/components/ConfirmModal";
 
 type Produto = {
   id: string;
@@ -35,6 +37,8 @@ export default function Home() {
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const router = useRouter();
   const exportMenuRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
@@ -107,12 +111,12 @@ export default function Home() {
     const quantidadeRua = parseInt(form.quantidade_rua);
 
     if (!form.nome.trim()) {
-      alert("Por favor, preencha o nome do produto.");
+      setToast({ type: 'error', message: 'Por favor, preencha o nome do produto.' });
       return;
     }
 
     if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua)) {
-      alert("Por favor, preencha as quantidades corretamente.");
+      setToast({ type: 'error', message: 'Por favor, preencha as quantidades corretamente.' });
       return;
     }
 
@@ -128,27 +132,26 @@ export default function Home() {
 
     if (!error) {
       setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
-      alert("Produto adicionado com sucesso!");
+      setToast({ type: 'success', message: 'Produto adicionado com sucesso!' });
       fetchProdutos();
     } else {
-      console.error("Erro ao adicionar produto:", error);
-      alert("Erro ao adicionar produto!");
+      setToast({ type: 'error', message: 'Erro ao adicionar produto!' });
     }
   };
 
   const excluirProduto = async (id: string) => {
-    const confirmar = window.confirm(
-      "Tem certeza que deseja excluir este produto?"
-    );
-    if (!confirmar) return;
+    setConfirmDelete({ open: true, id });
+  };
 
-    const { error } = await supabase.from("produtos").delete().eq("id", id);
+  const confirmarExclusaoProduto = async () => {
+    if (!confirmDelete.id) return;
+    const { error } = await supabase.from("produtos").delete().eq("id", confirmDelete.id);
+    setConfirmDelete({ open: false, id: null });
     if (!error) {
-      alert("Produto excluído com sucesso!");
+      setToast({ type: 'success', message: 'Produto excluído com sucesso!' });
       fetchProdutos();
     } else {
-      console.error("Erro ao excluir produto:", error);
-      alert("Erro ao excluir produto!");
+      setToast({ type: 'error', message: 'Erro ao excluir produto!' });
     }
   };
 
@@ -179,7 +182,7 @@ export default function Home() {
     const quantidadeRua = parseInt(form.quantidade_rua);
 
     if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua)) {
-      alert("Por favor, preencha as quantidades corretamente.");
+      setToast({ type: 'error', message: 'Por favor, preencha as quantidades corretamente.' });
       return;
     }
 
@@ -197,11 +200,10 @@ export default function Home() {
     if (!error) {
       setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
       setEditando(null);
-      alert("Produto atualizado com sucesso!");
+      setToast({ type: 'success', message: 'Produto atualizado com sucesso!' });
       fetchProdutos();
     } else {
-      console.error("Erro ao atualizar produto:", error);
-      alert("Erro ao atualizar produto!");
+      setToast({ type: 'error', message: 'Erro ao atualizar produto!' });
     }
   };
 
@@ -280,6 +282,13 @@ export default function Home() {
   return (
     <>
       <Header />
+      <Toast toast={toast} onClose={() => setToast(null)} />
+      <ConfirmModal
+        open={confirmDelete.open}
+        onConfirm={confirmarExclusaoProduto}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        message="Tem certeza que deseja excluir este produto?"
+      />
       <main className="min-h-screen flex flex-col justify-between bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-0 md:mt-0 mb-0 md:mb-0 p-2 sm:p-4 md:p-8 max-w-full md:max-w-4xl mx-auto">
         {isAdmin && (
           <div className="mt-0 mb-14">

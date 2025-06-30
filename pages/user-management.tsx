@@ -5,6 +5,8 @@ import { FaSyncAlt } from "react-icons/fa";
 import Header from "../components/Header";
 import UserForm from "@/components/UserForm";
 import UserList from "@/components/UserList";
+import Toast from "@/components/Toast";
+import ConfirmModal from "@/components/ConfirmModal";
 
 interface User {
   id: string;
@@ -28,6 +30,8 @@ export default function UserManagement() {
   const [showEdit, setShowEdit] = useState(false);
   const [search, setSearch] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
   const router = useRouter();
 
   const fetchUsers = async () => {
@@ -140,25 +144,26 @@ export default function UserManagement() {
 
   // Excluir usuário do Auth e do profiles
   const handleDelete = async (id: string) => {
-    const confirmar = window.confirm("Tem certeza que deseja excluir este usuário?");
-    if (!confirmar) return;
+    setConfirmDelete({ open: true, id });
+  };
 
+  const confirmDeleteUser = async () => {
+    if (!confirmDelete.id) return;
     setLoading(true);
     // Chama a API interna protegida
     const res = await fetch("/api/delete-user", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id: confirmDelete.id }),
     });
     const result = await res.json();
     setLoading(false);
-
+    setConfirmDelete({ open: false, id: null });
     if (!res.ok) {
-      setMessage("Erro ao excluir usuário: " + (result.error || "Erro desconhecido"));
+      setToast({ type: 'error', message: "Erro ao excluir usuário: " + (result.error || "Erro desconhecido") });
       return;
     }
-
-    setMessage("Usuário excluído com sucesso!");
+    setToast({ type: 'success', message: "Usuário excluído com sucesso!" });
     fetchUsers();
   };
 
@@ -204,9 +209,16 @@ export default function UserManagement() {
   return (
     <>
       <Header />
+      <Toast toast={toast} onClose={() => setToast(null)} />
+      <ConfirmModal
+        open={confirmDelete.open}
+        onConfirm={confirmDeleteUser}
+        onCancel={() => setConfirmDelete({ open: false, id: null })}
+        message="Tem certeza que deseja excluir este usuário?"
+      />
       <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white px-2">
         <UserForm form={form} setForm={setForm} onSubmit={handleRegister} loading={loading} />
-        {message && (
+        {(message && !toast) && (
           <div className="mt-4 text-center text-sm text-yellow-400">
             {message}
           </div>
