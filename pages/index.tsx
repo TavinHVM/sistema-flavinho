@@ -17,7 +17,7 @@ import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
 
 type Produto = {
-  id: string;
+  numero: number;
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
@@ -33,7 +33,7 @@ export default function Home() {
   });
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [editando, setEditando] = useState<string | null>(null);
+  const [editando, setEditando] = useState<number | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
@@ -47,19 +47,9 @@ export default function Home() {
     setLoading(true);
     const { data, error } = await supabase
       .from("produtos")
-      .select("*"); // Remova a ordenação do Supabase, pois faremos no frontend
-
+      .select("*");
     if (!error && data) {
-      // Ordenação numérica extraindo o número do nome (ex: "Produto 10")
-      const sorted = [...data].sort((a, b) => {
-        const regex = /(\d+)/;
-        const aMatch = a.nome.match(regex);
-        const bMatch = b.nome.match(regex);
-        if (aMatch && bMatch) {
-          return Number(aMatch[1]) - Number(bMatch[1]);
-        }
-        return a.nome.localeCompare(b.nome, 'pt-BR');
-      });
+      const sorted = [...data].sort((a, b) => a.numero - b.numero);
       setProdutos(sorted);
     }
     setLoading(false);
@@ -120,10 +110,15 @@ export default function Home() {
       return;
     }
 
+    // Buscar o maior numero atual
+    const { data: maxNumeroData } = await supabase.from("produtos").select("numero").order("numero", { ascending: false }).limit(1);
+    const nextNumero = (maxNumeroData && maxNumeroData[0] && maxNumeroData[0].numero ? Number(maxNumeroData[0].numero) : 0) + 1;
+
     const produtoParaSalvar = {
       nome: form.nome,
       quantidade_empresa: quantidadeEmpresa,
       quantidade_rua: quantidadeRua,
+      numero: nextNumero,
     };
 
     const { error } = await supabase
@@ -139,13 +134,13 @@ export default function Home() {
     }
   };
 
-  const excluirProduto = async (id: string) => {
-    setConfirmDelete({ open: true, id });
+  const excluirProduto = async (numero: number) => {
+    setConfirmDelete({ open: true, id: numero.toString() });
   };
 
   const confirmarExclusaoProduto = async () => {
     if (!confirmDelete.id) return;
-    const { error } = await supabase.from("produtos").delete().eq("id", confirmDelete.id);
+    const { error } = await supabase.from("produtos").delete().eq("numero", Number(confirmDelete.id));
     setConfirmDelete({ open: false, id: null });
     if (!error) {
       setToast({ type: 'success', message: 'Produto excluído com sucesso!' });
@@ -155,11 +150,11 @@ export default function Home() {
     }
   };
 
-  const editarProduto = async (id: string) => {
+  const editarProduto = async (numero: number) => {
     const { data } = await supabase
       .from("produtos")
       .select("*")
-      .eq("id", id)
+      .eq("numero", numero)
       .single();
 
     if (data) {
@@ -168,7 +163,7 @@ export default function Home() {
         quantidade_empresa: data.quantidade_empresa.toString(),
         quantidade_rua: data.quantidade_rua.toString(),
       });
-      setEditando(id);
+      setEditando(numero);
       setTimeout(() => {
         formRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 100);
@@ -195,7 +190,7 @@ export default function Home() {
     const { error } = await supabase
       .from("produtos")
       .update(produtoParaAtualizar)
-      .eq("id", editando);
+      .eq("numero", editando);
 
     if (!error) {
       setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
@@ -332,7 +327,7 @@ export default function Home() {
             />
           </div>
           <ProdutoList
-            produtos={produtos.map((p, idx) => ({ ...p, numero: idx + 1 }))}
+            produtos={produtos}
             search={search}
             onEditar={editarProduto}
             onExcluir={excluirProduto}

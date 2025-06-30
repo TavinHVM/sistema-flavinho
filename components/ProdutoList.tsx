@@ -1,19 +1,19 @@
 import { FaTrash, FaEdit, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useState } from "react";
 
-type Produto = {
-  id: string;
+interface Produto {
+  numero: number;
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
-  numero: number;
-};
+  created_at: string;
+}
 
 interface ProdutoListProps {
   produtos: Produto[];
   search: string;
-  onEditar: (id: string) => void;
-  onExcluir: (id: string) => void;
+  onEditar?: (numero: number) => void;
+  onExcluir?: (numero: number) => void;
 }
 
 type SortKey = keyof Produto | "total" | null;
@@ -136,7 +136,7 @@ export default function ProdutoList({
         </thead>
         <tbody>
           {sortedProdutos.map((produto) => (
-            <tr key={produto.id} className="border-b border-gray-700">
+            <tr key={produto.numero} className="border-b border-gray-700">
               <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">
                 {produto.numero}
               </td>
@@ -154,18 +154,22 @@ export default function ProdutoList({
               </td>
               <td className="py-4 px-4">
                 <div className="flex gap-2">
-                  <button
-                    onClick={() => onExcluir(produto.id)}
-                    className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
-                  >
-                    <FaTrash /> Excluir
-                  </button>
-                  <button
-                    onClick={() => onEditar(produto.id)}
-                    className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
-                  >
-                    <FaEdit /> Editar
-                  </button>
+                  {onExcluir && (
+                    <button
+                      onClick={() => onExcluir(produto.numero)}
+                      className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
+                    >
+                      <FaTrash /> Excluir
+                    </button>
+                  )}
+                  {onEditar && (
+                    <button
+                      onClick={() => onEditar(produto.numero)}
+                      className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+                    >
+                      <FaEdit /> Editar
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>
