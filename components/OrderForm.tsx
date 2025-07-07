@@ -66,8 +66,8 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <input className="rounded p-2 text-black w-full" placeholder="Nome completo" value={form.cliente} onChange={e => setForm({ ...form, cliente: e.target.value })} />
         </div>
         <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">CPF</label>
-          <input className="rounded p-2 text-black w-full" placeholder="CPF do cliente" value={form.cpf} onChange={e => setForm({ ...form, cpf: e.target.value })} />
+          <label className="text-xs text-gray-300 font-semibold">CPF/CNPJ</label>
+          <input className="rounded p-2 text-black w-full" placeholder="CPF/CNPJ do cliente" value={form.cpf} onChange={e => setForm({ ...form, cpf: e.target.value })} />
         </div>
       </div>
       {/* Linha 3: Endereço, Telefone, Referência */}

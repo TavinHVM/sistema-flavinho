@@ -70,10 +70,9 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose }) => {
           <div><b>Nº:</b> {pedido.numero}</div>
           <div><b>Data Locação:</b> {formatDateBR(pedido.data_locacao)}</div>
           <div><b>Data Evento:</b> {formatDateBR(pedido.data_evento)}</div>
-          <div><b>Data Retirada:</b> {formatDateBR(pedido.data_retirada)}</div>
           <div><b>Data Devolução:</b> {formatDateBR(pedido.data_devolucao)}</div>
           <div><b>Cliente:</b> {pedido.cliente}</div>
-          <div><b>CPF:</b> {pedido.cpf}</div>
+          <div><b>CPF/CNPJ:</b> {pedido.cpf}</div>
           <div><b>Telefone:</b> {pedido.telefone}</div>
           <div><b>Endereço Evento:</b> {pedido.endereco}</div>
           <div><b>Endereço Residencial:</b> {pedido.residencial}</div>

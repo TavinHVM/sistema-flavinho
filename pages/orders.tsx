@@ -8,6 +8,7 @@ import { Pedido, PedidoItem } from "../types/Pedido";
 import PainelAdminButton from "@/components/PainelAdminButton";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
+import { FaSyncAlt } from "react-icons/fa";
 
 type PedidoItemField = keyof PedidoItem;
 // Função utilitária para converter data pt-BR para ISO (yyyy-mm-dd)
@@ -169,6 +170,8 @@ export default function Orders() {
       data_recebeu: form.data_recebeu ? toISODate(form.data_recebeu) : null,
       responsavel_buscou: form.responsavel_buscou,
       data_buscou: form.data_buscou ? toISODate(form.data_buscou) : null,
+      responsavel_conferiu_forro: form.responsavel_conferiu_forro,
+      responsavel_conferiu_utensilio: form.responsavel_conferiu_utensilio,
       created_at: new Date().toISOString(),
     };
     const numeroPedido = form.numero ? Number(form.numero) : null;
@@ -302,13 +305,23 @@ export default function Orders() {
             }}
           />
         </div>
-        <SectionTitle className="mt-8 mb-2">Pedidos</SectionTitle>
-        <input
-          className="rounded p-2 text-black mb-2 w-full"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Pesquisar por cliente"
-        />
+
+        <div className="items-center justify-center">
+          <SectionTitle className="text-center mt-12">Pedidos</SectionTitle>
+          <button
+            className="mt-2 mb-2 flex items-center justify-center gap-2 bg-blue-800 text-white p-2 rounded hover:bg-blue-900 transition-all font-poppins text-[0.95rem] font-medium w-full"
+            onClick={() => fetchPedidos()}
+          >
+            <FaSyncAlt className={loading ? "animate-spin" : ""} />
+            Atualizar Lista
+          </button>
+          <input
+            className="rounded p-2 text-black mb-2 w-full"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Pesquisar por cliente"
+          />
+        </div>
         <OrderList
           pedidos={pedidosFiltrados}
           search={search}
