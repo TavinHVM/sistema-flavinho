@@ -128,9 +128,18 @@ export default function UserManagement() {
 
     // Atualiza senha se fornecida
     if (senha && senha.length >= 6) {
-      const { error: passError } = await supabase.auth.admin.updateUserById(editingUserId!, { password: senha });
-      if (passError) {
-        setMessage("Usuário atualizado, mas erro ao atualizar senha: " + passError.message);
+      // Pega o role do usuário autenticado do localStorage
+      const userStr = localStorage.getItem("user");
+      const user = userStr ? JSON.parse(userStr) : null;
+      const roleAtual = user?.role;
+      const res = await fetch("/api/update-user-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: editingUserId, newPassword: senha, role: roleAtual }),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        setMessage("Usuário atualizado, mas erro ao atualizar senha: " + (result.error || "Erro desconhecido"));
         setEditingUserId(null);
         fetchUsers();
         return;
