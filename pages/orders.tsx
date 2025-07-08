@@ -172,6 +172,7 @@ export default function Orders() {
       data_buscou: form.data_buscou ? toISODate(form.data_buscou) : null,
       responsavel_conferiu_forro: form.responsavel_conferiu_forro,
       responsavel_conferiu_utensilio: form.responsavel_conferiu_utensilio,
+      materiais: form.materiais,
       created_at: new Date().toISOString(),
     };
     const numeroPedido = form.numero ? Number(form.numero) : null;
