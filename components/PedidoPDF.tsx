@@ -154,7 +154,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
             DATA: {formatDateBR(pedido.data_entregou)}
           </Text>
           <Text style={{ flex: 1, textAlign: 'center' }}>
-            HORÁRIO: ______
+            HORÁRIO: {pedido.horario_entregou || "______"}
           </Text>
           <Text style={{ flex: 1, textAlign: 'right' }}>
             DESCONTO: R$ {pedido.desconto?.toFixed(2)}
@@ -169,7 +169,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
             DATA: {formatDateBR(pedido.data_recebeu)}
           </Text>
           <Text style={{ flex: 2, textAlign: 'left' }}>
-            HORÁRIO: ______
+            HORÁRIO: {pedido.horario_recebeu || "______"}
           </Text>
         </View>
         {/* Linha 3: BUSCOU (esquerda), DATA (centro), HORÁRIO (direita), TOTAL (direita) */}
@@ -181,7 +181,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
             DATA: {formatDateBR(pedido.data_buscou)}
           </Text>
           <Text style={{ flex: 1, textAlign: 'center' }}>
-            HORÁRIO: ______
+            HORÁRIO: {pedido.horario_buscou || "______"}
           </Text>
           <Text style={{ flex: 1, textAlign: 'right', fontWeight: 'bold' }}>
             TOTAL: R$ {pedido.valor_total?.toFixed(2)}

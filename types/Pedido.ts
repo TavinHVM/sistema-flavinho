@@ -34,4 +34,7 @@ export interface Pedido {
   responsavel_conferiu_forro?: string;
   responsavel_conferiu_utensilio?: string;
   created_at?: string;
+  horario_entregou?: string; // HH:mm
+  horario_recebeu?: string; // HH:mm
+  horario_buscou?: string; // HH:mm
 }

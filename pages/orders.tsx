@@ -57,6 +57,9 @@ export default function Orders() {
     data_buscou: "",
     responsavel_conferiu_forro: "",
     responsavel_conferiu_utensilio: "",
+    horario_entregou: "",
+    horario_recebeu: "",
+    horario_buscou: "",
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [produtos, setProdutos] = useState<ProdutoLocal[]>([]);
@@ -173,6 +176,9 @@ export default function Orders() {
       responsavel_conferiu_forro: form.responsavel_conferiu_forro,
       responsavel_conferiu_utensilio: form.responsavel_conferiu_utensilio,
       materiais: form.materiais,
+      horario_entregou: form.horario_entregou,
+      horario_recebeu: form.horario_recebeu,
+      horario_buscou: form.horario_buscou,
       created_at: new Date().toISOString(),
     };
     const numeroPedido = form.numero ? Number(form.numero) : null;
@@ -214,6 +220,9 @@ export default function Orders() {
         data_buscou: "",
         responsavel_conferiu_forro: "",
         responsavel_conferiu_utensilio: "",
+        horario_entregou: "",
+        horario_recebeu: "",
+        horario_buscou: "",
       });
       setIsEditing(false);
       fetchPedidos();
@@ -301,6 +310,9 @@ export default function Orders() {
                 data_buscou: "",
                 responsavel_conferiu_forro: "",
                 responsavel_conferiu_utensilio: "",
+                horario_entregou: "",
+                horario_recebeu: "",
+                horario_buscou: "",
               });
               setIsEditing(false);
             }}
