@@ -7,6 +7,7 @@ import UserForm from "@/components/UserForm";
 import UserList from "@/components/UserList";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
+import RefreshButton from "@/components/RefreshButton";
 
 interface User {
   id: string;
@@ -238,6 +239,7 @@ export default function UserManagement() {
               Usuários
             </h2>
             <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center w-full sm:w-auto">
+              <RefreshButton onClick={fetchUsers} loading={loading} />
               <input
                 type="text"
                 placeholder="Pesquisar por nome"
@@ -246,14 +248,6 @@ export default function UserManagement() {
                 className="p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm w-full sm:w-auto"
                 style={{ minWidth: 0, flex: 1 }}
               />
-              <button
-                onClick={fetchUsers}
-                className="flex items-center gap-2 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium w-full sm:w-auto"
-                disabled={loading}
-              >
-                <FaSyncAlt className={loading ? "animate-spin" : ""} />
-                Atualizar Lista
-              </button>
             </div>
           </div>
 

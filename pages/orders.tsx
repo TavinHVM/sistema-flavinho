@@ -9,6 +9,7 @@ import PainelAdminButton from "@/components/PainelAdminButton";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
 import { FaSyncAlt } from "react-icons/fa";
+import RefreshButton from "@/components/RefreshButton";
 
 type PedidoItemField = keyof PedidoItem;
 // Função utilitária para converter data pt-BR para ISO (yyyy-mm-dd)
@@ -308,13 +309,9 @@ export default function Orders() {
 
         <div className="items-center justify-center">
           <SectionTitle className="text-center mt-12">Pedidos</SectionTitle>
-          <button
-            className="mt-2 mb-2 flex items-center justify-center gap-2 bg-blue-800 text-white p-2 rounded hover:bg-blue-900 transition-all font-poppins text-[0.95rem] font-medium w-full"
-            onClick={() => fetchPedidos()}
-          >
-            <FaSyncAlt className={loading ? "animate-spin" : ""} />
-            Atualizar Lista
-          </button>
+          <div className="flex items-center justify-center mb-2">
+            <RefreshButton onClick={fetchPedidos} loading={loading} />
+          </div>
           <input
             className="rounded p-2 text-black mb-2 w-full"
             value={search}
