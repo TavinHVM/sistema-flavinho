@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
-import { FaSyncAlt } from "react-icons/fa";
 import Header from "../components/Header";
 import UserForm from "@/components/UserForm";
 import UserList from "@/components/UserList";

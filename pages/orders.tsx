@@ -8,7 +8,6 @@ import { Pedido, PedidoItem } from "../types/Pedido";
 import PainelAdminButton from "@/components/PainelAdminButton";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
-import { FaSyncAlt } from "react-icons/fa";
 import RefreshButton from "@/components/RefreshButton";
 
 type PedidoItemField = keyof PedidoItem;

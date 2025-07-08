@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import Header from "@/components/Header";
-import ConfirmModal from "@/components/ConfirmModal";
 
 export default function Login() {
   const [usuario, setUsuario] = useState("");
