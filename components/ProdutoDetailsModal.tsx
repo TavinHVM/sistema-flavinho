@@ -1,5 +1,5 @@
 import React from "react";
-import { FaEdit, FaTrash, FaFilePdf } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 interface Produto {
   numero: number;

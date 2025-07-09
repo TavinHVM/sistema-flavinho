@@ -1,4 +1,4 @@
-import { FaTrash, FaEdit, FaSortUp, FaSortDown } from "react-icons/fa";
+import { FaSortUp, FaSortDown } from "react-icons/fa";
 import { useState } from "react";
 import ProdutoDetailsModal from "./ProdutoDetailsModal";
 
