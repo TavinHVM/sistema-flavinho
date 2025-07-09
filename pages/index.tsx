@@ -329,8 +329,14 @@ export default function Home() {
           <ProdutoList
             produtos={produtos}
             search={search}
-            onEditar={editarProduto}
-            onExcluir={excluirProduto}
+            onEditar={(numero) => {
+              // Fechar modal antes de editar
+              editarProduto(numero);
+            }}
+            onExcluir={(numero) => {
+              // Fechar modal antes de excluir
+              excluirProduto(numero);
+            }}
           />
         </section>
         <div className="flex justify-center text-xs text-gray-400 text-center mt-auto">

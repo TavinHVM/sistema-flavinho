@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaTrash, FaEdit, FaSortUp, FaSortDown } from "react-icons/fa";
+import { FaSortUp, FaSortDown } from "react-icons/fa";
 import OrderDetailsModal from "./OrderDetailsModal";
 import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";

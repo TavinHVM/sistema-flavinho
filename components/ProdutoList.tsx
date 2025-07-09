@@ -1,5 +1,6 @@
 import { FaTrash, FaEdit, FaSortUp, FaSortDown } from "react-icons/fa";
 import { useState } from "react";
+import ProdutoDetailsModal from "./ProdutoDetailsModal";
 
 interface Produto {
   numero: number;
@@ -27,6 +28,8 @@ export default function ProdutoList({
 }: ProdutoListProps) {
   const [sortKey, setSortKey] = useState<SortKey>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+  const [modalProduto, setModalProduto] = useState<Produto | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleSort = (key: SortKey) => {
     if (sortKey !== key) {
@@ -47,6 +50,15 @@ export default function ProdutoList({
     if (sortOrder === "asc") return <FaSortUp className="inline ml-1" />;
     if (sortOrder === "desc") return <FaSortDown className="inline ml-1" />;
     return null;
+  };
+
+  const handleVerMais = (produto: Produto) => {
+    setModalProduto(produto);
+    setModalOpen(true);
+  };
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setModalProduto(null);
   };
 
   const sortedProdutos = (() => {
@@ -104,78 +116,40 @@ export default function ProdutoList({
           <tr className="bg-gray-700 text-gray-300">
             <th
               className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("numero")}>
-              N° {getSortIcon("numero")}
-            </th>
+              onClick={() => handleSort("numero")}>N° {getSortIcon("numero")}</th>
             <th
               className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("nome")}
-            >
-              Nome {getSortIcon("nome")}
-            </th>
+              onClick={() => handleSort("nome")}>Nome {getSortIcon("nome")}</th>
             <th
               className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("quantidade_empresa")}
-            >
-              Na empresa {getSortIcon("quantidade_empresa")}
-            </th>
+              onClick={() => handleSort("quantidade_empresa")}>Na empresa {getSortIcon("quantidade_empresa")}</th>
             <th
               className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("quantidade_rua")}
-            >
-              Em rota de entrega {getSortIcon("quantidade_rua")}
-            </th>
+              onClick={() => handleSort("quantidade_rua")}>Em rota de entrega {getSortIcon("quantidade_rua")}</th>
             <th
               className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("total")}
-            >
-              Total {getSortIcon("total")}
-            </th>
-            <th className="py-3 px-4 text-left">Ações</th>
+              onClick={() => handleSort("total")}>Total {getSortIcon("total")}</th>
+            <th className="py-3 px-4 text-left"></th>
           </tr>
         </thead>
         <tbody>
           {sortedProdutos.map((produto) => (
-            <tr key={produto.numero} className="border-b border-gray-700">
-              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">
-                {produto.numero}
-              </td>
-              <td className="py-4 px-4 font-poppins text-[1rem] font-semibold">
-                {produto.nome}
-              </td>
-              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">
-                {produto.quantidade_empresa}
-              </td>
-              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">
-                {produto.quantidade_rua}
-              </td>
-              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">
-                {produto.quantidade_empresa + produto.quantidade_rua}
-              </td>
-              <td className="py-4 px-4">
-                <div className="flex gap-2">
-                  {onExcluir && (
-                    <button
-                      onClick={() => onExcluir(produto.numero)}
-                      className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
-                    >
-                      <FaTrash /> Excluir
-                    </button>
-                  )}
-                  {onEditar && (
-                    <button
-                      onClick={() => onEditar(produto.numero)}
-                      className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
-                    >
-                      <FaEdit /> Editar
-                    </button>
-                  )}
-                </div>
-              </td>
+            <tr key={produto.numero} className="border-b border-gray-700 hover:bg-gray-700 cursor-pointer" onClick={e => {
+              // Evitar abrir modal ao clicar nos botões de ação
+              if ((e.target as HTMLElement).closest("button")) return;
+              handleVerMais(produto);
+            }}>
+              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">{produto.numero}</td>
+              <td className="py-4 px-4 font-poppins text-[1rem] font-semibold">{produto.nome}</td>
+              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">{produto.quantidade_empresa}</td>
+              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">{produto.quantidade_rua}</td>
+              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">{produto.quantidade_empresa + produto.quantidade_rua}</td>
+              <td className="py-4 px-4"></td>
             </tr>
           ))}
         </tbody>
       </table>
+      <ProdutoDetailsModal produto={modalProduto} open={modalOpen} onClose={handleCloseModal} onEditar={onEditar} onExcluir={onExcluir} />
     </div>
   );
 }
