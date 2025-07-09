@@ -109,7 +109,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
               className="p-2 cursor-pointer select-none min-w-[60px]"
               onClick={() => handleSort("numero")}
             >
-              <span className="flex items-center gap-1">
+              <span className="flex items-center">
                 Nº {getSortIcon("numero")}
               </span>
             </th>
@@ -117,7 +117,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
               className="p-2 cursor-pointer select-none min-w-[140px]"
               onClick={() => handleSort("cliente")}
             >
-              <span className="flex items-center gap-1">
+              <span className="flex items-center">
                 Cliente {getSortIcon("cliente")}
               </span>
             </th>
@@ -153,7 +153,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                 Total {getSortIcon("valor_total")}
               </span>
             </th>
-            <th className="p-2 min-w-[110px]">Ações</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -165,63 +165,15 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
               <td className="p-2">{formatDateBR(p.data_evento) || '-'}</td>
               <td className="p-2">{p.endereco || '-'}</td>
               <td className="p-2">R$ {p.valor_total?.toFixed(2)}</td>
-              <td className="p-2" onClick={e => e.stopPropagation()}>
-                <div className="flex gap-1 flex-wrap">
-                  {onEditar && (
-                    <button
-                      key="edit"
-                      className="bg-blue-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
-                      onClick={() => onEditar({
-                        ...p,
-                        materiais: p.materiais ?? [],
-                        numero: typeof p.numero === "string" ? p.numero : String(p.numero),
-                        data_locacao: p.data_locacao ?? "",
-                        data_evento: p.data_evento ?? "",
-                        data_retirada: p.data_retirada ?? "",
-                        data_devolucao: p.data_devolucao ?? "",
-                        cliente: p.cliente ?? "",
-                        cpf: p.cpf ?? "",
-                        endereco: p.endereco ?? "",
-                        telefone: p.telefone ?? "",
-                        residencial: p.residencial ?? "",
-                        referencia: p.referencia ?? "",
-                        entrega: p.entrega ?? "",
-                        busca: p.busca ?? "",
-                        pagamento: p.pagamento ?? "",
-                        valor_pago: p.valor_pago ?? 0,
-                        valor_total: p.valor_total ?? 0,
-                        responsavel_entregou: p.responsavel_entregou ?? "",
-                        data_entregou: p.data_entregou ?? "",
-                        responsavel_recebeu: p.responsavel_recebeu ?? "",
-                        data_recebeu: p.data_recebeu ?? "",
-                        responsavel_buscou: p.responsavel_buscou ?? "",
-                        data_buscou: p.data_buscou ?? "",
-                        responsavel_conferiu_forro: p.responsavel_conferiu_forro ?? "",
-                        responsavel_conferiu_utensilio: p.responsavel_conferiu_utensilio ?? "",
-                        desconto: p.desconto ?? 0,
-                      })}
-                      title="Editar"
-                    >
-                      <FaEdit /> Editar
-                    </button>
-                  )}
-                  {onExcluir && p.numero && (
-                    <button
-                      key="delete"
-                      className="bg-red-600 text-white rounded px-2 py-1 text-xs flex items-center justify-center gap-1 min-w-[80px]"
-                      onClick={() => onExcluir(Number(p.numero))}
-                      title="Excluir"
-                    >
-                      <FaTrash /> Excluir
-                    </button>
-                  )}
-                </div>
-              </td>
+              <td className="p-2"></td>
             </tr>
           ))}
         </tbody>
       </table>
-      <OrderDetailsModal pedido={modalPedido} open={modalOpen} onClose={handleCloseModal} />
+      <OrderDetailsModal pedido={modalPedido} open={modalOpen} onClose={handleCloseModal}
+        onEditar={onEditar}
+        onExcluir={onExcluir}
+      />
     </div>
   );
 };

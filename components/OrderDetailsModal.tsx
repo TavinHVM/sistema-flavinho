@@ -5,14 +5,17 @@ import { formatDateBR } from "../lib/formatDate";
 import { FaFilePdf } from "react-icons/fa";
 import { pdf } from "@react-pdf/renderer";
 import PedidoPDF from "./PedidoPDF";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 interface Props {
   pedido: Pedido | null;
   open: boolean;
   onClose: () => void;
+  onEditar?: (pedido: Pedido) => void;
+  onExcluir?: (id: number) => void;
 }
 
-const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose }) => {
+const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, onExcluir }) => {
   if (!pedido) return null;
 
   const handleDownloadPDF = async () => {
@@ -65,6 +68,22 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose }) => {
           >
             <FaFilePdf /> Salvar como PDF
           </button>
+          {onEditar && (
+            <button
+              className="bg-blue-600 text-white rounded px-2 py-1 text-xs flex items-center gap-1"
+              onClick={() => { onClose(); onEditar(pedido); }}
+            >
+              <FaEdit /> Editar
+            </button>
+          )}
+          {onExcluir && pedido.numero && (
+            <button
+              className="bg-red-600 text-white rounded px-2 py-1 text-xs flex items-center gap-1"
+              onClick={() => { onClose(); onExcluir(Number(pedido.numero)); }}
+            >
+              <FaTrash /> Excluir
+            </button>
+          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-white">
           <div><b>Nº:</b> {pedido.numero}</div>
