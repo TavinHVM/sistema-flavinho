@@ -169,53 +169,63 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <input className="rounded p-2 text-black w-full" type="number" value={form.valor_total} onChange={e => setForm({ ...form, valor_total: Number(e.target.value) })} />
         </div>
       </div>
-      {/* Linha 7: Responsáveis */}
-      <div className="flex flex-col md:flex-row gap-2 mt-2">
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Resp. Entregou</label>
-          <input className="rounded p-2 text-black w-full" value={form.responsavel_entregou} onChange={e => setForm({ ...form, responsavel_entregou: e.target.value })} />
+      {/* Linha 7: Responsáveis - AGRUPADO POR AÇÃO */}
+      <div className="flex flex-col gap-2 mt-2">
+        {/* Linha Entrega */}
+        <div className="flex flex-col md:flex-row gap-2">
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Resp. Entregou</label>
+            <input className="rounded p-2 text-black w-full" value={form.responsavel_entregou} onChange={e => setForm({ ...form, responsavel_entregou: e.target.value })} />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Data Entrega</label>
+            <input className="rounded p-2 text-black w-full" type="date" value={form.data_entregou} onChange={e => setForm({ ...form, data_entregou: e.target.value })} />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Horário Entregou</label>
+            <input className="rounded p-2 text-black w-full" type="time" value={form.horario_entregou || ""} onChange={e => setForm({ ...form, horario_entregou: e.target.value })} />
+          </div>
         </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Data Entrega</label>
-          <input className="rounded p-2 text-black w-full" type="date" value={form.data_entregou} onChange={e => setForm({ ...form, data_entregou: e.target.value })} />
+        {/* Linha Recebeu */}
+        <div className="flex flex-col md:flex-row gap-2">
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Resp. Recebeu</label>
+            <input className="rounded p-2 text-black w-full" value={form.responsavel_recebeu} onChange={e => setForm({ ...form, responsavel_recebeu: e.target.value })} />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Data Recebeu</label>
+            <input className="rounded p-2 text-black w-full" type="date" value={form.data_recebeu} onChange={e => setForm({ ...form, data_recebeu: e.target.value })} />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Horário Recebeu</label>
+            <input className="rounded p-2 text-black w-full" type="time" value={form.horario_recebeu || ""} onChange={e => setForm({ ...form, horario_recebeu: e.target.value })} />
+          </div>
         </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Horário Entregou</label>
-          <input className="rounded p-2 text-black w-full" type="time" value={form.horario_entregou || ""} onChange={e => setForm({ ...form, horario_entregou: e.target.value })} />
+        {/* Linha Buscou */}
+        <div className="flex flex-col md:flex-row gap-2">
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Resp. Buscou</label>
+            <input className="rounded p-2 text-black w-full" value={form.responsavel_buscou} onChange={e => setForm({ ...form, responsavel_buscou: e.target.value })} />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Data Busca</label>
+            <input className="rounded p-2 text-black w-full" type="date" value={form.data_buscou} onChange={e => setForm({ ...form, data_buscou: e.target.value })} />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Horário Buscou</label>
+            <input className="rounded p-2 text-black w-full" type="time" value={form.horario_buscou || ""} onChange={e => setForm({ ...form, horario_buscou: e.target.value })} />
+          </div>
         </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Resp. Recebeu</label>
-          <input className="rounded p-2 text-black w-full" value={form.responsavel_recebeu} onChange={e => setForm({ ...form, responsavel_recebeu: e.target.value })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Data Recebeu</label>
-          <input className="rounded p-2 text-black w-full" type="date" value={form.data_recebeu} onChange={e => setForm({ ...form, data_recebeu: e.target.value })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Horário Recebeu</label>
-          <input className="rounded p-2 text-black w-full" type="time" value={form.horario_recebeu || ""} onChange={e => setForm({ ...form, horario_recebeu: e.target.value })} />
-        </div>
-      </div>
-      <div className="flex flex-col md:flex-row gap-2 mt-2">
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Resp. Buscou</label>
-          <input className="rounded p-2 text-black w-full" value={form.responsavel_buscou} onChange={e => setForm({ ...form, responsavel_buscou: e.target.value })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Data Busca</label>
-          <input className="rounded p-2 text-black w-full" type="date" value={form.data_buscou} onChange={e => setForm({ ...form, data_buscou: e.target.value })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Horário Buscou</label>
-          <input className="rounded p-2 text-black w-full" type="time" value={form.horario_buscou || ""} onChange={e => setForm({ ...form, horario_buscou: e.target.value })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Resp. Conferiu Forro</label>
-          <input className="rounded p-2 text-black w-full" value={form.responsavel_conferiu_forro} onChange={e => setForm({ ...form, responsavel_conferiu_forro: e.target.value })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Resp. Conferiu Utensílio</label>
-          <input className="rounded p-2 text-black w-full" value={form.responsavel_conferiu_utensilio} onChange={e => setForm({ ...form, responsavel_conferiu_utensilio: e.target.value })} />
+        {/* Linha Conferiu */}
+        <div className="flex flex-col md:flex-row gap-2">
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Resp. Conferiu Forro</label>
+            <input className="rounded p-2 text-black w-full" value={form.responsavel_conferiu_forro} onChange={e => setForm({ ...form, responsavel_conferiu_forro: e.target.value })} />
+          </div>
+          <div className="flex-1">
+            <label className="text-xs text-gray-300 font-semibold">Resp. Conferiu Utensílio</label>
+            <input className="rounded p-2 text-black w-full" value={form.responsavel_conferiu_utensilio} onChange={e => setForm({ ...form, responsavel_conferiu_utensilio: e.target.value })} />
+          </div>
         </div>
       </div>
       <button
