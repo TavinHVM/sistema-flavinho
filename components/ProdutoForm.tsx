@@ -38,11 +38,14 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
             <input
               type="number"
               className="font-inter p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              inputMode="numeric"
+              pattern="[0-9]*"
               placeholder="Quantidade na empresa"
               value={form.quantidade_empresa}
-              onChange={(e) =>
-                setForm({ ...form, quantidade_empresa: e.target.value })
-              }
+              onChange={e => {
+                const onlyNumbers = e.target.value.replace(/\D/g, '');
+                setForm({ ...form, quantidade_empresa: onlyNumbers });
+              }}
             />
           </div>
           <div className="flex flex-col">
@@ -52,21 +55,23 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
             <input
               type="number"
               className="font-inter p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              inputMode="numeric"
+              pattern="[0-9]*"
               placeholder="Quantidade em rota de entrega"
               value={form.quantidade_rua}
-              onChange={(e) =>
-                setForm({ ...form, quantidade_rua: e.target.value })
-              }
+              onChange={e => {
+                const onlyNumbers = e.target.value.replace(/\D/g, '');
+                setForm({ ...form, quantidade_rua: onlyNumbers })
+              }}
             />
           </div>
         </div>
         <button
           onClick={onSubmit}
-          className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${
-            editando
-              ? "bg-blue-600 hover:bg-blue-700"
-              : "bg-green-600 hover:bg-green-700"
-          }`}
+          className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${editando
+            ? "bg-blue-600 hover:bg-blue-700"
+            : "bg-green-600 hover:bg-green-700"
+            }`}
         >
           {editando ? <FaEdit /> : <FaPlus />}
           {editando ? "Atualizar Produto" : "Adicionar Produto"}
