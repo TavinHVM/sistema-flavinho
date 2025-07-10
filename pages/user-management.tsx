@@ -8,7 +8,6 @@ import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
 import RefreshButton from "@/components/RefreshButton";
 import SectionTitle from "@/components/SectionTitle";
-import SearchInput from "@/components/SearchInput";
 
 interface User {
   id: string;
