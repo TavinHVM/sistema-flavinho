@@ -102,70 +102,58 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-xs bg-gray-900 rounded">
+      <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
         <thead>
-          <tr className="bg-gray-700">
-            <th
-              className="p-2 cursor-pointer select-none min-w-[60px]"
-              onClick={() => handleSort("numero")}
-            >
+          <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
+            <th className="p-3 min-w-[60px] cursor-pointer select-none" onClick={() => handleSort("numero")}>
               <span className="flex items-center">
                 Nº {getSortIcon("numero")}
               </span>
             </th>
-            <th
-              className="p-2 cursor-pointer select-none min-w-[140px]"
-              onClick={() => handleSort("cliente")}
-            >
+            <th className="p-3 min-w-[140px] cursor-pointer select-none" onClick={() => handleSort("cliente")}>
               <span className="flex items-center">
                 Cliente {getSortIcon("cliente")}
               </span>
             </th>
-            <th
-              className="p-2 cursor-pointer select-none min-w-[110px]"
-              onClick={() => handleSort("data_locacao")}
-            >
+            <th className="p-3 min-w-[110px] cursor-pointer select-none" onClick={() => handleSort("data_locacao")}>
               <span className="flex items-center gap-1">
                 Data Locação {getSortIcon("data_locacao")}
               </span>
             </th>
-            <th
-              className="p-2 cursor-pointer select-none min-w-[110px]"
-              onClick={() => handleSort("data_evento")}
-            >
+            <th className="p-3 min-w-[110px] cursor-pointer select-none" onClick={() => handleSort("data_evento")}>
               <span className="flex items-center gap-1">
                 Data Evento {getSortIcon("data_evento")}
               </span>
             </th>
-            <th
-              className="p-2 cursor-pointer select-none min-w-[140px]"
-              onClick={() => handleSort("endereco")}
-            >
+            <th className="p-3 min-w-[140px] cursor-pointer select-none" onClick={() => handleSort("endereco")}>
               <span className="flex items-center gap-1">
                 Local do Evento {getSortIcon("endereco")}
               </span>
             </th>
-            <th
-              className="p-2 cursor-pointer select-none min-w-[80px]"
-              onClick={() => handleSort("valor_total")}
-            >
+            <th className="p-3 min-w-[80px] cursor-pointer select-none" onClick={() => handleSort("valor_total")}>
               <span className="flex items-center gap-1">
                 Total {getSortIcon("valor_total")}
               </span>
             </th>
-            <th></th>
+            <th className="p-3"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-800">
           {pedidosOrdenados.map((p, idx) => (
-            <tr key={p.id || p.numero || idx} className="border-b border-gray-800 hover:bg-gray-800 cursor-pointer" onClick={() => handleVerMais(p)}>
-              <td className="p-2">{p.numero}</td>
-              <td className="p-2">{p.cliente}</td>
-              <td className="p-2">{formatDateBR(p.data_locacao)}</td>
-              <td className="p-2">{formatDateBR(p.data_evento) || '-'}</td>
-              <td className="p-2">{p.endereco || '-'}</td>
-              <td className="p-2">R$ {p.valor_total?.toFixed(2)}</td>
-              <td className="p-2"></td>
+            <tr
+              key={p.id || p.numero || idx}
+              className="hover:bg-gray-800 transition-colors duration-150 cursor-pointer even:bg-gray-900 odd:bg-gray-950"
+              onClick={() => handleVerMais(p)}
+            >
+              <td className="p-3 text-gray-200">{p.numero}</td>
+              <td className="p-3 text-gray-100">{p.cliente}</td>
+              <td className="p-3 text-gray-100">{formatDateBR(p.data_locacao)}</td>
+              <td className="p-3 text-gray-100">{formatDateBR(p.data_evento) || '-'}</td>
+              <td className="p-3 text-gray-100">{p.endereco || '-'}</td>
+              <td className="p-3 text-gray-100">
+                R$ {p.valor_total?.toFixed(2)}
+              </td>
+              <td className="p-3"></td>
             </tr>
           ))}
         </tbody>

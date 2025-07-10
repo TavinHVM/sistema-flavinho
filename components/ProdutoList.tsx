@@ -111,40 +111,45 @@ export default function ProdutoList({
 
   return (
     <div className="overflow-x-auto rounded-lg">
-      <table className="min-w-full bg-gray-800 text-white text-sm">
+      <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
         <thead>
-          <tr className="bg-gray-700 text-gray-300">
-            <th
-              className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("numero")}>N° {getSortIcon("numero")}</th>
-            <th
-              className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("nome")}>Nome {getSortIcon("nome")}</th>
-            <th
-              className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("quantidade_empresa")}>Na empresa {getSortIcon("quantidade_empresa")}</th>
-            <th
-              className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("quantidade_rua")}>Em rota de entrega {getSortIcon("quantidade_rua")}</th>
-            <th
-              className="py-3 px-4 text-left cursor-pointer select-none"
-              onClick={() => handleSort("total")}>Total {getSortIcon("total")}</th>
-            <th className="py-3 px-4 text-left"></th>
+          <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
+            <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("numero")}>
+              N° {getSortIcon("numero")}
+            </th>
+            <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("nome")}>
+              Nome {getSortIcon("nome")}
+            </th>
+            <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("quantidade_empresa")}>
+              Na empresa {getSortIcon("quantidade_empresa")}
+            </th>
+            <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("quantidade_rua")}>
+              Em rota de entrega {getSortIcon("quantidade_rua")}
+            </th>
+            <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("total")}>
+              Total {getSortIcon("total")}
+            </th>
+            <th className="p-3"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-800">
           {sortedProdutos.map((produto) => (
-            <tr key={produto.numero} className="border-b border-gray-700 hover:bg-gray-700 cursor-pointer" onClick={e => {
-              // Evitar abrir modal ao clicar nos botões de ação
-              if ((e.target as HTMLElement).closest("button")) return;
-              handleVerMais(produto);
-            }}>
-              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">{produto.numero}</td>
-              <td className="py-4 px-4 font-poppins text-[1rem] font-semibold">{produto.nome}</td>
-              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">{produto.quantidade_empresa}</td>
-              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">{produto.quantidade_rua}</td>
-              <td className="py-4 px-4 font-inter text-[0.9rem] font-normal text-gray-400">{produto.quantidade_empresa + produto.quantidade_rua}</td>
-              <td className="py-4 px-4"></td>
+            <tr
+              key={produto.numero}
+              className="hover:bg-gray-800 transition-colors duration-150 cursor-pointer even:bg-gray-900 odd:bg-gray-950"
+              onClick={(e) => {
+                if ((e.target as HTMLElement).closest("button")) return;
+                handleVerMais(produto);
+              }}
+            >
+              <td className="p-3 text-gray-400">{produto.numero}</td>
+              <td className="p-3 text-gray-100 font-semibold">{produto.nome}</td>
+              <td className="p-3 text-gray-400">{produto.quantidade_empresa}</td>
+              <td className="p-3 text-gray-400">{produto.quantidade_rua}</td>
+              <td className="p-3 text-gray-400">
+                {produto.quantidade_empresa + produto.quantidade_rua}
+              </td>
+              <td className="p-3"></td>
             </tr>
           ))}
         </tbody>

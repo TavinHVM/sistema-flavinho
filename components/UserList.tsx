@@ -23,32 +23,35 @@ export default function UserList({ users, search, onEditar, onExcluir }: UserLis
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full bg-gray-800 rounded-lg">
+      <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
         <thead>
-          <tr>
-            <th className="py-3 px-4 text-left">Nome</th>
-            <th className="py-3 px-4 text-left">Email</th>
-            <th className="py-3 px-4 text-left">Cargo</th>
-            <th className="py-3 px-4 text-left">Ações</th>
+          <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
+            <th className="p-3">Nome</th>
+            <th className="p-3">Email</th>
+            <th className="p-3">Cargo</th>
+            <th className="p-3">Ações</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-800">
           {filtered.map((user) => (
-            <tr key={user.id} className="border-b border-gray-700">
-              <td className="py-4 px-4">{user.nome}</td>
-              <td className="py-4 px-4">{user.email}</td>
-              <td className="py-4 px-4">{user.role}</td>
-              <td className="py-4 px-4">
-                <div className="flex gap-2">
+            <tr
+              key={user.id}
+              className="even:bg-gray-800 odd:bg-gray-950 hover:bg-gray-700 transition-colors duration-150"
+            >
+              <td className="p-3 text-gray-100">{user.nome}</td>
+              <td className="p-3 text-gray-400">{user.email}</td>
+              <td className="p-3 text-gray-400">{user.role}</td>
+              <td className="p-3">
+                <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => onExcluir(user.id)}
-                    className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-poppins text-[0.95rem] font-medium"
+                    className="flex items-center gap-1 bg-red-600 text-white px-3 py-2 rounded hover:bg-red-700 transition-all font-medium text-sm"
                   >
                     <FaTrash /> Excluir
                   </button>
                   <button
                     onClick={() => onEditar(user)}
-                    className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-poppins text-[0.95rem] font-medium"
+                    className="flex items-center gap-1 bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 transition-all font-medium text-sm"
                   >
                     <FaEdit /> Editar
                   </button>
@@ -58,6 +61,7 @@ export default function UserList({ users, search, onEditar, onExcluir }: UserLis
           ))}
         </tbody>
       </table>
+
     </div>
   );
 }
