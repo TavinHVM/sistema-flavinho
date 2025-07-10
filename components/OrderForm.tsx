@@ -67,7 +67,17 @@ const OrderForm: React.FC<OrderFormProps> = ({
         </div>
         <div className="flex-1">
           <label className="text-xs text-gray-300 font-semibold">CPF/CNPJ</label>
-          <input className="rounded p-2 text-black w-full" placeholder="CPF/CNPJ do cliente" value={form.cpf} onChange={e => setForm({ ...form, cpf: e.target.value })} />
+          <input
+            className="rounded p-2 text-black w-full"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="CPF/CNPJ do cliente"
+            value={form.cpf}
+            onChange={e => {
+              const onlyNumbers = e.target.value.replace(/\D/g, ''); // remove tudo que não for número
+              setForm({ ...form, cpf: onlyNumbers });
+            }}
+          />
         </div>
       </div>
       {/* Linha 3: Endereço, Telefone, Referência */}
@@ -78,7 +88,11 @@ const OrderForm: React.FC<OrderFormProps> = ({
         </div>
         <div className="flex-1">
           <label className="text-xs text-gray-300 font-semibold">Telefone</label>
-          <input className="rounded p-2 text-black w-full" placeholder="(DDD) 99999-9999" value={form.telefone} onChange={e => setForm({ ...form, telefone: e.target.value })} />
+          <input className="rounded p-2 text-black w-full" inputMode="numeric" pattern="[0-9]*" placeholder="(DDD) 99999-9999" value={form.telefone} onChange={e => {
+            const onlyNumbers = e.target.value.replace(/\D/g, '');
+            setForm({ ...form, telefone: onlyNumbers });
+          }}
+          />
         </div>
         <div className="flex-1">
           <label className="text-xs text-gray-300 font-semibold">Referência</label>
