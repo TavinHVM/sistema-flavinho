@@ -7,6 +7,8 @@ import UserList from "@/components/UserList";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
 import RefreshButton from "@/components/RefreshButton";
+import SectionTitle from "@/components/SectionTitle";
+import SearchInput from "@/components/SearchInput";
 
 interface User {
   id: string;
@@ -233,22 +235,18 @@ export default function UserManagement() {
           </div>
         )}
         <section className="mt-8 w-full max-w-full sm:max-w-4xl px-0 sm:px-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-            <h2 className="font-poppins text-[1.1rem] sm:text-[1.2rem] font-semibold">
-              Usuários
-            </h2>
-            <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center w-full sm:w-auto">
-              <RefreshButton onClick={fetchUsers} loading={loading} />
-              <input
-                type="text"
-                placeholder="Pesquisar por nome"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter text-sm w-full sm:w-auto"
-                style={{ minWidth: 0, flex: 1 }}
-              />
-            </div>
+        <div className="items-center justify-center">
+          <SectionTitle className="text-center mt-12">Usuários</SectionTitle>
+          <div className="flex items-center justify-center mb-2">
+            <RefreshButton onClick={fetchUsers} loading={loading} />
           </div>
+          <input
+            className="rounded p-2 text-black mb-2 w-full"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Pesquisar por cliente"
+          />
+        </div>
 
           <UserList users={users} search={search} onEditar={handleEdit} onExcluir={handleDelete} />
           {editingUserId && (
