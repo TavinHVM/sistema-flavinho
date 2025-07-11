@@ -100,8 +100,9 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           <div><b>Endereço Evento:</b> {pedido.endereco}</div>
           <div><b>Endereço Residencial:</b> {pedido.residencial}</div>
           <div><b>Referência:</b> {pedido.referencia}</div>
-          <div><b>Entrega:</b> {pedido.entrega}</div>
-          <div><b>Busca:</b> {pedido.busca}</div>
+          <div><b>Entrega:</b> {pedido.data_entregou} às {pedido.horario_entregou}</div>
+          <div><b>Busca:</b> {pedido.data_buscou} às {pedido.horario_buscou}</div>
+          <div><b>Recebeu:</b> {pedido.data_recebeu} às {pedido.horario_recebeu}</div>
           <div><b>Pagamento:</b> {pedido.pagamento}</div>
           <div><b>Valor Pago:</b> R$ {pedido.valor_pago?.toFixed(2)}</div>
           <div><b>Desconto:</b> R$ {pedido.desconto?.toFixed(2)}</div>
