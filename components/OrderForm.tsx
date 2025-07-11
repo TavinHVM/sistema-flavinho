@@ -156,14 +156,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
       {/* Linha 5: Entrega, Busca, Pagamento */}
       <div className="flex flex-col md:flex-row gap-2 mt-2">
         <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Horário de Entrega</label>
-          <input className="rounded p-2 text-black w-full" placeholder="Ex: Sábado das 11:30 às 15:30" value={form.entrega} onChange={e => setForm({ ...form, entrega: e.target.value })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Horário de Busca</label>
-          <input className="rounded p-2 text-black w-full" placeholder="Ex: Segunda das 8:00 às 18:00" value={form.busca} onChange={e => setForm({ ...form, busca: e.target.value })} />
-        </div>
-        <div className="flex-1">
           <label className="text-xs text-gray-300 font-semibold">Forma de Pagamento</label>
           <input className="rounded p-2 text-black w-full" placeholder="Dinheiro, Pix, Cartão, etc" value={form.pagamento} onChange={e => setForm({ ...form, pagamento: e.target.value })} />
         </div>

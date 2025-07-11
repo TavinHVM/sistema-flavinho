@@ -19,8 +19,6 @@ export interface Pedido {
   residencial: string;
   referencia: string;
   materiais: PedidoItem[];
-  entrega?: string;
-  busca?: string;
   pagamento?: string;
   valor_pago?: number;
   valor_total: number;
