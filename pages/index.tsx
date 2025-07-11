@@ -15,6 +15,7 @@ import RefreshButton from "@/components/RefreshButton";
 import PainelAdminButton from "@/components/PainelAdminButton";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
+import logoBase64 from "@/components/logoBase64";
 
 type Produto = {
   numero: number;
@@ -239,15 +240,43 @@ export default function Home() {
   const exportarPDF = () => {
     const dataHora = getDataHoraFormatada();
     const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("Estoque - Flavinho Festas", 14, 14);
-    doc.setFontSize(10);
+
     const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Adiciona a logo se estiver válida
+    if (logoBase64 && logoBase64.startsWith("data:image/png;base64")) {
+      try {
+        doc.addImage(logoBase64, 'PNG', 14, 10, 20, 20);
+      } catch (error) {
+        console.error("Erro ao adicionar imagem:", error);
+      }
+    }
+
+    // Título centralizado
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.addImage(logoBase64, 'PNG', 14, 10, 20, 20);
+    doc.text("Flavinho Festas", pageWidth / 2, 18, { align: "center" });
+    doc.setFontSize(12);
+    doc.text("Relatório de Estoque", pageWidth / 2, 24, { align: "center" });
+    doc.setFontSize(10);
+    doc.text("Todos os produtos cadastrados", pageWidth / 2, 30, { align: "center" });
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100);
+    doc.text("https://sistema-flavinho.vercel.app/", pageWidth / 2, 36, { align: "center" });
+    doc.setTextColor(0);
+
+    // Data/hora no canto direito
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
     const text = `Gerado em: ${dataHora}`;
     const textWidth = doc.getTextWidth(text);
-    doc.text(text, pageWidth - textWidth - 14, 14);
+    doc.text(text, pageWidth - textWidth - 14, 26);
+
+    // Tabela
     autoTable(doc, {
-      startY: 20,
+      startY: 45,
       head: [["Nome", "Qtde. Empresa", "Qtde. Entrega", "Total"]],
       body: produtos.map((p) => [
         p.nome,
@@ -255,9 +284,27 @@ export default function Home() {
         p.quantidade_rua,
         p.quantidade_empresa + p.quantidade_rua,
       ]),
+      theme: 'grid',
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255,
+        halign: 'center',
+        fontStyle: 'bold',
+      },
+      bodyStyles: {
+        halign: 'center',
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240],
+      },
+      styles: {
+        fontSize: 10,
+      }
     });
+
     doc.save(`Estoque - Flavinho Festas ${dataHora}.pdf`);
   };
+
 
   if (isLoggedIn === null) {
     // Em verificação

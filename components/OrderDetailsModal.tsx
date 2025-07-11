@@ -67,14 +67,14 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
         </div>
         <div className="flex gap-2 mb-4">
           <button
-            className="bg-gray-700 text-white rounded px-2 py-1 text-xs flex items-center gap-1"
+            className="bg-gray-700 text-white rounded px-4 py-4 text-sm flex items-center gap-1"
             onClick={handleDownloadPDF}
           >
             <FaFilePdf /> Salvar como PDF
           </button>
           {onEditar && (
             <button
-              className="bg-blue-600 text-white rounded px-2 py-1 text-xs flex items-center gap-1"
+              className="bg-blue-600 text-white rounded px-4 py-3 text-sm flex items-center gap-1"
               onClick={() => { onClose(); onEditar(pedido); }}
             >
               <FaEdit /> Editar
@@ -82,7 +82,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           )}
           {onExcluir && pedido.numero && (
             <button
-              className="bg-red-600 text-white rounded px-2 py-1 text-xs flex items-center gap-1"
+              className="bg-red-600 text-white rounded px-4 py-3 text-sm flex items-center gap-1"
               onClick={() => { onClose(); onExcluir(Number(pedido.numero)); }}
             >
               <FaTrash /> Excluir

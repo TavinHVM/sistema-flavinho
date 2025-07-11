@@ -36,7 +36,7 @@ const ProdutoDetailsModal: React.FC<ProdutoDetailsModalProps> = ({ produto, open
         <div className="flex gap-2 mb-4">
           {onEditar && (
             <button
-              className="bg-blue-600 text-white rounded px-2 py-1 text-xs flex items-center gap-1"
+              className="bg-blue-600 text-white rounded px-4 py-4 text-sm flex items-center gap-1"
               onClick={() => { onClose(); onEditar(produto.numero); }}
             >
               <FaEdit /> Editar
@@ -44,7 +44,7 @@ const ProdutoDetailsModal: React.FC<ProdutoDetailsModalProps> = ({ produto, open
           )}
           {onExcluir && (
             <button
-              className="bg-red-600 text-white rounded px-2 py-1 text-xs flex items-center gap-1"
+              className="bg-red-600 text-white rounded px-4 py-4 text-sm flex items-center gap-1"
               onClick={() => { onClose(); onExcluir(produto.numero); }}
             >
               <FaTrash /> Excluir

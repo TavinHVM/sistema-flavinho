@@ -129,7 +129,6 @@ export default function ProdutoList({
             <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("total")}>
               Total {getSortIcon("total")}
             </th>
-            <th className="p-3"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-800">
@@ -149,7 +148,6 @@ export default function ProdutoList({
               <td className="p-3 text-gray-400">
                 {produto.quantidade_empresa + produto.quantidade_rua}
               </td>
-              <td className="p-3"></td>
             </tr>
           ))}
         </tbody>
