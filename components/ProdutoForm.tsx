@@ -11,6 +11,13 @@ interface ProdutoFormProps {
 
 const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
   ({ form, setForm, onSubmit, editando, onCancel }, ref) => {
+    function formatarMoeda(valor: string) {
+      if (!valor) return "";
+      const numero = parseInt(valor, 10);
+      if (isNaN(numero)) return "";
+      return (numero / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
     return (
       <section
         className="mb-4 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md"
@@ -70,11 +77,14 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
               Preço
             </label>
             <input
-              type="number"
+              type="text"
               className="font-poppins p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Preço do produto"
-              value={form.preco}
-              onChange={(e) => setForm({ ...form, preco: e.target.value.replace(/[^0-9.]/g, "") })}
+              value={formatarMoeda(form.preco)}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "");
+                setForm({ ...form, preco: raw });
+              }}
             />
           </div>
         </div>

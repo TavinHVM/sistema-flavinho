@@ -110,6 +110,10 @@ export default function ProdutoList({
     });
   })();
 
+  function formatarMoeda(valor: number) {
+    return (valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
   return (
     <div className="overflow-x-auto rounded-lg">
       <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
@@ -147,10 +151,13 @@ export default function ProdutoList({
             >
               <td className="p-3 text-gray-400">{produto.numero}</td>
               <td className="p-3 text-gray-100 font-semibold">{produto.nome}</td>
-              <td className="p-3 text-gray-400">{produto.preco}</td>
-              <td className="p-3 text-gray-400">{produto.quantidade_empresa}</td>
-              <td className="p-3 text-gray-400">{produto.quantidade_rua}</td>
-              <td className="p-3 text-gray-400">
+              <td className="p-3">
+                <span className="text-slate-400 font-bold">R$ </span>
+                <span className="text-emerald-400 font-bold">{formatarMoeda(produto.preco)}</span>
+              </td>
+              <td className="p-3 text-blue-400 font-bold">{produto.quantidade_empresa}</td>
+              <td className="p-3 text-yellow-400 font-bold">{produto.quantidade_rua}</td>
+              <td className="p-3 text-gray-200 font-bold">
                 {produto.quantidade_empresa + produto.quantidade_rua}
               </td>
             </tr>

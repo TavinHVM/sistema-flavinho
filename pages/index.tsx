@@ -102,7 +102,7 @@ export default function Home() {
   const adicionarProduto = async () => {
     const quantidadeEmpresa = parseInt(form.quantidade_empresa);
     const quantidadeRua = parseInt(form.quantidade_rua);
-    const preco = Number(form.preco);
+    const preco = parseInt(form.preco || "0", 10); // preco em centavos
 
     if (!form.nome.trim()) {
       setToast({ type: 'error', message: 'Por favor, preencha o nome do produto.' });
@@ -167,7 +167,7 @@ export default function Home() {
         nome: data.nome,
         quantidade_empresa: data.quantidade_empresa.toString(),
         quantidade_rua: data.quantidade_rua.toString(),
-        preco: data.preco?.toString() ?? "",
+        preco: data.preco ? data.preco.toString() : "",
       });
       setEditando(numero);
       setTimeout(() => {
@@ -181,7 +181,7 @@ export default function Home() {
 
     const quantidadeEmpresa = parseInt(form.quantidade_empresa);
     const quantidadeRua = parseInt(form.quantidade_rua);
-    const preco = Number(form.preco);
+    const preco = parseInt(form.preco || "0", 10); // preco em centavos
 
     if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua) || isNaN(preco)) {
       setToast({ type: 'error', message: 'Por favor, preencha as quantidades e o preço corretamente.' });
