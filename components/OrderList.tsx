@@ -145,13 +145,14 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
               className="hover:bg-gray-800 transition-colors duration-150 cursor-pointer even:bg-gray-900 odd:bg-gray-950"
               onClick={() => handleVerMais(p)}
             >
-              <td className="p-3 text-gray-200">{p.numero}</td>
-              <td className="p-3 text-gray-100">{p.cliente}</td>
-              <td className="p-3 text-gray-100">{formatDateBR(p.data_locacao)}</td>
-              <td className="p-3 text-gray-100">{formatDateBR(p.data_evento) || '-'}</td>
-              <td className="p-3 text-gray-100">{p.endereco || '-'}</td>
-              <td className="p-3 text-gray-100">
-                R$ {p.valor_total?.toFixed(2)}
+              <td className="p-3 text-gray-400">{p.numero}</td>
+              <td className="p-3 text-gray-50 font-semibold">{p.cliente}</td>
+              <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_locacao)}</td>
+              <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_evento) || '-'}</td>
+              <td className="p-3 text-gray-300 font-semibold">{p.endereco || '-'}</td>
+              <td className="p-3 text-gray-300">
+                <span className="text-slate-400 font-bold">R$ </span>
+                <span className="font-bold text-emerald-400">{p.valor_total?.toFixed(2)}</span>
               </td>
               <td className="p-3"></td>
             </tr>
