@@ -2,8 +2,8 @@ import { FaEdit, FaPlus } from "react-icons/fa";
 import { forwardRef } from "react";
 
 interface ProdutoFormProps {
-  form: { nome: string; quantidade_empresa: string; quantidade_rua: string };
-  setForm: (form: { nome: string; quantidade_empresa: string; quantidade_rua: string }) => void;
+  form: { nome: string; quantidade_empresa: string; quantidade_rua: string; preco: string };
+  setForm: (form: { nome: string; quantidade_empresa: string; quantidade_rua: string; preco: string }) => void;
   onSubmit: () => void;
   editando: boolean;
   onCancel?: () => void;
@@ -63,6 +63,18 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
                 const onlyNumbers = e.target.value.replace(/\D/g, '');
                 setForm({ ...form, quantidade_rua: onlyNumbers })
               }}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
+              Preço
+            </label>
+            <input
+              type="number"
+              className="font-poppins p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Preço do produto"
+              value={form.preco}
+              onChange={(e) => setForm({ ...form, preco: e.target.value.replace(/[^0-9.]/g, "") })}
             />
           </div>
         </div>

@@ -7,6 +7,7 @@ interface Produto {
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
+  preco: number;
   created_at: string;
 }
 
@@ -120,6 +121,9 @@ export default function ProdutoList({
             <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("nome")}>
               Nome {getSortIcon("nome")}
             </th>
+            <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("preco")}>
+              Preço {getSortIcon("preco")}
+            </th>
             <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("quantidade_empresa")}>
               Na empresa {getSortIcon("quantidade_empresa")}
             </th>
@@ -143,6 +147,7 @@ export default function ProdutoList({
             >
               <td className="p-3 text-gray-400">{produto.numero}</td>
               <td className="p-3 text-gray-100 font-semibold">{produto.nome}</td>
+              <td className="p-3 text-gray-400">{produto.preco}</td>
               <td className="p-3 text-gray-400">{produto.quantidade_empresa}</td>
               <td className="p-3 text-gray-400">{produto.quantidade_rua}</td>
               <td className="p-3 text-gray-400">

@@ -22,6 +22,7 @@ type Produto = {
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
+  preco: number;
   created_at: string;
 };
 
@@ -31,6 +32,7 @@ export default function Home() {
     nome: "",
     quantidade_empresa: "",
     quantidade_rua: "",
+    preco: "",
   });
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -100,14 +102,15 @@ export default function Home() {
   const adicionarProduto = async () => {
     const quantidadeEmpresa = parseInt(form.quantidade_empresa);
     const quantidadeRua = parseInt(form.quantidade_rua);
+    const preco = Number(form.preco);
 
     if (!form.nome.trim()) {
       setToast({ type: 'error', message: 'Por favor, preencha o nome do produto.' });
       return;
     }
 
-    if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua)) {
-      setToast({ type: 'error', message: 'Por favor, preencha as quantidades corretamente.' });
+    if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua) || isNaN(preco)) {
+      setToast({ type: 'error', message: 'Por favor, preencha as quantidades e o preço corretamente.' });
       return;
     }
 
@@ -119,6 +122,7 @@ export default function Home() {
       nome: form.nome,
       quantidade_empresa: quantidadeEmpresa,
       quantidade_rua: quantidadeRua,
+      preco: preco,
       numero: nextNumero,
     };
 
@@ -127,7 +131,7 @@ export default function Home() {
       .insert([produtoParaSalvar]);
 
     if (!error) {
-      setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
+      setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "", preco: "" });
       setToast({ type: 'success', message: 'Produto adicionado com sucesso!' });
       fetchProdutos();
     } else {
@@ -163,6 +167,7 @@ export default function Home() {
         nome: data.nome,
         quantidade_empresa: data.quantidade_empresa.toString(),
         quantidade_rua: data.quantidade_rua.toString(),
+        preco: data.preco?.toString() ?? "",
       });
       setEditando(numero);
       setTimeout(() => {
@@ -176,9 +181,10 @@ export default function Home() {
 
     const quantidadeEmpresa = parseInt(form.quantidade_empresa);
     const quantidadeRua = parseInt(form.quantidade_rua);
+    const preco = Number(form.preco);
 
-    if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua)) {
-      setToast({ type: 'error', message: 'Por favor, preencha as quantidades corretamente.' });
+    if (isNaN(quantidadeEmpresa) || isNaN(quantidadeRua) || isNaN(preco)) {
+      setToast({ type: 'error', message: 'Por favor, preencha as quantidades e o preço corretamente.' });
       return;
     }
 
@@ -186,6 +192,7 @@ export default function Home() {
       nome: form.nome,
       quantidade_empresa: quantidadeEmpresa,
       quantidade_rua: quantidadeRua,
+      preco: preco,
     };
 
     const { error } = await supabase
@@ -194,7 +201,7 @@ export default function Home() {
       .eq("numero", editando);
 
     if (!error) {
-      setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "" });
+      setForm({ nome: "", quantidade_empresa: "", quantidade_rua: "", preco: "" });
       setEditando(null);
       setToast({ type: 'success', message: 'Produto atualizado com sucesso!' });
       fetchProdutos();
@@ -348,7 +355,7 @@ export default function Home() {
               editando
                 ? () => {
                   setEditando(null);
-                  setForm({ nome: '', quantidade_empresa: '', quantidade_rua: '' });
+                  setForm({ nome: '', quantidade_empresa: '', quantidade_rua: '', preco: '' });
                 }
                 : undefined
             }
