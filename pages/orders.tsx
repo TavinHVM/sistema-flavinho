@@ -28,6 +28,7 @@ type ProdutoLocal = {
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
+  preco: number; // Adicionado campo preco
 };
 
 export default function Orders() {
@@ -89,6 +90,7 @@ export default function Orders() {
             nome: String(p.nome ?? ""),
             quantidade_empresa: Number(p.quantidade_empresa ?? 0),
             quantidade_rua: Number(p.quantidade_rua ?? 0),
+            preco: Number(p.preco ?? 0), // Adicionado campo preco
           }))
         );
       }

@@ -12,6 +12,7 @@ interface Material {
 interface Produto {
   id: string;
   nome: string;
+  preco?: number;
 }
 
 interface OrderFormProps {
@@ -39,6 +40,30 @@ const OrderForm: React.FC<OrderFormProps> = ({
   isEditing = false,
   onCancelEdit,
 }) => {
+  // Função para buscar o preço do produto pelo nome
+  function getPrecoProduto(nome: string): number {
+    const prod = produtos.find((p) => p.nome === nome);
+    return prod && prod.preco ? prod.preco : 0;
+  }
+
+  // Atualiza valor_unit e valor_total ao trocar produto ou quantidade
+  function handleMaterialFieldChange(idx: number, field: string, value: string | number) {
+    const materiais = [...form.materiais];
+    if (field === "nome") {
+      materiais[idx].nome = value as string;
+      materiais[idx].valor_unit = getPrecoProduto(value as string) / 100;
+      materiais[idx].valor_total = materiais[idx].quantidade * materiais[idx].valor_unit;
+    } else if (field === "quantidade") {
+      materiais[idx].quantidade = Number(value);
+      materiais[idx].valor_unit = getPrecoProduto(materiais[idx].nome) / 100;
+      materiais[idx].valor_total = materiais[idx].quantidade * materiais[idx].valor_unit;
+    }
+    setForm({ ...form, materiais });
+  }
+
+  // Total geral
+  const totalGeral = form.materiais.reduce((acc, mat) => acc + (mat.valor_total || 0), 0);
+
   return (
     <div className="mt-8 bg-gray-800 rounded-lg p-3 flex flex-col gap-2" id="order-form-scroll">
       <div className="flex items-center justify-center mb-3">
@@ -124,10 +149,10 @@ const OrderForm: React.FC<OrderFormProps> = ({
               {form.materiais.map((mat: Material, idx: number) => (
                 <tr key={mat.nome + '-' + idx} className="border-b border-gray-500">
                   <td className="p-1">
-                    <input className="rounded p-1 text-black w-16" type="number" min={1} value={mat.quantidade} onChange={e => handleMaterialChange(idx, "quantidade", parseInt(e.target.value))} />
+                    <input className="rounded p-1 text-black w-16" type="number" min={1} value={mat.quantidade} onChange={e => handleMaterialFieldChange(idx, "quantidade", parseInt(e.target.value))} />
                   </td>
                   <td className="p-1">
-                    <select className="rounded p-1 text-black w-full" value={mat.nome} onChange={e => handleMaterialChange(idx, "nome", e.target.value)}>
+                    <select className="rounded p-1 text-black w-full" value={mat.nome} onChange={e => handleMaterialFieldChange(idx, "nome", e.target.value)}>
                       <option value="">Selecione</option>
                       {produtos
                         .slice()
@@ -138,9 +163,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
                     </select>
                   </td>
                   <td className="p-1">
-                    <input className="rounded p-1 text-black w-20" type="number" min={0} value={mat.valor_unit} onChange={e => handleMaterialChange(idx, "valor_unit", parseFloat(e.target.value))} />
+                    <input className="rounded p-1 text-black w-20" type="text" value={getPrecoProduto(mat.nome) ? (getPrecoProduto(mat.nome) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''} disabled />
                   </td>
-                  <td className="p-1">R$ {mat.valor_total?.toFixed(2)}</td>
+                  <td className="p-1">R$ {mat.valor_total?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
                   <td className="p-1">
                     {form.materiais.length > 1 && (
                       <button className="text-red-400 text-xs" type="button" onClick={() => removeMaterial(idx)}>Remover</button>
@@ -151,28 +176,17 @@ const OrderForm: React.FC<OrderFormProps> = ({
             </tbody>
           </table>
         </div>
-        <button className="bg-blue-700 text-white rounded px-2 py-1 text-xs mt-2" type="button" onClick={addMaterial}>Adicionar Item</button>
+        <button className="bg-blue-700 text-white rounded px-2 py-1 text-xs mt-2 w-full" type="button" onClick={addMaterial}>Adicionar Item</button>
+        <div className="flex justify-end mt-2 gap-2">
+          <span className="text-lg font-bold text-gray-200">Total Geral:</span>
+          <span className="text-lg font-bold text-emerald-400"> R$ {totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+        </div>
       </div>
       {/* Linha 5: Entrega, Busca, Pagamento */}
       <div className="flex flex-col md:flex-row gap-2 mt-2">
         <div className="flex-1">
           <label className="text-xs text-gray-300 font-semibold">Forma de Pagamento</label>
           <input className="rounded p-2 text-black w-full" placeholder="Dinheiro, Pix, Cartão, etc" value={form.pagamento} onChange={e => setForm({ ...form, pagamento: e.target.value })} />
-        </div>
-      </div>
-      {/* Linha 6: Valores */}
-      <div className="flex flex-col md:flex-row gap-2 mt-2">
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Valor Pago (R$)</label>
-          <input className="rounded p-2 text-black w-full" type="number" value={form.valor_pago} onChange={e => setForm({ ...form, valor_pago: Number(e.target.value) })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Desconto (R$)</label>
-          <input className="rounded p-2 text-black w-full" type="number" value={form.desconto} onChange={e => setForm({ ...form, desconto: Number(e.target.value) })} />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-300 font-semibold">Valor Total (R$)</label>
-          <input className="rounded p-2 text-black w-full" type="number" value={form.valor_total} onChange={e => setForm({ ...form, valor_total: Number(e.target.value) })} />
         </div>
       </div>
       {/* Linha 7: Responsáveis - AGRUPADO POR AÇÃO */}

@@ -150,7 +150,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
               <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_locacao)}</td>
               <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_evento) || '-'}</td>
               <td className="p-3 text-gray-300 font-semibold">{p.endereco || '-'}</td>
-              <td className="p-3 text-gray-300">
+              <td className="p-3 text-gray-300 font-bold">
                 <span className="text-slate-400 font-bold">R$ </span>
                 <span className="font-bold text-emerald-400">{p.valor_total?.toFixed(2)}</span>
               </td>
