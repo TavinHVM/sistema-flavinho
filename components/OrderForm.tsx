@@ -33,7 +33,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
   setForm,
   produtos,
   onSubmit,
-  handleMaterialChange,
   addMaterial,
   removeMaterial,
   loading,
