@@ -3,6 +3,7 @@ export interface PedidoItem {
   quantidade: number;
   valor_unit: number;
   valor_total: number;
+  preco: number;
 }
 
 export interface Pedido {
@@ -14,15 +15,14 @@ export interface Pedido {
   data_devolucao: string;
   cliente: string;
   cpf: string;
+  preco: number;
   endereco: string;
   telefone: string;
   residencial: string;
   referencia: string;
   materiais: PedidoItem[];
   pagamento?: string;
-  valor_pago?: number;
   valor_total: number;
-  desconto: number;
   responsavel_entregou?: string;
   data_entregou?: string;
   responsavel_recebeu?: string;

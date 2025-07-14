@@ -41,7 +41,6 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
         numero: pedido.numero || "",
         materiais: pedido.materiais || [],
         valor_total: pedido.valor_total || 0,
-        desconto: pedido.desconto || 0,
       }} />
     ).toBlob();
     const url = URL.createObjectURL(blob);
@@ -104,8 +103,6 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           <div><b>Busca:</b> {formatDateBR(pedido.data_buscou)} às {pedido.horario_buscou}</div>
           <div><b>Recebeu:</b> {formatDateBR(pedido.data_recebeu)} às {pedido.horario_recebeu}</div>
           <div><b>Pagamento:</b> {pedido.pagamento}</div>
-          <div><b>Valor Pago:</b> R$ {pedido.valor_pago?.toFixed(2)}</div>
-          <div><b>Desconto:</b> R$ {pedido.desconto?.toFixed(2)}</div>
           <div><b>Valor Total:</b> R$ {pedido.valor_total?.toFixed(2)}</div>
         </div>
         <div className="mt-4 border-t">

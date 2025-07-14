@@ -33,6 +33,7 @@ type ProdutoLocal = {
 
 export default function Orders() {
   const [form, setForm] = useState<Pedido & { materiais: PedidoItem[] }>({
+    preco: 0,
     data_locacao: "",
     data_evento: "",
     data_retirada: "",
@@ -43,11 +44,9 @@ export default function Orders() {
     telefone: "",
     residencial: "",
     referencia: "",
-    materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0 }],
+    materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }],
     pagamento: "",
-    valor_pago: 0,
     valor_total: 0,
-    desconto: 0,
     responsavel_entregou: "",
     data_entregou: "",
     responsavel_recebeu: "",
@@ -124,7 +123,7 @@ export default function Orders() {
   };
 
   const addMaterial = () => {
-    setForm({ ...form, materiais: [...form.materiais, { nome: "", quantidade: 1, valor_unit: 0, valor_total: 0 }] });
+    setForm({ ...form, materiais: [...form.materiais, { nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }] });
   };
 
   const removeMaterial = (idx: number) => {
@@ -148,7 +147,7 @@ export default function Orders() {
       }
     }
     // Calcular valor total
-    const valor_total = form.materiais.reduce((acc: number, m: PedidoItem) => acc + (m.valor_total || 0), 0) - parseFloat(form.desconto?.toString() || "0");
+    const valor_total = form.materiais.reduce((acc: number, m: PedidoItem) => acc + (m.valor_total || 0), 0) || "0";
     // Se for edição (form.numero existe em pedidos), faz update
     const pedidoParaSalvar = {
       data_locacao: form.data_locacao ? toISODate(form.data_locacao) : null,
@@ -162,9 +161,7 @@ export default function Orders() {
       residencial: form.residencial,
       referencia: form.referencia,
       pagamento: form.pagamento,
-      valor_pago: parseFloat(form.valor_pago?.toString() || "0"),
       valor_total,
-      desconto: parseFloat(form.desconto?.toString() || "0"),
       responsavel_entregou: form.responsavel_entregou,
       data_entregou: form.data_entregou ? toISODate(form.data_entregou) : null,
       responsavel_recebeu: form.responsavel_recebeu,
@@ -193,6 +190,7 @@ export default function Orders() {
     if (!error) {
       setToast({ type: 'success', message: isEditing ? 'Pedido atualizado!' : 'Pedido salvo!' });
       setForm({
+        preco: 0,
         data_locacao: "",
         data_evento: "",
         data_retirada: "",
@@ -203,11 +201,9 @@ export default function Orders() {
         telefone: "",
         residencial: "",
         referencia: "",
-        materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0 }],
+        materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }],
         pagamento: "",
-        valor_pago: 0,
         valor_total: 0,
-        desconto: 0,
         responsavel_entregou: "",
         data_entregou: "",
         responsavel_recebeu: "",
@@ -281,6 +277,7 @@ export default function Orders() {
             isEditing={isEditing}
             onCancelEdit={() => {
               setForm({
+                preco: 0,
                 data_locacao: "",
                 data_evento: "",
                 data_retirada: "",
@@ -291,11 +288,9 @@ export default function Orders() {
                 telefone: "",
                 residencial: "",
                 referencia: "",
-                materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0 }],
+                materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }],
                 pagamento: "",
-                valor_pago: 0,
                 valor_total: 0,
-                desconto: 0,
                 responsavel_entregou: "",
                 data_entregou: "",
                 responsavel_recebeu: "",
@@ -336,6 +331,7 @@ export default function Orders() {
                 quantidade: mat.quantidade,
                 valor_unit: mat.valor_unit,
                 valor_total: mat.valor_total,
+                preco: mat.preco || 0, // Garantir que preco esteja definido
               })),
             });
             setIsEditing(true);

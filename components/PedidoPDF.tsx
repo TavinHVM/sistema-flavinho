@@ -209,14 +209,6 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
           <Text style={{ fontSize: 9 }}>{pedido.responsavel_conferiu_utensilio}</Text>
         </View>
 
-        {/* Desconto */}
-        {pedido.desconto !== undefined && pedido.desconto !== null && (
-          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 2 }}>
-            <Text style={{ fontWeight: "bold", fontSize: 10 }}>Desconto: </Text>
-            <Text style={{ fontSize: 10 }}>R$ {pedido.desconto.toFixed(2)}</Text>
-          </View>
-        )}
-
         {/* Total */}
         <View style={{ marginTop: 4, borderTopWidth: 1, borderColor: '#000', paddingTop: 4 }}>
           <Text style={{ fontSize: 10, fontWeight: "bold", textAlign: 'right' }}>
