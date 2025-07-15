@@ -26,7 +26,8 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
         <h2 className="font-poppins text-[1.1rem] font-semibold mb-4">
           {editando ? "Atualizar Produto" : "Adicionar Produto"}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Primeira linha: Nome e Preço */}
           <div className="flex flex-col">
             <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
               Nome
@@ -38,6 +39,24 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
               onChange={(e) => setForm({ ...form, nome: e.target.value })}
             />
           </div>
+
+          <div className="flex flex-col">
+            <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
+              Preço
+            </label>
+            <input
+              type="text"
+              className="font-poppins p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Preço do produto"
+              value={formatarMoeda(form.preco)}
+              onChange={(e) => {
+                const raw = e.target.value.replace(/\D/g, "");
+                setForm({ ...form, preco: raw });
+              }}
+            />
+          </div>
+
+          {/* Segunda linha: Quantidade na empresa e em rota */}
           <div className="flex flex-col">
             <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
               Qtde. Empresa
@@ -55,6 +74,7 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
               }}
             />
           </div>
+
           <div className="flex flex-col">
             <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
               Qtde. Entrega
@@ -72,22 +92,8 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
               }}
             />
           </div>
-          <div className="flex flex-col">
-            <label className="mb-1 ml-1 text-white text-sm font-medium font-poppins">
-              Preço
-            </label>
-            <input
-              type="text"
-              className="font-poppins p-3 rounded bg-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Preço do produto"
-              value={formatarMoeda(form.preco)}
-              onChange={(e) => {
-                const raw = e.target.value.replace(/\D/g, "");
-                setForm({ ...form, preco: raw });
-              }}
-            />
-          </div>
         </div>
+
         <button
           onClick={onSubmit}
           className={`mt-4 w-full flex items-center justify-center gap-2 p-3 rounded text-white font-poppins text-[0.95rem] font-medium transition-all ${editando
