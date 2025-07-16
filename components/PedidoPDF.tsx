@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
     textAlign: "center",
-    marginVertical: 8,
+    marginVertical: 6,
   },
   subTextCenter: {
     fontSize: 9,
@@ -158,8 +158,13 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
           <View key={i} style={styles.tableRow}>
             <Text style={[styles.tableCell, styles.colQuant]}>{mat.quantidade}</Text>
             <Text style={[styles.tableCell, styles.colMaterial]}>{mat.nome}</Text>
-            <Text style={[styles.tableCell, styles.colValorUnit]}>R$ {mat.valor_unit?.toFixed(2)}</Text>
-            <Text style={[styles.tableCell, styles.colValorTotal]}>R$ {mat.valor_total?.toFixed(2)}</Text>
+            <Text style={[styles.tableCell, styles.colValorUnit]}>
+              {mat.valor_unit?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </Text>
+            <Text style={[styles.tableCell, styles.colValorTotal]}>
+              {mat.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </Text>
+
           </View>
         ))}
       </View>
@@ -212,7 +217,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
         {/* Total */}
         <View style={{ marginTop: 4, borderTopWidth: 1, borderColor: '#000', paddingTop: 4 }}>
           <Text style={{ fontSize: 10, fontWeight: "bold", textAlign: 'right' }}>
-            TOTAL GERAL: R$ {pedido.valor_total?.toFixed(2)}
+            TOTAL GERAL: {pedido.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
           </Text>
         </View>
       </View>

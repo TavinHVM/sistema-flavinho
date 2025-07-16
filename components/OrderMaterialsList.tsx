@@ -21,8 +21,12 @@ const OrderMaterialsList: React.FC<Props> = ({ materiais }) => {
           <tr key={mat.nome + '-' + idx}>
             <td className="border px-2 py-1 text-center">{mat.quantidade}</td>
             <td className="border px-2 py-1">{mat.nome}</td>
-            <td className="border px-2 py-1 text-right">R$ {mat.valor_unit?.toFixed(2)}</td>
-            <td className="border px-2 py-1 text-right">R$ {mat.valor_total?.toFixed(2)}</td>
+            <td className="border px-2 py-1 text-right">
+              {mat.valor_unit?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </td>
+            <td className="border px-2 py-1 text-right">
+              {mat.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </td>
           </tr>
         ))}
       </tbody>

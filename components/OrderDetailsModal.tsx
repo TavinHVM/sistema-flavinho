@@ -103,7 +103,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           <div><b>Busca:</b> {formatDateBR(pedido.data_buscou)} às {pedido.horario_buscou}</div>
           <div><b>Recebeu:</b> {formatDateBR(pedido.data_recebeu)} às {pedido.horario_recebeu}</div>
           <div><b>Pagamento:</b> {pedido.pagamento}</div>
-          <div><b>Valor Total:</b> R$ {pedido.valor_total?.toFixed(2)}</div>
+          <div><b>Valor Total:</b> {pedido.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
         </div>
         <div className="mt-4 border-t">
           <h3 className="font-semibold mb-2 mt-4">Materiais</h3>

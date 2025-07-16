@@ -157,11 +157,11 @@ const OrderForm: React.FC<OrderFormProps> = ({
                     className="w-16 px-2 py-1 rounded bg-gray-100 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </td>
-                <td className="p-2">
+                <td className="p-2 min-w-[160px]">
                   <select
                     value={mat.nome}
                     onChange={e => handleMaterialFieldChange(idx, "nome", e.target.value)}
-                    className="w-full px-2 py-1 rounded bg-gray-100 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="min-w-[140px] px-2 py-1 rounded bg-gray-100 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Selecione</option>
                     {produtos
@@ -172,6 +172,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
                       ))}
                   </select>
                 </td>
+
                 <td className="p-2">
                   <input
                     type="text"
