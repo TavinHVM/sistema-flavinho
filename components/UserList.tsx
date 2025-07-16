@@ -39,8 +39,8 @@ export default function UserList({ users, search, onEditar, onExcluir }: UserLis
               className="even:bg-gray-800 odd:bg-gray-950 hover:bg-gray-700 transition-colors duration-150"
             >
               <td className="p-3 text-gray-100">{user.nome}</td>
-              <td className="p-3 text-gray-400">{user.email}</td>
-              <td className="p-3 text-gray-400">{user.role}</td>
+              <td className="p-3 font-semibold text-sky-300">{user.email}</td>
+              <td className="p-3 text-gray-200">{user.role}</td>
               <td className="p-3">
                 <div className="flex flex-wrap gap-2">
                   <button
