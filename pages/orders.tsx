@@ -171,11 +171,12 @@ export default function Orders() {
       responsavel_conferiu_forro: form.responsavel_conferiu_forro,
       responsavel_conferiu_utensilio: form.responsavel_conferiu_utensilio,
       materiais: form.materiais,
-      horario_entregou: form.horario_entregou,
-      horario_recebeu: form.horario_recebeu,
-      horario_buscou: form.horario_buscou,
+      horario_entregou: form.horario_entregou || null,
+      horario_recebeu: form.horario_recebeu || null,
+      horario_buscou: form.horario_buscou || null,
       created_at: new Date().toISOString(),
     };
+    
     const numeroPedido = form.numero ? Number(form.numero) : null;
     let error;
     if (numeroPedido && pedidos.some(p => Number(p.numero) === numeroPedido)) {
