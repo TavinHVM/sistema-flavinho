@@ -1,6 +1,7 @@
 import React from "react";
 import { Pedido } from "../types/Pedido";
 import SectionTitle from "./SectionTitle";
+import { FaTrash } from "react-icons/fa";
 
 interface Material {
   nome: string;
@@ -130,75 +131,78 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <input className="rounded p-2 text-black w-full" placeholder="Apartamento, bloco, etc" value={form.residencial} onChange={e => setForm({ ...form, residencial: e.target.value })} />
         </div>
       </div>
-      {/* Materiais */}
-      <div className="bg-gray-800 rounded-xl p-4 shadow mt-4">
-        <h2 className="text-white text-base font-semibold mb-3">Materiais</h2>
 
-        <div className="overflow-x-auto rounded-lg">
-          <table className="w-full text-sm text-gray-200">
-            <thead className="bg-gray-700 text-gray-300 text-left">
-              <tr>
-                <th className="p-2 font-medium">Quant.</th>
-                <th className="p-2 font-medium">Material</th>
-                <th className="p-2 font-medium">Valor Unit.</th>
-                <th className="p-2 font-medium">Valor Total</th>
-                <th className="p-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {form.materiais.map((mat: Material, idx: number) => (
-                <tr key={mat.nome + '-' + idx} className="border-b border-gray-600 hover:bg-gray-700 transition">
-                  <td className="p-2">
-                    <input
-                      type="number"
-                      min={1}
-                      value={mat.quantidade}
-                      onChange={e => handleMaterialFieldChange(idx, "quantidade", parseInt(e.target.value))}
-                      className="w-16 px-2 py-1 rounded bg-gray-100 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </td>
-                  <td className="p-2">
-                    <select
-                      value={mat.nome}
-                      onChange={e => handleMaterialFieldChange(idx, "nome", e.target.value)}
-                      className="w-full px-2 py-1 rounded bg-gray-100 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      {/* Materiais */}
+      <div className="mt-10 border-t-2 border-t border-t-gray-500">
+        <h2 className="text-white text-base font-semibold mt-2 text-center">Itens</h2>
+      </div>
+
+      <div className="overflow-x-auto rounded-lg">
+        <table className="w-full text-sm text-gray-200">
+          <thead className="bg-gray-700 text-gray-300 text-left">
+            <tr>
+              <th className="p-2 font-medium">Quant.</th>
+              <th className="p-2 font-medium">Item</th>
+              <th className="p-2 font-medium">Valor Unit.</th>
+              <th className="p-2 font-medium">Valor Total</th>
+              <th className="p-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {form.materiais.map((mat: Material, idx: number) => (
+              <tr key={mat.nome + '-' + idx} className="border-b border-gray-600 hover:bg-gray-700 transition">
+                <td className="p-2">
+                  <input
+                    type="number"
+                    min={1}
+                    value={mat.quantidade}
+                    onChange={e => handleMaterialFieldChange(idx, "quantidade", parseInt(e.target.value))}
+                    className="w-16 px-2 py-1 rounded bg-gray-100 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </td>
+                <td className="p-2">
+                  <select
+                    value={mat.nome}
+                    onChange={e => handleMaterialFieldChange(idx, "nome", e.target.value)}
+                    className="w-full px-2 py-1 rounded bg-gray-100 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Selecione</option>
+                    {produtos
+                      .slice()
+                      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+                      .map(p => (
+                        <option key={p.id} value={p.nome}>{p.nome}</option>
+                      ))}
+                  </select>
+                </td>
+                <td className="p-2">
+                  <input
+                    type="text"
+                    disabled
+                    value={getPrecoProduto(mat.nome) ? (getPrecoProduto(mat.nome) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''}
+                    className="w-24 px-2 py-1 rounded bg-gray-100 text-gray-700 border border-gray-300"
+                  />
+                </td>
+                <td className="p-2 text-green-300 font-medium">
+                  R$ {mat.valor_total?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </td>
+                <td className="p-2 text-right">
+                  {form.materiais.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeMaterial(idx)}
+                      className="text-red-400 hover:text-red-300 text-sm transition font-bold mr-3"
                     >
-                      <option value="">Selecione</option>
-                      {produtos
-                        .slice()
-                        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
-                        .map(p => (
-                          <option key={p.id} value={p.nome}>{p.nome}</option>
-                        ))}
-                    </select>
-                  </td>
-                  <td className="p-2">
-                    <input
-                      type="text"
-                      disabled
-                      value={getPrecoProduto(mat.nome) ? (getPrecoProduto(mat.nome) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''}
-                      className="w-24 px-2 py-1 rounded bg-gray-100 text-gray-700 border border-gray-300"
-                    />
-                  </td>
-                  <td className="p-2 text-green-300 font-medium">
-                    R$ {mat.valor_total?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                  </td>
-                  <td className="p-2 text-right">
-                    {form.materiais.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeMaterial(idx)}
-                        className="text-red-400 hover:text-red-300 text-sm transition"
-                      >
-                        Remover
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <FaTrash className="inline mr-1" />
+                      Remover
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
         <button
           type="button"
@@ -208,13 +212,12 @@ const OrderForm: React.FC<OrderFormProps> = ({
           + Adicionar Item
         </button>
 
-        <div className="flex justify-end items-center mt-4">
-          <span className="text-gray-300 text-base font-semibold mr-2">Total Geral:</span>
-          <span className="text-green-400 text-xl font-bold">
+        <div className="flex justify-end items-center mt-2 border-b border-b-2 border-b-gray-500 mb-4">
+          <span className="text-gray-300 text-base font-semibold mr-2 mb-2">Total Geral:</span>
+          <span className="text-green-400 text-xl font-bold mb-2">
             R$ {totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </span>
         </div>
-      </div>
 
       {/* Linha 5: Entrega, Busca, Pagamento */}
       <div className="flex flex-col md:flex-row gap-2 mt-2">
