@@ -187,7 +187,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
       {/* RESPONSABILIDADES - MANUAL */}
       <View style={{ marginTop: 10 }}>
         <Text style={{ fontWeight: "bold", fontSize: 9, marginBottom: 4 }}>RESPONSABILIDADES</Text>
-        {["ENTREGOU", "RECEBEU", "BUSCOU", "CONFERIU FORRO", "CONFERIU UTENSÍLIO"].map((label, index) => (
+        {["RESP. ENTREGOU", "RESP. RECEBEU", "RESP. BUSCOU", "RESP. CONFERIU FORRO", "RESP. CONFERIU UTENSÍLIO"].map((label, index) => (
           <View
             key={index}
             style={{

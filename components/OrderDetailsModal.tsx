@@ -24,14 +24,6 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
     const blob = await pdf(
       <PedidoPDF pedido={{
         ...pedido,
-        responsavel_entregou: pedido.responsavel_entregou || "",
-        data_entregou: pedido.data_entregou || "",
-        responsavel_recebeu: pedido.responsavel_recebeu || "",
-        data_recebeu: pedido.data_recebeu || "",
-        responsavel_buscou: pedido.responsavel_buscou || "",
-        data_buscou: pedido.data_buscou || "",
-        responsavel_conferiu_forro: pedido.responsavel_conferiu_forro || "",
-        responsavel_conferiu_utensilio: pedido.responsavel_conferiu_utensilio || "",
         telefone: pedido.telefone || "",
         residencial: pedido.residencial || "",
         referencia: pedido.referencia || "",
@@ -101,22 +93,12 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           <div><b>Endereço Evento:</b> {pedido.endereco}</div>
           <div><b>Endereço Residencial:</b> {pedido.residencial}</div>
           <div><b>Referência:</b> {pedido.referencia}</div>
-          <div><b>Entrega:</b> {formatDateBR(pedido.data_entregou)} às {pedido.horario_entregou}</div>
-          <div><b>Busca:</b> {formatDateBR(pedido.data_buscou)} às {pedido.horario_buscou}</div>
-          <div><b>Recebeu:</b> {formatDateBR(pedido.data_recebeu)} às {pedido.horario_recebeu}</div>
           <div><b>Pagamento:</b> {pedido.pagamento}</div>
           <div><b>Valor Total:</b> {pedido.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
         </div>
         <div className="mt-4 border-t">
           <h3 className="font-semibold mb-2 mt-4">Materiais</h3>
           <OrderMaterialsList materiais={pedido.materiais} />
-        </div>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-white">
-          <div><b>Resp. Entregou:</b> {pedido.responsavel_entregou}</div>
-          <div><b>Resp. Recebeu:</b> {pedido.responsavel_recebeu}</div>
-          <div><b>Resp. Buscou:</b> {pedido.responsavel_buscou}</div>
-          <div><b>Resp. Conferiu Forro:</b> {pedido.responsavel_conferiu_forro}</div>
-          <div><b>Resp. Conferiu Utensílio:</b> {pedido.responsavel_conferiu_utensilio}</div>
         </div>
       </div>
     </div>

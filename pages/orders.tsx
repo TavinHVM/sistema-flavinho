@@ -47,17 +47,6 @@ export default function Orders() {
     materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }],
     pagamento: "",
     valor_total: 0,
-    responsavel_entregou: "",
-    data_entregou: "",
-    responsavel_recebeu: "",
-    data_recebeu: "",
-    responsavel_buscou: "",
-    data_buscou: "",
-    responsavel_conferiu_forro: "",
-    responsavel_conferiu_utensilio: "",
-    horario_entregou: "",
-    horario_recebeu: "",
-    horario_buscou: "",
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [produtos, setProdutos] = useState<ProdutoLocal[]>([]);
@@ -162,21 +151,10 @@ export default function Orders() {
       referencia: form.referencia,
       pagamento: form.pagamento,
       valor_total,
-      responsavel_entregou: form.responsavel_entregou,
-      data_entregou: form.data_entregou ? toISODate(form.data_entregou) : null,
-      responsavel_recebeu: form.responsavel_recebeu,
-      data_recebeu: form.data_recebeu ? toISODate(form.data_recebeu) : null,
-      responsavel_buscou: form.responsavel_buscou,
-      data_buscou: form.data_buscou ? toISODate(form.data_buscou) : null,
-      responsavel_conferiu_forro: form.responsavel_conferiu_forro,
-      responsavel_conferiu_utensilio: form.responsavel_conferiu_utensilio,
       materiais: form.materiais,
-      horario_entregou: form.horario_entregou || null,
-      horario_recebeu: form.horario_recebeu || null,
-      horario_buscou: form.horario_buscou || null,
       created_at: new Date().toISOString(),
     };
-    
+
     const numeroPedido = form.numero ? Number(form.numero) : null;
     let error;
     if (numeroPedido && pedidos.some(p => Number(p.numero) === numeroPedido)) {
@@ -205,17 +183,6 @@ export default function Orders() {
         materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }],
         pagamento: "",
         valor_total: 0,
-        responsavel_entregou: "",
-        data_entregou: "",
-        responsavel_recebeu: "",
-        data_recebeu: "",
-        responsavel_buscou: "",
-        data_buscou: "",
-        responsavel_conferiu_forro: "",
-        responsavel_conferiu_utensilio: "",
-        horario_entregou: "",
-        horario_recebeu: "",
-        horario_buscou: "",
       });
       setIsEditing(false);
       fetchPedidos();
@@ -292,17 +259,6 @@ export default function Orders() {
                 materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }],
                 pagamento: "",
                 valor_total: 0,
-                responsavel_entregou: "",
-                data_entregou: "",
-                responsavel_recebeu: "",
-                data_recebeu: "",
-                responsavel_buscou: "",
-                data_buscou: "",
-                responsavel_conferiu_forro: "",
-                responsavel_conferiu_utensilio: "",
-                horario_entregou: "",
-                horario_recebeu: "",
-                horario_buscou: "",
               });
               setIsEditing(false);
             }}
