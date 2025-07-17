@@ -12,48 +12,48 @@ import { formatDateBR } from "../lib/formatDate";
 import logoBase64 from "./logoBase64";
 import qrcodeBase64 from "./qrcodeBase64";
 import { formatTelefoneBR } from "@/lib/formatNumber";
+import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
 
-// Estilos atualizados
 const styles = StyleSheet.create({
   page: {
-    padding: 24,
-    fontSize: 10,
+    padding: 20,
+    fontSize: 9,
     fontFamily: "Helvetica",
-    lineHeight: 1.5,
+    lineHeight: 1.4,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 10,
+    marginBottom: 6,
   },
   empresaInfo: {
     flex: 1,
-    paddingLeft: 10,
+    paddingLeft: 8,
   },
   titleCenter: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "bold",
     textAlign: "center",
-    marginVertical: 6,
+    marginVertical: 4,
   },
   subTextCenter: {
-    fontSize: 9,
+    fontSize: 8,
     textAlign: "center",
   },
   clausulas: {
-    marginVertical: 6,
+    marginVertical: 4,
   },
   clausulaItem: {
-    fontSize: 9,
-    marginBottom: 2,
+    fontSize: 8,
+    marginBottom: 1,
     textAlign: "justify",
   },
   table: {
     width: "100%",
     borderWidth: 1,
     borderColor: "#000",
-    marginTop: 8,
+    marginTop: 6,
   },
   tableRow: {
     flexDirection: "row",
@@ -66,18 +66,13 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: "#000",
-    padding: 4,
+    padding: 2,
     textAlign: "center",
   },
   colQuant: { width: "15%" },
   colMaterial: { width: "45%" },
   colValorUnit: { width: "20%" },
   colValorTotal: { width: "20%" },
-  assinatura: {
-    marginTop: 20,
-    textAlign: "center",
-    fontSize: 9,
-  },
 });
 
 interface PedidoPDFProps {
@@ -87,12 +82,11 @@ interface PedidoPDFProps {
 const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      {/* Cabeçalho */}
       <View style={styles.header}>
-        {logoBase64 && <Image src={logoBase64} style={{ width: 70, height: 70 }} />}
-        <Image src={qrcodeBase64} style={{ width: 70, height: 70 }} />
+        {logoBase64 && <Image src={logoBase64} style={{ width: 60, height: 60 }} />}
+        <Image src={qrcodeBase64} style={{ width: 60, height: 60 }} />
         <View style={styles.empresaInfo}>
-          <Text style={{ fontWeight: "bold", fontSize: 10 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 9 }}>
             FLAVINHO Espaço Locações & Festa
           </Text>
           <Text>joaoflavio.20@hotmail.com</Text>
@@ -102,52 +96,49 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
         </View>
       </View>
 
-      {/* Atenção */}
       <Text style={styles.titleCenter}>ATENÇÃO</Text>
       <Text style={styles.subTextCenter}>
         *TODOS OS MATERIAIS DEVERÃO SER CONFERIDOS PELO CLIENTE NO RECEBIMENTO DO MESMO.
       </Text>
-      <Text style={{ ...styles.subTextCenter, fontSize: 8, marginBottom: 6 }}>
+      <Text style={{ ...styles.subTextCenter, fontSize: 7, marginBottom: 4 }}>
         OBS.: QUALQUER DEFEITO NOS MESMOS SERÁ COBRADO O VALOR DO MESMO OU REPOSIÇÃO COM OUTRO DO MESMO MODELO.
       </Text>
 
-      {/* Cláusulas */}
       <Text style={styles.titleCenter}>CLÁUSULAS DO CONTRATO</Text>
       <View style={styles.clausulas}>
-        {[
-          "O material será cobrado aluguel de 12 em 12 horas",
-          "Somente materiais de cozinha receberão limpos e deverão ser devolvidos limpos. Caso contrário, será cobrada taxa de limpeza",
-          "O material só será recebido em perfeito estado",
-          "Todos os materiais deverão ser conferidos. Não aceitamos reclamações posteriores",
-          "O depósito é feito pelo cliente qualificado mediante quitação devida recebida",
-          "O material alugado segue o art. 1256 do CC e responsabilidade conforme art. 901-902 CPC",
-          "Material danificado poderá ser substituído por outro igual. Caso contrário, será cobrado o valor integral do item",
-        ].map((cl, i) => (
+        {["O material será cobrado aluguel de 12 em 12 horas", "Somente materiais de cozinha receberão limpos e deverão ser devolvidos limpos. Caso contrário, será cobrada taxa de limpeza", "O material só será recebido em perfeito estado", "Todos os materiais deverão ser conferidos. Não aceitamos reclamações posteriores", "O depósito é feito pelo cliente qualificado mediante quitação devida recebida", "O material alugado segue o art. 1256 do CC e responsabilidade conforme art. 901-902 CPC", "Material danificado poderá ser substituído por outro igual. Caso contrário, será cobrado o valor integral do item"].map((cl, i) => (
           <Text key={i} style={styles.clausulaItem}>{`${i + 1} - ${cl}`}</Text>
         ))}
       </View>
 
-      {/* Dados do evento / cliente */}
       <Text style={styles.titleCenter}>CONTRATO DE LOCAÇÃO</Text>
-      <View style={{ marginTop: 8, fontSize: 9 }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+
+      <View
+        style={{
+          marginTop: 4,
+          fontSize: 8,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          gap: 10,
+        }}
+      >
+        {/* Bloco Esquerdo */}
+        <View style={{ width: "48%" }}>
           <Text>DATA LOCAÇÃO: {formatDateBR(pedido.data_locacao)}</Text>
+          <Text>CLIENTE: {pedido.cliente}</Text>
+          <Text>LOCAL: {pedido.endereco}</Text>
+          <Text>RESIDENCIAL: {pedido.residencial}</Text>
+        </View>
+
+        {/* Bloco Direito */}
+        <View style={{ width: "48%" }}>
           <Text>EVENTO: {formatDateBR(pedido.data_evento)}</Text>
           <Text>DEVOLUÇÃO: {formatDateBR(pedido.data_devolucao)}</Text>
-        </View>
-        <View style={{ height: 6 }} />
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text>CLIENTE: {pedido.cliente}</Text>
           <Text>CELULAR: {formatTelefoneBR(pedido.telefone)}</Text>
-        </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text>LOCAL: {pedido.endereco}</Text>
           <Text>REFERÊNCIA: {pedido.referencia}</Text>
         </View>
-        <Text>RESIDENCIAL: {pedido.residencial}</Text>
       </View>
 
-      {/* Tabela de materiais */}
       <View style={styles.table}>
         <View style={[styles.tableRow, styles.tableHeader]}>
           <Text style={[styles.tableCell, styles.colQuant]}>QUANT.</Text>
@@ -165,68 +156,57 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
             <Text style={[styles.tableCell, styles.colValorTotal]}>
               {mat.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </Text>
+          </View>
+        ))}
+      </View>
+      <Text style={{ fontWeight: "bold", fontSize: 9, marginTop: 4, textAlign: "right" }}> TOTAL GERAL: R$ {pedido.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Text>
 
+      {/* RESPONSABILIDADES - MANUAL */}
+      <View style={{ marginTop: 10 }}>
+        <Text style={{ fontWeight: "bold", fontSize: 9, marginBottom: 4 }}>RESPONSABILIDADES</Text>
+        {["ENTREGOU", "RECEBEU", "BUSCOU", "CONFERIU FORRO", "CONFERIU UTENSÍLIO"].map((label, index) => (
+          <View
+            key={index}
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 3,
+              paddingHorizontal: 6,
+            }}
+          >
+            <Text style={{ fontSize: 8, width: "35%" }}>{label}: ____________________</Text>
+            <Text style={{ fontSize: 8, width: "30%", textAlign: "center" }}>Data: ____/____/____</Text>
+            <Text style={{ fontSize: 8, width: "30%", textAlign: "right" }}>Horário: ____:____</Text>
           </View>
         ))}
       </View>
 
-      {/* Seção de responsáveis */}
-      <View style={{ marginTop: 16, padding: 10, borderWidth: 1, borderColor: "#000", borderRadius: 4 }}>
-        <Text style={{ fontWeight: "bold", fontSize: 10, marginBottom: 6 }}>RESPONSABILIDADES</Text>
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: 10,
+          marginTop: 8,
+          textAlign: "center",
+        }}
+      >
+        CERTIFICO QUE EU CONFERI TODO MATERIAL E ME RESPONSABILIZO POR TODO E QUALQUER MATERIAL
+        PRESCRITO NESTE CONTRATO.
+      </Text>
 
-        {[
-          {
-            label: "ENTREGOU",
-            nome: pedido.responsavel_entregou,
-            data: formatDateBR(pedido.data_entregou),
-            horario: pedido.horario_entregou || "____",
-          },
-          {
-            label: "RECEBEU",
-            nome: pedido.responsavel_recebeu,
-            data: formatDateBR(pedido.data_recebeu),
-            horario: pedido.horario_recebeu || "____",
-          },
-          {
-            label: "BUSCOU",
-            nome: pedido.responsavel_buscou,
-            data: formatDateBR(pedido.data_buscou),
-            horario: pedido.horario_buscou || "____",
-          },
-        ].map((item, index) => (
-          <View key={index} style={{ flexDirection: 'row', marginBottom: 4, flexWrap: 'wrap' }}>
-            <Text style={{ fontWeight: "bold", fontSize: 9 }}>{item.label}: </Text>
-            <Text style={{ fontSize: 9 }}>{item.nome}</Text>
-
-            <Text style={{ fontWeight: "bold", fontSize: 9, marginLeft: 12 }}>Data: </Text>
-            <Text style={{ fontSize: 9 }}>{item.data}</Text>
-
-            <Text style={{ fontWeight: "bold", fontSize: 9, marginLeft: 12 }}>Horário: </Text>
-            <Text style={{ fontSize: 9 }}>{item.horario}</Text>
-          </View>
-        ))}
-
-        {/* Conferência */}
-        <View style={{ flexDirection: 'row', marginBottom: 4, flexWrap: 'wrap' }}>
-          <Text style={{ fontWeight: "bold", fontSize: 9 }}>CONFERIU FORRO: </Text>
-          <Text style={{ fontSize: 9 }}>{pedido.responsavel_conferiu_forro}</Text>
-
-          <Text style={{ fontWeight: "bold", fontSize: 9, marginLeft: 12 }}>CONFERIU UTENSÍLIO: </Text>
-          <Text style={{ fontSize: 9 }}>{pedido.responsavel_conferiu_utensilio}</Text>
-        </View>
-
-        {/* Total */}
-        <View style={{ marginTop: 4, borderTopWidth: 1, borderColor: '#000', paddingTop: 4 }}>
-          <Text style={{ fontSize: 10, fontWeight: "bold", textAlign: 'right' }}>
-            TOTAL GERAL: {pedido.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-          </Text>
-        </View>
-      </View>
-
-      {/* Assinatura */}
-      <View style={styles.assinatura}>
-        <Text>ASSINATURA: ____________________________</Text>
-        <Text style={{ marginTop: 4 }}>CPF/CNPJ/RG: ____________________________</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 12,
+          paddingHorizontal: 10,
+        }}
+      >
+        <Text style={{ fontSize: 9, fontWeight: "bold" }}>
+          ASSINATURA: ______________________________________
+        </Text>
+        <Text style={{ fontSize: 9, fontWeight: "bold" }}>
+          CPF/CNPJ/RG: {formatCpfCnpjBR(pedido.cpf)}
+        </Text>
       </View>
     </Page>
   </Document>
