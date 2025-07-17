@@ -10,7 +10,7 @@ export default function UpdatePassword() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
         console.log("Usuário autenticado para redefinir senha.");
         setShowForm(true);
