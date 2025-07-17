@@ -122,21 +122,44 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
           gap: 10,
         }}
       >
-        {/* Bloco Esquerdo */}
         <View style={{ width: "48%" }}>
-          <Text>DATA LOCAÇÃO: {formatDateBR(pedido.data_locacao)}</Text>
-          <Text>CLIENTE: {pedido.cliente}</Text>
-          <Text>LOCAL: {pedido.endereco}</Text>
-          <Text>RESIDENCIAL: {pedido.residencial}</Text>
+          <Text>
+            <Text style={{ fontWeight: "bold" }}>DATA LOCAÇÃO: </Text>
+            {formatDateBR(pedido.data_locacao)}
+          </Text>
+          <Text>
+            <Text style={{ fontWeight: "bold" }}>CLIENTE: </Text>
+            {pedido.cliente}
+          </Text>
+          <Text>
+            <Text style={{ fontWeight: "bold" }}>LOCAL: </Text>
+            {pedido.endereco}
+          </Text>
+          <Text>
+            <Text style={{ fontWeight: "bold" }}>RESIDENCIAL: </Text>
+            {pedido.residencial}
+          </Text>
         </View>
 
-        {/* Bloco Direito */}
         <View style={{ width: "48%" }}>
-          <Text>EVENTO: {formatDateBR(pedido.data_evento)}</Text>
-          <Text>DEVOLUÇÃO: {formatDateBR(pedido.data_devolucao)}</Text>
-          <Text>CELULAR: {formatTelefoneBR(pedido.telefone)}</Text>
-          <Text>REFERÊNCIA: {pedido.referencia}</Text>
+          <Text>
+            <Text style={{ fontWeight: "bold" }}>EVENTO: </Text>
+            {formatDateBR(pedido.data_evento)}
+          </Text>
+          <Text>
+            <Text style={{ fontWeight: "bold" }}>DEVOLUÇÃO: </Text>
+            {formatDateBR(pedido.data_devolucao)}
+          </Text>
+          <Text>
+            <Text style={{ fontWeight: "bold" }}>CELULAR: </Text>
+            {formatTelefoneBR(pedido.telefone)}
+          </Text>
+          <Text>
+            <Text style={{ fontWeight: "bold" }}>REFERÊNCIA: </Text>
+            {pedido.referencia}
+          </Text>
         </View>
+
       </View>
 
       <View style={styles.table}>
