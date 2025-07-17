@@ -10,23 +10,25 @@ export default function UpdatePassword() {
   const router = useRouter();
 
   useEffect(() => {
-    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        console.log("Usuário autenticado para redefinir senha.");
-        setShowForm(true);
-      }
-    });
+    const hash = window.location.hash;
 
-    // Check if the user is already authenticated via hash
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        setShowForm(true);
-      }
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    // Realiza o login com base no hash do Supabase (access_token)
+    if (hash && hash.includes("access_token")) {
+      supabase.auth
+        .exchangeCodeForSession(hash)
+        .then(({ error }) => {
+          if (!error) {
+            setShowForm(true);
+          } else {
+            setMessage("Link inválido ou expirado.");
+          }
+        })
+        .catch(() => {
+          setMessage("Erro ao validar o link de redefinição.");
+        });
+    } else {
+      setMessage("Link inválido.");
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,7 +50,7 @@ export default function UpdatePassword() {
         <h1 className="text-xl font-bold mb-4 text-center">Redefinir Senha</h1>
 
         {!showForm ? (
-          <p className="text-center text-gray-400">Carregando ou link inválido/expirado...</p>
+          <p className="text-center text-gray-400">{message || "Carregando..."}</p>
         ) : (
           <form onSubmit={handleSubmit}>
             <input
@@ -68,7 +70,9 @@ export default function UpdatePassword() {
           </form>
         )}
 
-        {message && <p className="mt-4 text-center text-blue-400">{message}</p>}
+        {message && showForm && (
+          <p className="mt-4 text-center text-blue-400">{message}</p>
+        )}
       </div>
     </main>
   );
