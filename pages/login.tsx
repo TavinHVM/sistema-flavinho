@@ -15,9 +15,11 @@ export default function Login() {
   const router = useRouter();
 
   useEffect(() => {
-    const userStr = localStorage.getItem("user");
-    if (userStr) {
-      router.replace("/dashboard");
+    if (router.pathname === "/login") {
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        router.replace("/dashboard");
+      }
     }
   }, [router]);
 
