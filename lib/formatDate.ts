@@ -1,13 +1,14 @@
-// Função utilitária para formatar datas no padrão brasileiro dd/mm/yyyy
 export function formatDateBR(dateStr?: string | Date): string {
   if (!dateStr) return "";
+
   let date: Date;
   if (typeof dateStr === "string") {
-    // Tenta parsear ISO ou outros formatos
-    date = new Date(dateStr);
-    if (isNaN(date.getTime())) return dateStr; // Retorna original se inválida
+    const [year, month, day] = dateStr.split("-").map(Number);
+    // Cria a data como local, sem considerar fuso
+    date = new Date(year, month - 1, day);
   } else {
     date = dateStr;
   }
+
   return date.toLocaleDateString("pt-BR");
 }
