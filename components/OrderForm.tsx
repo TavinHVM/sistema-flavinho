@@ -2,6 +2,8 @@ import React from "react";
 import { Pedido } from "../types/Pedido";
 import SectionTitle from "./SectionTitle";
 import { FaTrash } from "react-icons/fa";
+import { formatTelefoneBR } from "@/lib/formatNumber";
+import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
 
 interface Material {
   nome: string;
@@ -94,7 +96,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
             inputMode="numeric"
             pattern="[0-9]*"
             placeholder="CPF/CNPJ do cliente"
-            value={form.cpf}
+            value={formatCpfCnpjBR(form.cpf)}
             onChange={e => {
               const onlyNumbers = e.target.value.replace(/\D/g, '');
               setForm({ ...form, cpf: onlyNumbers });
@@ -110,7 +112,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
         </div>
         <div className="flex-1 min-w-0">
           <label className="text-xs text-gray-300 font-semibold">Telefone</label>
-          <input className="rounded p-2 text-black w-full" inputMode="numeric" pattern="[0-9]*" placeholder="(DDD) 99999-9999" value={form.telefone} onChange={e => {
+          <input className="rounded p-2 text-black w-full" inputMode="numeric" pattern="[0-9]*" placeholder="(DDD) 99999-9999" value={formatTelefoneBR(form.telefone)} onChange={e => {
             const onlyNumbers = e.target.value.replace(/\D/g, '');
             setForm({ ...form, telefone: onlyNumbers });
           }}

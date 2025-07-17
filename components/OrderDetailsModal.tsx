@@ -6,6 +6,8 @@ import { FaFilePdf } from "react-icons/fa";
 import { pdf } from "@react-pdf/renderer";
 import PedidoPDF from "./PedidoPDF";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { formatTelefoneBR } from "@/lib/formatNumber";
+import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
 
 interface Props {
   pedido: Pedido | null;
@@ -94,8 +96,8 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           <div><b>Data Evento:</b> {formatDateBR(pedido.data_evento)}</div>
           <div><b>Data Devolução:</b> {formatDateBR(pedido.data_devolucao)}</div>
           <div><b>Cliente:</b> {pedido.cliente}</div>
-          <div><b>CPF/CNPJ:</b> {pedido.cpf}</div>
-          <div><b>Telefone:</b> {pedido.telefone}</div>
+          <div><b>CPF/CNPJ:</b> {formatCpfCnpjBR(pedido.cpf)}</div>
+          <div><b>Telefone:</b> {formatTelefoneBR(pedido.telefone)}</div>
           <div><b>Endereço Evento:</b> {pedido.endereco}</div>
           <div><b>Endereço Residencial:</b> {pedido.residencial}</div>
           <div><b>Referência:</b> {pedido.referencia}</div>

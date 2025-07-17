@@ -11,6 +11,7 @@ import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 import logoBase64 from "./logoBase64";
 import qrcodeBase64 from "./qrcodeBase64";
+import { formatTelefoneBR } from "@/lib/formatNumber";
 
 // Estilos atualizados
 const styles = StyleSheet.create({
@@ -137,7 +138,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
         <View style={{ height: 6 }} />
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text>CLIENTE: {pedido.cliente}</Text>
-          <Text>CELULAR: {pedido.telefone}</Text>
+          <Text>CELULAR: {formatTelefoneBR(pedido.telefone)}</Text>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text>LOCAL: {pedido.endereco}</Text>
@@ -225,7 +226,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
       {/* Assinatura */}
       <View style={styles.assinatura}>
         <Text>ASSINATURA: ____________________________</Text>
-        <Text style={{ marginTop: 4 }}>CPF/RG: ____________________________</Text>
+        <Text style={{ marginTop: 4 }}>CPF/CNPJ/RG: ____________________________</Text>
       </View>
     </Page>
   </Document>
