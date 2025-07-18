@@ -92,7 +92,8 @@ export default function ProdutoList({
       if (
         sortKey === "numero" ||
         sortKey === "quantidade_empresa" ||
-        sortKey === "quantidade_rua"
+        sortKey === "quantidade_rua" ||
+        sortKey === "preco" // <- aqui!
       ) {
         const aNum = typeof aValue === "number" ? aValue : Number(aValue) || 0;
         const bNum = typeof bValue === "number" ? bValue : Number(bValue) || 0;
@@ -100,6 +101,7 @@ export default function ProdutoList({
           ? aNum - bNum
           : bNum - aNum;
       }
+
 
       // Para strings
       const aStr = (aValue ?? "").toString().toLowerCase();
