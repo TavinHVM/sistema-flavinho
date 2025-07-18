@@ -16,7 +16,7 @@ export default function UserForm({ form, setForm, onSubmit, loading }: UserFormP
         <div className="bg-[rgb(26,34,49)] p-4 sm:p-8 rounded-lg shadow-lg w-full max-w-full sm:max-w-md mt-2">
             {/* Título e subtítulo adicionados aqui */}
             <div className="flex flex-col items-center justify-center mb-6">
-                <div className="mb-4 w-full mb-8 mt-2">
+                <div className="w-full mb-6 mt-2">
                     <PainelAdminButton />
                 </div>
                 <h1 className="font-poppins text-[2rem] font-bold mb-1 text-center">
@@ -86,7 +86,7 @@ export default function UserForm({ form, setForm, onSubmit, loading }: UserFormP
                 className="w-full p-3 rounded bg-gray-900 text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-inter mb-4"
             >
                 <option value="">Selecione o cargo</option>
-                <option value="Funcionário">Funcionário</option>
+                <option value="Funcionario">Funcionário</option>
                 <option value="Administrador">Administrador</option>
             </select>
             <p className="text-xs text-gray-400 mb-3 ml-1">
