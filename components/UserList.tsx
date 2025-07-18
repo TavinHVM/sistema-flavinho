@@ -44,7 +44,7 @@ export default function UserList({ users, search, onEditar, onExcluir }: UserLis
                 className={`p-3 ${user.role === 'Administrador'
                     ? 'text-amber-400'
                     : user.role === 'Funcionario'
-                      ? 'text-gray-300'
+                      ? 'text-emerald-400'
                       : 'text-emerald-400'
                   }`}
               >
