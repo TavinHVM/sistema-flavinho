@@ -40,7 +40,17 @@ export default function UserList({ users, search, onEditar, onExcluir }: UserLis
             >
               <td className="p-3 text-gray-100">{user.nome}</td>
               <td className="p-3 font-semibold text-sky-300">{user.email}</td>
-              <td className="p-3 text-gray-200">{user.role}</td>
+              <td
+                className={`p-3 ${user.role === 'Administrador'
+                    ? 'text-amber-400'
+                    : user.role === 'Funcionario'
+                      ? 'text-gray-300'
+                      : 'text-emerald-400'
+                  }`}
+              >
+                {user.role}
+              </td>
+
               <td className="p-3">
                 <div className="flex flex-wrap gap-2">
                   <button
