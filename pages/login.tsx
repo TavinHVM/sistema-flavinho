@@ -67,7 +67,10 @@ export default function Login() {
     e.preventDefault();
     setResetMessage("");
     setResetLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail);
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: "https://sistema-flavinho.vercel.app/update-password",
+    });
+    
     if (error) {
       setResetMessage("Erro ao enviar e-mail de redefinição. Verifique o e-mail informado.");
     } else {
