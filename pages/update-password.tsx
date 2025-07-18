@@ -10,25 +10,16 @@ export default function UpdatePassword() {
   const router = useRouter();
 
   useEffect(() => {
-    const hash = window.location.hash;
-
-    // Realiza o login com base no hash do Supabase (access_token)
-    if (hash && hash.includes("access_token")) {
-      supabase.auth
-        .exchangeCodeForSession(hash)
-        .then(({ error }) => {
-          if (!error) {
-            setShowForm(true);
-          } else {
-            setMessage("Link inválido ou expirado.");
-          }
-        })
-        .catch(() => {
-          setMessage("Erro ao validar o link de redefinição.");
-        });
-    } else {
-      setMessage("Link inválido.");
+    async function checkSession() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setShowForm(true);
+      } else {
+        setMessage("Link inválido ou expirado.");
+      }
     }
+
+    checkSession();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
