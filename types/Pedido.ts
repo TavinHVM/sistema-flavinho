@@ -11,7 +11,6 @@ export interface Pedido {
   numero?: string;
   data_locacao: string;
   data_evento: string;
-  data_retirada?: string;
   data_devolucao: string;
   cliente: string;
   cpf: string;
