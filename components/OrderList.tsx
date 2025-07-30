@@ -21,7 +21,7 @@ interface OrderListProps {
 type SortKey = "numero" | "cpf" | "cliente" | "data_locacao" | "data_evento" | "endereco" | "valor_total" | null;
 type SortOrder = "asc" | "desc" | null;
 
-const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir }) => {
+const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) => {
   const [modalPedido, setModalPedido] = useState<Pedido | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
