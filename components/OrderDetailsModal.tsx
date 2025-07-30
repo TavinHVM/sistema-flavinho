@@ -37,6 +37,22 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
         valor_total: pedido.valor_total || 0,
         valor_pago: pedido.valor_pago || 0,
         valor_deve: pedido.valor_deve || 0,
+        // Campos de responsabilidades
+        resp_entregou: pedido.resp_entregou || "",
+        data_entregou: pedido.data_entregou || "",
+        hora_entregou: pedido.hora_entregou || "",
+        resp_recebeu: pedido.resp_recebeu || "",
+        data_recebeu: pedido.data_recebeu || "",
+        hora_recebeu: pedido.hora_recebeu || "",
+        resp_buscou: pedido.resp_buscou || "",
+        data_buscou: pedido.data_buscou || "",
+        hora_buscou: pedido.hora_buscou || "",
+        resp_forro: pedido.resp_forro || "",
+        data_forro: pedido.data_forro || "",
+        hora_forro: pedido.hora_forro || "",
+        resp_utensilio: pedido.resp_utensilio || "",
+        data_utensilio: pedido.data_utensilio || "",
+        hora_utensilio: pedido.hora_utensilio || "",
       }} />
     ).toBlob();
     const url = URL.createObjectURL(blob);

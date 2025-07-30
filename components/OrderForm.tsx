@@ -260,6 +260,182 @@ const OrderForm: React.FC<OrderFormProps> = ({
           />
         </div>
       </div>
+
+      {/* Seção de Responsabilidades */}
+      <div className="mt-6 border-t-2 border-t-gray-500">
+        <h2 className="text-white text-base font-semibold mt-4 mb-4 text-center">Responsabilidades</h2>
+        
+        {/* Responsável Entregou */}
+        <div className="mb-4">
+          <h3 className="text-gray-300 text-sm font-medium mb-2">Entrega</h3>
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Responsável Entregou</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                placeholder="Nome do responsável" 
+                value={form.resp_entregou || ''} 
+                onChange={e => setForm({ ...form, resp_entregou: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Data Entrega</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="date" 
+                value={form.data_entregou || ''} 
+                onChange={e => setForm({ ...form, data_entregou: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Hora Entrega</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="time" 
+                value={form.hora_entregou || ''} 
+                onChange={e => setForm({ ...form, hora_entregou: e.target.value })} 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Responsável Recebeu */}
+        <div className="mb-4">
+          <h3 className="text-gray-300 text-sm font-medium mb-2">Recebimento</h3>
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Responsável Recebeu</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                placeholder="Nome do responsável" 
+                value={form.resp_recebeu || ''} 
+                onChange={e => setForm({ ...form, resp_recebeu: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Data Recebimento</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="date" 
+                value={form.data_recebeu || ''} 
+                onChange={e => setForm({ ...form, data_recebeu: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Hora Recebimento</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="time" 
+                value={form.hora_recebeu || ''} 
+                onChange={e => setForm({ ...form, hora_recebeu: e.target.value })} 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Responsável Buscou */}
+        <div className="mb-4">
+          <h3 className="text-gray-300 text-sm font-medium mb-2">Busca</h3>
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Responsável Buscou</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                placeholder="Nome do responsável" 
+                value={form.resp_buscou || ''} 
+                onChange={e => setForm({ ...form, resp_buscou: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Data Busca</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="date" 
+                value={form.data_buscou || ''} 
+                onChange={e => setForm({ ...form, data_buscou: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Hora Busca</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="time" 
+                value={form.hora_buscou || ''} 
+                onChange={e => setForm({ ...form, hora_buscou: e.target.value })} 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Responsável Conferiu Forro */}
+        <div className="mb-4">
+          <h3 className="text-gray-300 text-sm font-medium mb-2">Conferência de Forro</h3>
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Responsável Conferiu Forro</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                placeholder="Nome do responsável" 
+                value={form.resp_forro || ''} 
+                onChange={e => setForm({ ...form, resp_forro: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Data Conferência</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="date" 
+                value={form.data_forro || ''} 
+                onChange={e => setForm({ ...form, data_forro: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Hora Conferência</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="time" 
+                value={form.hora_forro || ''} 
+                onChange={e => setForm({ ...form, hora_forro: e.target.value })} 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Responsável Conferiu Utensílio */}
+        <div className="mb-4">
+          <h3 className="text-gray-300 text-sm font-medium mb-2">Conferência de Utensílios</h3>
+          <div className="flex flex-col sm:flex-row gap-2 w-full">
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Responsável Conferiu Utensílio</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                placeholder="Nome do responsável" 
+                value={form.resp_utensilio || ''} 
+                onChange={e => setForm({ ...form, resp_utensilio: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Data Conferência</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="date" 
+                value={form.data_utensilio || ''} 
+                onChange={e => setForm({ ...form, data_utensilio: e.target.value })} 
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <label className="text-xs text-gray-300 font-semibold">Hora Conferência</label>
+              <input 
+                className="rounded p-2 text-black w-full" 
+                type="time" 
+                value={form.hora_utensilio || ''} 
+                onChange={e => setForm({ ...form, hora_utensilio: e.target.value })} 
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <button
         className={`${isEditing ? 'bg-blue-600' : 'bg-green-600'} text-white rounded p-2 mt-4 font-bold w-full`}
         type="button"

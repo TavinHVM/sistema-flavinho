@@ -48,6 +48,22 @@ export default function Orders() {
     valor_total: 0,
     valor_pago: 0,
     valor_deve: 0,
+    // Campos de responsabilidades
+    resp_entregou: "",
+    data_entregou: "",
+    hora_entregou: "",
+    resp_recebeu: "",
+    data_recebeu: "",
+    hora_recebeu: "",
+    resp_buscou: "",
+    data_buscou: "",
+    hora_buscou: "",
+    resp_forro: "",
+    data_forro: "",
+    hora_forro: "",
+    resp_utensilio: "",
+    data_utensilio: "",
+    hora_utensilio: "",
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [produtos, setProdutos] = useState<ProdutoLocal[]>([]);
@@ -155,6 +171,22 @@ export default function Orders() {
       valor_deve: form.valor_deve,
       materiais: form.materiais,
       created_at: new Date().toISOString(),
+      // Campos de responsabilidades
+      resp_entregou: form.resp_entregou || null,
+      data_entregou: form.data_entregou ? toISODate(form.data_entregou) : null,
+      hora_entregou: form.hora_entregou || null,
+      resp_recebeu: form.resp_recebeu || null,
+      data_recebeu: form.data_recebeu ? toISODate(form.data_recebeu) : null,
+      hora_recebeu: form.hora_recebeu || null,
+      resp_buscou: form.resp_buscou || null,
+      data_buscou: form.data_buscou ? toISODate(form.data_buscou) : null,
+      hora_buscou: form.hora_buscou || null,
+      resp_forro: form.resp_forro || null,
+      data_forro: form.data_forro ? toISODate(form.data_forro) : null,
+      hora_forro: form.hora_forro || null,
+      resp_utensilio: form.resp_utensilio || null,
+      data_utensilio: form.data_utensilio ? toISODate(form.data_utensilio) : null,
+      hora_utensilio: form.hora_utensilio || null,
     };
 
     const numeroPedido = form.numero ? Number(form.numero) : null;
@@ -186,6 +218,22 @@ export default function Orders() {
         valor_total: 0,
         valor_pago: 0,
         valor_deve: 0,
+        // Campos de responsabilidades
+        resp_entregou: "",
+        data_entregou: "",
+        hora_entregou: "",
+        resp_recebeu: "",
+        data_recebeu: "",
+        hora_recebeu: "",
+        resp_buscou: "",
+        data_buscou: "",
+        hora_buscou: "",
+        resp_forro: "",
+        data_forro: "",
+        hora_forro: "",
+        resp_utensilio: "",
+        data_utensilio: "",
+        hora_utensilio: "",
       });
       setIsEditing(false);
       fetchPedidos();
@@ -274,6 +322,22 @@ export default function Orders() {
                 valor_total: 0,
                 valor_pago: 0,
                 valor_deve: 0,
+                // Campos de responsabilidades
+                resp_entregou: "",
+                data_entregou: "",
+                hora_entregou: "",
+                resp_recebeu: "",
+                data_recebeu: "",
+                hora_recebeu: "",
+                resp_buscou: "",
+                data_buscou: "",
+                hora_buscou: "",
+                resp_forro: "",
+                data_forro: "",
+                hora_forro: "",
+                resp_utensilio: "",
+                data_utensilio: "",
+                hora_utensilio: "",
               });
               setIsEditing(false);
             }}
@@ -307,6 +371,22 @@ export default function Orders() {
                 valor_total: mat.valor_total,
                 preco: mat.preco || 0, // Garantir que preco esteja definido
               })),
+              // Campos de responsabilidades
+              resp_entregou: pedido.resp_entregou || "",
+              data_entregou: pedido.data_entregou || "",
+              hora_entregou: pedido.hora_entregou || "",
+              resp_recebeu: pedido.resp_recebeu || "",
+              data_recebeu: pedido.data_recebeu || "",
+              hora_recebeu: pedido.hora_recebeu || "",
+              resp_buscou: pedido.resp_buscou || "",
+              data_buscou: pedido.data_buscou || "",
+              hora_buscou: pedido.hora_buscou || "",
+              resp_forro: pedido.resp_forro || "",
+              data_forro: pedido.data_forro || "",
+              hora_forro: pedido.hora_forro || "",
+              resp_utensilio: pedido.resp_utensilio || "",
+              data_utensilio: pedido.data_utensilio || "",
+              hora_utensilio: pedido.hora_utensilio || "",
             });
             setIsEditing(true);
             setTimeout(() => {

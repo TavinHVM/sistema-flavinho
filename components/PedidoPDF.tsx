@@ -199,24 +199,104 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
         </Text>
       </View>
 
-      {/* RESPONSABILIDADES - MANUAL */}
+      {/* RESPONSABILIDADES - DINÂMICO */}
       <View style={{ marginTop: 6 }}>
         <Text style={{ fontWeight: "bold", fontSize: 8, marginBottom: 2 }}>RESPONSABILIDADES</Text>
-        {["RESP. ENTREGOU", "RESP. RECEBEU", "RESP. BUSCOU", "RESP. CONFERIU FORRO", "RESP. CONFERIU UTENSÍLIO"].map((label, index) => (
-          <View
-            key={index}
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginBottom: 2,
-              paddingHorizontal: 4,
-            }}
-          >
-            <Text style={{ fontSize: 7, width: "35%" }}>{label}: ____________________</Text>
-            <Text style={{ fontSize: 7, width: "30%", textAlign: "center" }}>Data: ____/____/____</Text>
-            <Text style={{ fontSize: 7, width: "30%", textAlign: "right" }}>Horário: ____:____</Text>
-          </View>
-        ))}
+        
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 2,
+            paddingHorizontal: 4,
+          }}
+        >
+          <Text style={{ fontSize: 7, width: "35%" }}>
+            RESP. ENTREGOU: {pedido.resp_entregou || "____________________"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "center" }}>
+            Data: {pedido.data_entregou ? formatDateBR(pedido.data_entregou) : "____/____/____"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "right" }}>
+            Horário: {pedido.hora_entregou || "____:____"}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 2,
+            paddingHorizontal: 4,
+          }}
+        >
+          <Text style={{ fontSize: 7, width: "35%" }}>
+            RESP. RECEBEU: {pedido.resp_recebeu || "____________________"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "center" }}>
+            Data: {pedido.data_recebeu ? formatDateBR(pedido.data_recebeu) : "____/____/____"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "right" }}>
+            Horário: {pedido.hora_recebeu || "____:____"}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 2,
+            paddingHorizontal: 4,
+          }}
+        >
+          <Text style={{ fontSize: 7, width: "35%" }}>
+            RESP. BUSCOU: {pedido.resp_buscou || "____________________"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "center" }}>
+            Data: {pedido.data_buscou ? formatDateBR(pedido.data_buscou) : "____/____/____"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "right" }}>
+            Horário: {pedido.hora_buscou || "____:____"}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 2,
+            paddingHorizontal: 4,
+          }}
+        >
+          <Text style={{ fontSize: 7, width: "35%" }}>
+            RESP. CONFERIU FORRO: {pedido.resp_forro || "____________________"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "center" }}>
+            Data: {pedido.data_forro ? formatDateBR(pedido.data_forro) : "____/____/____"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "right" }}>
+            Horário: {pedido.hora_forro || "____:____"}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 2,
+            paddingHorizontal: 4,
+          }}
+        >
+          <Text style={{ fontSize: 7, width: "35%" }}>
+            RESP. CONFERIU UTENSÍLIO: {pedido.resp_utensilio || "____________________"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "center" }}>
+            Data: {pedido.data_utensilio ? formatDateBR(pedido.data_utensilio) : "____/____/____"}
+          </Text>
+          <Text style={{ fontSize: 7, width: "30%", textAlign: "right" }}>
+            Horário: {pedido.hora_utensilio || "____:____"}
+          </Text>
+        </View>
       </View>
 
       <Text
