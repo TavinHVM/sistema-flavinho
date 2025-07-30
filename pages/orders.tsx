@@ -189,9 +189,20 @@ export default function Orders() {
   };
 
   // Filtro
-  const pedidosFiltrados = pedidos.filter((p) =>
-    p.cliente.toLowerCase().includes(search.toLowerCase())
-  );
+  const pedidosFiltrados = pedidos.filter((p) => {
+    const searchTerm = search.toLowerCase();
+    
+    // Se o termo de busca contém apenas números, assume que é pesquisa por CPF
+    const isNumericSearch = /^\d+$/.test(search);
+    
+    if (isNumericSearch) {
+      // Para CPF: busca rigorosa - deve começar com a sequência digitada
+      return p.cpf.startsWith(search);
+    } else {
+      // Para nome: busca flexível - pode conter em qualquer parte
+      return p.cliente.toLowerCase().includes(searchTerm);
+    }
+  });
 
   if (isLoggedIn === null) {
     // Em verificação
@@ -270,7 +281,7 @@ export default function Orders() {
             className="rounded p-2 text-black mb-2 w-full"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Pesquisar por cliente"
+            placeholder="Pesquisar por cliente ou CPF"
           />
         </div>
         <OrderList

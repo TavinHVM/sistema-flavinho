@@ -234,18 +234,18 @@ export default function UserManagement() {
           </div>
         )}
         <section className="mt-8 w-full max-w-full sm:max-w-4xl px-0 sm:px-4">
-        <div className="items-center justify-center">
-          <SectionTitle className="text-center mt-12">Usuários</SectionTitle>
-          <div className="flex items-center justify-center mb-2">
-            <RefreshButton onClick={fetchUsers} loading={loading} />
+          <div className="items-center justify-center">
+            <SectionTitle className="text-center mt-12">Usuários</SectionTitle>
+            <div className="flex items-center justify-center mb-2">
+              <RefreshButton onClick={fetchUsers} loading={loading} />
+            </div>
+            <input
+              className="rounded p-2 text-black mb-2 w-full"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Pesquisar por usuário"
+            />
           </div>
-          <input
-            className="rounded p-2 text-black mb-2 w-full"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Pesquisar por cliente"
-          />
-        </div>
 
           <UserList users={users} search={search} onEditar={handleEdit} onExcluir={handleDelete} />
           {editingUserId && (

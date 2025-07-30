@@ -18,7 +18,7 @@ interface OrderListProps {
   onExcluir?: (id: number) => void;
 }
 
-type SortKey = "numero" | "cliente" | "data_locacao" | "data_evento" | "endereco" | "valor_total" | null;
+type SortKey = "numero" | "cpf" | "cliente" | "data_locacao" | "data_evento" | "endereco" | "valor_total" | null;
 type SortOrder = "asc" | "desc" | null;
 
 const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir }) => {
@@ -59,9 +59,9 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
     setModalPedido(null);
   };
 
-  const pedidosFiltrados = pedidos.filter((p) =>
-    p.cliente.toLowerCase().includes(search.toLowerCase())
-  );
+  // Os pedidos já vêm filtrados da página principal (orders.tsx)
+  // que já faz a filtragem por cliente e CPF
+  const pedidosFiltrados = pedidos;
 
   const pedidosOrdenados = (() => {
     if (!sortKey || !sortOrder) return pedidosFiltrados;
@@ -110,6 +110,11 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                 Nº {getSortIcon("numero")}
               </span>
             </th>
+            <th className="p-3 min-w-[120px] cursor-pointer select-none" onClick={() => handleSort("cpf")}>
+              <span className="flex items-center">
+                CPF {getSortIcon("cpf")}
+              </span>
+            </th>
             <th className="p-3 min-w-[140px] cursor-pointer select-none" onClick={() => handleSort("cliente")}>
               <span className="flex items-center">
                 Cliente {getSortIcon("cliente")}
@@ -146,6 +151,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
               onClick={() => handleVerMais(p)}
             >
               <td className="p-3 text-gray-400">{p.numero}</td>
+              <td className="p-3 text-gray-300 font font-semibold">{p.cpf}</td>
               <td className="p-3 text-gray-50 font-semibold">{p.cliente}</td>
               <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_locacao)}</td>
               <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_evento) || '-'}</td>
