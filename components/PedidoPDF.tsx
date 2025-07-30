@@ -187,7 +187,17 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
           </View>
         ))}
       </View>
-      <Text style={{ fontWeight: "bold", fontSize: 8, marginTop: 2, textAlign: "right" }}> TOTAL GERAL: R$ {pedido.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Text>
+      <View style={{ marginTop: 2, textAlign: "right" }}>
+        <Text style={{ fontWeight: "bold", fontSize: 8, marginBottom: 1 }}>
+          TOTAL GERAL: R$ {pedido.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+        </Text>
+        <Text style={{ fontWeight: "bold", fontSize: 8, marginBottom: 1, color: "#22c55e" }}>
+          VALOR PAGO: R$ {pedido.valor_pago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+        </Text>
+        <Text style={{ fontWeight: "bold", fontSize: 8, marginBottom: 1, color: "#ef4444" }}>
+          VALOR A PAGAR: R$ {pedido.valor_deve.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+        </Text>
+      </View>
 
       {/* RESPONSABILIDADES - MANUAL */}
       <View style={{ marginTop: 6 }}>

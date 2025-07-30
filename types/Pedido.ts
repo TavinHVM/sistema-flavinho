@@ -22,5 +22,7 @@ export interface Pedido {
   materiais: PedidoItem[];
   pagamento?: string;
   valor_total: number;
+  valor_pago: number;
+  valor_deve: number;
   created_at?: string;
 }

@@ -18,7 +18,7 @@ interface OrderListProps {
   onExcluir?: (id: number) => void;
 }
 
-type SortKey = "numero" | "cpf" | "cliente" | "data_locacao" | "data_evento" | "endereco" | "valor_total" | null;
+type SortKey = "numero" | "cpf" | "cliente" | "data_locacao" | "data_evento" | "endereco" | "valor_total" | "valor_pago" | "valor_deve" | null;
 type SortOrder = "asc" | "desc" | null;
 
 const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) => {
@@ -69,8 +69,8 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
       const aValue: unknown = a[sortKey as keyof typeof a];
       const bValue: unknown = b[sortKey as keyof typeof b];
 
-      // Para valor_total, garantir número
-      if (sortKey === "valor_total") {
+      // Para valor_total, valor_pago, valor_deve garantir número
+      if (sortKey === "valor_total" || sortKey === "valor_pago" || sortKey === "valor_deve") {
         const aNum = typeof aValue === "number" ? aValue : Number(aValue) || 0;
         const bNum = typeof bValue === "number" ? bValue : Number(bValue) || 0;
         return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
@@ -140,6 +140,16 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
                 Total {getSortIcon("valor_total")}
               </span>
             </th>
+            <th className="p-3 min-w-[80px] cursor-pointer select-none" onClick={() => handleSort("valor_pago")}>
+              <span className="flex items-center gap-1">
+                Pago {getSortIcon("valor_pago")}
+              </span>
+            </th>
+            <th className="p-3 min-w-[80px] cursor-pointer select-none" onClick={() => handleSort("valor_deve")}>
+              <span className="flex items-center gap-1">
+                Devido {getSortIcon("valor_deve")}
+              </span>
+            </th>
             <th className="p-3"></th>
           </tr>
         </thead>
@@ -159,6 +169,16 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
               <td className="p-3 text-gray-300 font-bold">
                 <span className="font-bold text-emerald-400">
                   {p.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </span>
+              </td>
+              <td className="p-3 text-gray-300 font-bold">
+                <span className="font-bold text-green-400">
+                  {p.valor_pago?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
+                </span>
+              </td>
+              <td className="p-3 text-gray-300 font-bold">
+                <span className={`font-bold ${(p.valor_deve || 0) > 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                  {p.valor_deve?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
                 </span>
               </td>
               <td className="p-3"></td>

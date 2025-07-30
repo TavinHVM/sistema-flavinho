@@ -46,6 +46,8 @@ export default function Orders() {
     materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }],
     pagamento: "",
     valor_total: 0,
+    valor_pago: 0,
+    valor_deve: 0,
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [produtos, setProdutos] = useState<ProdutoLocal[]>([]);
@@ -149,6 +151,8 @@ export default function Orders() {
       referencia: form.referencia,
       pagamento: form.pagamento,
       valor_total,
+      valor_pago: form.valor_pago,
+      valor_deve: form.valor_deve,
       materiais: form.materiais,
       created_at: new Date().toISOString(),
     };
@@ -180,6 +184,8 @@ export default function Orders() {
         materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }],
         pagamento: "",
         valor_total: 0,
+        valor_pago: 0,
+        valor_deve: 0,
       });
       setIsEditing(false);
       fetchPedidos();
@@ -266,6 +272,8 @@ export default function Orders() {
                 materiais: [{ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 }],
                 pagamento: "",
                 valor_total: 0,
+                valor_pago: 0,
+                valor_deve: 0,
               });
               setIsEditing(false);
             }}
@@ -290,6 +298,8 @@ export default function Orders() {
           onEditar={(pedido) => {
             setForm({
               ...pedido,
+              valor_pago: pedido.valor_pago || 0,
+              valor_deve: pedido.valor_deve || 0,
               materiais: pedido.materiais.map((mat: PedidoItem) => ({
                 nome: mat.nome,
                 quantidade: mat.quantidade,

@@ -63,6 +63,11 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
   const totalGeral = form.materiais.reduce((acc, mat) => acc + (mat.valor_total || 0), 0);
 
+  function formatarMoeda(valor: number) {
+    if (!valor) return "";
+    return (valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
   return (
     <div className="mt-8 bg-gray-800 rounded-lg p-3 flex flex-col gap-2 w-full" id="order-form-scroll">
       <div className="flex items-center justify-center mb-3">
@@ -224,6 +229,35 @@ const OrderForm: React.FC<OrderFormProps> = ({
         <div className="flex-1 min-w-0">
           <label className="text-xs text-gray-300 font-semibold">Forma de Pagamento</label>
           <input className="rounded p-2 text-black w-full" placeholder="Dinheiro, Pix, Cartão, etc" value={form.pagamento} onChange={e => setForm({ ...form, pagamento: e.target.value })} />
+        </div>
+      </div>
+
+      {/* Linha 6: Valores de Pagamento */}
+      <div className="flex flex-col sm:flex-row gap-2 mt-2 w-full">
+        <div className="flex-1 min-w-0">
+          <label className="text-xs text-gray-300 font-semibold">Valor Pago</label>
+          <input 
+            className="rounded p-2 text-black w-full" 
+            type="text" 
+            placeholder="0,00"
+            value={formatarMoeda(form.valor_pago * 100)}
+            onChange={e => {
+              const raw = e.target.value.replace(/\D/g, "");
+              const valorPagoEmCentavos = parseInt(raw, 10) || 0;
+              const valorPago = valorPagoEmCentavos / 100;
+              const valorDeve = totalGeral - valorPago;
+              setForm({ ...form, valor_pago: valorPago, valor_deve: valorDeve });
+            }} 
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <label className="text-xs text-gray-300 font-semibold">Valor a Pagar</label>
+          <input 
+            className="rounded p-2 text-gray-500 bg-gray-200 w-full" 
+            type="text"
+            disabled
+            value={`R$ ${form.valor_deve.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+          />
         </div>
       </div>
       <button

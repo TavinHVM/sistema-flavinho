@@ -35,6 +35,8 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
         numero: pedido.numero || "",
         materiais: pedido.materiais || [],
         valor_total: pedido.valor_total || 0,
+        valor_pago: pedido.valor_pago || 0,
+        valor_deve: pedido.valor_deve || 0,
       }} />
     ).toBlob();
     const url = URL.createObjectURL(blob);
@@ -95,6 +97,8 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           <div><b>Referência:</b> {pedido.referencia}</div>
           <div><b>Pagamento:</b> {pedido.pagamento}</div>
           <div><b>Valor Total:</b> {pedido.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+          <div><b>Valor Pago:</b> <span className="text-green-400">{pedido.valor_pago?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}</span></div>
+          <div><b>Valor a Pagar:</b> <span className={(pedido.valor_deve || 0) > 0 ? 'text-red-400' : 'text-gray-400'}>{pedido.valor_deve?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}</span></div>
         </div>
         <div className="mt-4 border-t">
           <h3 className="font-semibold mb-2 mt-4">Materiais</h3>
