@@ -101,11 +101,11 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
         </View>
       </View>
 
-      <Text style={styles.titleCenter}>ATENÇÃO</Text>
-      <Text style={styles.subTextCenter}>
+      <Text style={{ ...styles.titleCenter, color: "#ef0b10" }}>ATENÇÃO</Text>
+      <Text style={{ ...styles.subTextCenter, color: "#ef0b10" }}>
         *TODOS OS MATERIAIS DEVERÃO SER CONFERIDOS PELO CLIENTE NO RECEBIMENTO DO MESMO.
       </Text>
-      <Text style={{ ...styles.subTextCenter, fontSize: 6, marginBottom: 2 }}>
+      <Text style={{ ...styles.subTextCenter, fontSize: 6, marginBottom: 2, color: "#ef0b10" }}>
         OBS.: QUALQUER DEFEITO NOS MESMOS SERÁ COBRADO O VALOR DO MESMO OU REPOSIÇÃO COM OUTRO DO MESMO MODELO.
       </Text>
 
