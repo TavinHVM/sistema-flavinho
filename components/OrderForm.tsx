@@ -236,9 +236,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
       <div className="flex flex-col sm:flex-row gap-2 mt-2 w-full">
         <div className="flex-1 min-w-0">
           <label className="text-xs text-gray-300 font-semibold">Valor Pago</label>
-          <input 
-            className="rounded p-2 text-black w-full" 
-            type="text" 
+          <input
+            className="rounded p-2 text-black w-full"
+            type="text"
             placeholder="0,00"
             value={formatarMoeda(form.valor_pago * 100)}
             onChange={e => {
@@ -247,13 +247,13 @@ const OrderForm: React.FC<OrderFormProps> = ({
               const valorPago = valorPagoEmCentavos / 100;
               const valorDeve = totalGeral - valorPago;
               setForm({ ...form, valor_pago: valorPago, valor_deve: valorDeve });
-            }} 
+            }}
           />
         </div>
         <div className="flex-1 min-w-0">
           <label className="text-xs text-gray-300 font-semibold">Valor a Pagar</label>
-          <input 
-            className="rounded p-2 text-gray-500 bg-gray-200 w-full" 
+          <input
+            className="rounded p-2 text-gray-500 bg-gray-200 w-full"
             type="text"
             disabled
             value={`R$ ${form.valor_deve.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
@@ -264,36 +264,36 @@ const OrderForm: React.FC<OrderFormProps> = ({
       {/* Seção de Responsabilidades */}
       <div className="mt-6 border-t-2 border-t-gray-500">
         <h2 className="text-white text-base font-semibold mt-4 mb-4 text-center">Responsabilidades</h2>
-        
+
         {/* Responsável Entregou */}
         <div className="mb-4">
           <h3 className="text-gray-300 text-sm font-medium mb-2">Entrega</h3>
           <div className="flex flex-col sm:flex-row gap-2 w-full">
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Responsável Entregou</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                placeholder="Nome do responsável" 
-                value={form.resp_entregou || ''} 
-                onChange={e => setForm({ ...form, resp_entregou: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                placeholder="Nome do responsável"
+                value={form.resp_entregou || ''}
+                onChange={e => setForm({ ...form, resp_entregou: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Data Entrega</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="date" 
-                value={form.data_entregou || ''} 
-                onChange={e => setForm({ ...form, data_entregou: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="date"
+                value={form.data_entregou || ''}
+                onChange={e => setForm({ ...form, data_entregou: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Hora Entrega</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="time" 
-                value={form.hora_entregou || ''} 
-                onChange={e => setForm({ ...form, hora_entregou: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="time"
+                value={form.hora_entregou || ''}
+                onChange={e => setForm({ ...form, hora_entregou: e.target.value })}
               />
             </div>
           </div>
@@ -305,29 +305,29 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <div className="flex flex-col sm:flex-row gap-2 w-full">
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Responsável Recebeu</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                placeholder="Nome do responsável" 
-                value={form.resp_recebeu || ''} 
-                onChange={e => setForm({ ...form, resp_recebeu: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                placeholder="Nome do responsável"
+                value={form.resp_recebeu || ''}
+                onChange={e => setForm({ ...form, resp_recebeu: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Data Recebimento</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="date" 
-                value={form.data_recebeu || ''} 
-                onChange={e => setForm({ ...form, data_recebeu: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="date"
+                value={form.data_recebeu || ''}
+                onChange={e => setForm({ ...form, data_recebeu: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Hora Recebimento</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="time" 
-                value={form.hora_recebeu || ''} 
-                onChange={e => setForm({ ...form, hora_recebeu: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="time"
+                value={form.hora_recebeu || ''}
+                onChange={e => setForm({ ...form, hora_recebeu: e.target.value })}
               />
             </div>
           </div>
@@ -339,29 +339,29 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <div className="flex flex-col sm:flex-row gap-2 w-full">
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Responsável Buscou</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                placeholder="Nome do responsável" 
-                value={form.resp_buscou || ''} 
-                onChange={e => setForm({ ...form, resp_buscou: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                placeholder="Nome do responsável"
+                value={form.resp_buscou || ''}
+                onChange={e => setForm({ ...form, resp_buscou: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Data Busca</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="date" 
-                value={form.data_buscou || ''} 
-                onChange={e => setForm({ ...form, data_buscou: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="date"
+                value={form.data_buscou || ''}
+                onChange={e => setForm({ ...form, data_buscou: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Hora Busca</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="time" 
-                value={form.hora_buscou || ''} 
-                onChange={e => setForm({ ...form, hora_buscou: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="time"
+                value={form.hora_buscou || ''}
+                onChange={e => setForm({ ...form, hora_buscou: e.target.value })}
               />
             </div>
           </div>
@@ -373,29 +373,29 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <div className="flex flex-col sm:flex-row gap-2 w-full">
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Responsável Conferiu Forro</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                placeholder="Nome do responsável" 
-                value={form.resp_forro || ''} 
-                onChange={e => setForm({ ...form, resp_forro: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                placeholder="Nome do responsável"
+                value={form.resp_forro || ''}
+                onChange={e => setForm({ ...form, resp_forro: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Data Conferência</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="date" 
-                value={form.data_forro || ''} 
-                onChange={e => setForm({ ...form, data_forro: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="date"
+                value={form.data_forro || ''}
+                onChange={e => setForm({ ...form, data_forro: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Hora Conferência</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="time" 
-                value={form.hora_forro || ''} 
-                onChange={e => setForm({ ...form, hora_forro: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="time"
+                value={form.hora_forro || ''}
+                onChange={e => setForm({ ...form, hora_forro: e.target.value })}
               />
             </div>
           </div>
@@ -407,31 +407,53 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <div className="flex flex-col sm:flex-row gap-2 w-full">
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Responsável Conferiu Utensílio</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                placeholder="Nome do responsável" 
-                value={form.resp_utensilio || ''} 
-                onChange={e => setForm({ ...form, resp_utensilio: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                placeholder="Nome do responsável"
+                value={form.resp_utensilio || ''}
+                onChange={e => setForm({ ...form, resp_utensilio: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Data Conferência</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="date" 
-                value={form.data_utensilio || ''} 
-                onChange={e => setForm({ ...form, data_utensilio: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="date"
+                value={form.data_utensilio || ''}
+                onChange={e => setForm({ ...form, data_utensilio: e.target.value })}
               />
             </div>
             <div className="flex-1 min-w-0">
               <label className="text-xs text-gray-300 font-semibold">Hora Conferência</label>
-              <input 
-                className="rounded p-2 text-black w-full" 
-                type="time" 
-                value={form.hora_utensilio || ''} 
-                onChange={e => setForm({ ...form, hora_utensilio: e.target.value })} 
+              <input
+                className="rounded p-2 text-black w-full"
+                type="time"
+                value={form.hora_utensilio || ''}
+                onChange={e => setForm({ ...form, hora_utensilio: e.target.value })}
               />
             </div>
+          </div>
+        </div>
+
+        {/* Campo de Observações */}
+        <div className="mb-4">
+          <h3 className="text-gray-300 text-sm font-medium mb-2">Observações</h3>
+          <div className="w-full">
+            <label className="text-xs text-gray-300 font-semibold">Observações Gerais</label>
+            <textarea
+              className="rounded p-2 text-black w-full h-20 resize-vertical overflow-y-auto"
+              style={{
+                wordWrap: 'break-word',
+                overflowWrap: 'break-word',
+                whiteSpace: 'pre-wrap',
+                maxWidth: '100%',
+                width: '100%',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Digite observações, comentários extras ou instruções especiais..."
+              value={form.obs || ''}
+              onChange={e => setForm({ ...form, obs: e.target.value })}
+            />
           </div>
         </div>
       </div>

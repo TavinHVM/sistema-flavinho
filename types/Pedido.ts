@@ -41,4 +41,5 @@ export interface Pedido {
   resp_utensilio?: string;
   data_utensilio?: string;
   hora_utensilio?: string;
+  obs?: string;
 }

@@ -53,6 +53,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
         resp_utensilio: pedido.resp_utensilio || "",
         data_utensilio: pedido.data_utensilio || "",
         hora_utensilio: pedido.hora_utensilio || "",
+        obs: pedido.obs || "",
       }} />
     ).toBlob();
     const url = URL.createObjectURL(blob);
@@ -106,7 +107,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
 
         {/* Conteúdo scrollável */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          
+
           {/* Informações básicas do pedido */}
           <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-xl p-6 border border-gray-700">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
@@ -202,7 +203,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
               👥 Responsabilidades
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              
+
               {/* Entrega */}
               <div className="bg-gradient-to-br from-blue-800/30 to-blue-900/30 p-4 rounded-lg border border-blue-700/30">
                 <h4 className="font-medium text-blue-300 mb-3 flex items-center gap-2">
@@ -310,6 +311,26 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
 
             </div>
           </div>
+
+          {/* Observações */}
+          {pedido.obs && (
+            <div className="bg-gradient-to-r from-indigo-900/20 to-purple-900/20 rounded-xl p-6 border border-gray-700">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                📝 Observações
+              </h3>
+              <div className="bg-gray-700/50 p-4 rounded-lg overflow-hidden">
+                <p className="text-white leading-relaxed whitespace-pre-wrap break-words overflow-wrap-break-word"
+                  style={{
+                    wordWrap: 'break-word',
+                    overflowWrap: 'break-word',
+                    maxWidth: '100%',
+                    wordBreak: 'break-all'
+                  }}>
+                  {pedido.obs}
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Materiais */}
           <div className="bg-gradient-to-r from-gray-900/50 to-slate-900/50 rounded-xl p-6 border border-gray-700">

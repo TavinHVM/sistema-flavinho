@@ -64,6 +64,7 @@ export default function Orders() {
     resp_utensilio: "",
     data_utensilio: "",
     hora_utensilio: "",
+    obs: "",
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [produtos, setProdutos] = useState<ProdutoLocal[]>([]);
@@ -187,6 +188,7 @@ export default function Orders() {
       resp_utensilio: form.resp_utensilio || null,
       data_utensilio: form.data_utensilio ? toISODate(form.data_utensilio) : null,
       hora_utensilio: form.hora_utensilio || null,
+      obs: form.obs || null,
     };
 
     const numeroPedido = form.numero ? Number(form.numero) : null;
@@ -234,6 +236,7 @@ export default function Orders() {
         resp_utensilio: "",
         data_utensilio: "",
         hora_utensilio: "",
+        obs: "",
       });
       setIsEditing(false);
       fetchPedidos();
@@ -338,6 +341,7 @@ export default function Orders() {
                 resp_utensilio: "",
                 data_utensilio: "",
                 hora_utensilio: "",
+                obs: "",
               });
               setIsEditing(false);
             }}
@@ -387,6 +391,7 @@ export default function Orders() {
               resp_utensilio: pedido.resp_utensilio || "",
               data_utensilio: pedido.data_utensilio || "",
               hora_utensilio: pedido.hora_utensilio || "",
+              obs: pedido.obs || "",
             });
             setIsEditing(true);
             setTimeout(() => {

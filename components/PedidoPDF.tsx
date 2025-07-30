@@ -147,6 +147,13 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: "#eab308",
   },
+  observacoesSection: {
+    marginTop: 5,
+    padding: 3,
+    backgroundColor: "#f8fafc",
+    borderWidth: 0.5,
+    borderColor: "#64748b",
+  },
   responsabilidadeItem: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -175,23 +182,30 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
   const numItens = pedido.materiais.length;
   const isLongTable = numItens > 15; // Tabela longa
   const isVeryLongTable = numItens > 25; // Tabela muito longa
-  
+
+  // Função para quebrar texto longo
+  const breakLongText = (text: string, maxLength: number = 60) => {
+    if (!text) return "";
+    // Quebra palavras muito longas inserindo espaços
+    return text.replace(new RegExp(`(.{${maxLength}})`, 'g'), '$1 ');
+  };
+
   // Estilos dinâmicos baseados no tamanho da tabela
   const dynamicStyles = {
     // Reduz espaçamentos para tabelas longas (menos agressivo)
     headerMargin: isVeryLongTable ? 3 : isLongTable ? 4 : 5,
     sectionPadding: isVeryLongTable ? 3 : isLongTable ? 4 : 5,
     sectionMargin: isVeryLongTable ? 2 : isLongTable ? 3 : 3,
-    
+
     // Ajusta tamanhos de fonte (menos agressivo)
     titleSize: isVeryLongTable ? 8 : isLongTable ? 8.5 : 9,
     textSize: isVeryLongTable ? 6 : isLongTable ? 6.5 : 7,
     tableTextSize: isVeryLongTable ? 6 : isLongTable ? 6.5 : 7,
     tableHeaderSize: isVeryLongTable ? 7 : isLongTable ? 7.5 : 8,
-    
+
     // Ajusta altura das células (menos agressivo)
     cellPadding: isVeryLongTable ? 1.5 : isLongTable ? 2 : 2.5,
-    
+
     // Controla se mostra seções opcionais (menos restritivo)
     showClausulas: numItens <= 30, // Aumenta o limite
     compactResponsabilities: numItens > 20, // Compacta só após 20 itens
@@ -231,9 +245,9 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
         {dynamicStyles.showClausulas && (
           <>
             <Text style={[styles.titleCenter, { fontSize: dynamicStyles.titleSize }]}>CLÁUSULAS DO CONTRATO</Text>
-            <View style={[styles.clausulas, { 
-              padding: dynamicStyles.sectionPadding, 
-              marginVertical: dynamicStyles.sectionMargin 
+            <View style={[styles.clausulas, {
+              padding: dynamicStyles.sectionPadding,
+              marginVertical: dynamicStyles.sectionMargin
             }]}>
               {["O material será cobrado aluguel de 12 em 12 horas", "Somente materiais de cozinha receberão limpos e deverão ser devolvidos limpos. Caso contrário, será cobrada taxa de limpeza", "O material só será recebido em perfeito estado", "Todos os materiais deverão ser conferidos. Não aceitamos reclamações posteriores", "O depósito é feito pelo cliente qualificado mediante quitação devida recebida", "O material alugado segue o art. 1256 do CC e responsabilidade conforme art. 901-902 CPC", "Material danificado poderá ser substituído por outro igual. Caso contrário, será cobrado o valor integral do item"].map((cl, i) => (
                 <Text key={i} style={[styles.clausulaItem, { fontSize: dynamicStyles.textSize }]}>{`${i + 1}. ${cl}`}</Text>
@@ -244,9 +258,9 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
 
         <Text style={[styles.titleCenter, { fontSize: dynamicStyles.titleSize }]}>CONTRATO DE LOCAÇÃO</Text>
 
-        <View style={[styles.contratoSection, { 
-          padding: dynamicStyles.sectionPadding, 
-          marginVertical: dynamicStyles.sectionMargin 
+        <View style={[styles.contratoSection, {
+          padding: dynamicStyles.sectionPadding,
+          marginVertical: dynamicStyles.sectionMargin
         }]}>
           <View
             style={{
@@ -306,32 +320,32 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           {pedido.materiais.map((mat, i) => (
             <View key={i} style={styles.tableRow}>
               <Text style={[
-                styles.tableCell, 
-                styles.colQuant, 
+                styles.tableCell,
+                styles.colQuant,
                 { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding },
                 i % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
               ]}>
                 {mat.quantidade}
               </Text>
               <Text style={[
-                styles.tableCell, 
-                styles.colMaterial, 
+                styles.tableCell,
+                styles.colMaterial,
                 { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding, textAlign: "left" },
                 i % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
               ]}>
                 {mat.nome}
               </Text>
               <Text style={[
-                styles.tableCell, 
-                styles.colValorUnit, 
+                styles.tableCell,
+                styles.colValorUnit,
                 { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding },
                 i % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
               ]}>
                 {mat.valor_unit?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
               </Text>
               <Text style={[
-                styles.tableCell, 
-                styles.colValorTotal, 
+                styles.tableCell,
+                styles.colValorTotal,
                 { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding },
                 i % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
               ]}>
@@ -341,9 +355,9 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           ))}
         </View>
 
-        <View style={[styles.totaisSection, { 
-          marginTop: dynamicStyles.sectionMargin, 
-          padding: dynamicStyles.sectionPadding 
+        <View style={[styles.totaisSection, {
+          marginTop: dynamicStyles.sectionMargin,
+          padding: dynamicStyles.sectionPadding
         }]}>
           <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.titleSize, marginBottom: 1, color: "#1f2937", textAlign: "right" }}>
             TOTAL GERAL: R$ {pedido.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
@@ -357,9 +371,9 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
         </View>
 
         {/* RESPONSABILIDADES - Layout dinâmico */}
-        <View style={[styles.responsabilidadesSection, { 
-          marginTop: dynamicStyles.sectionMargin, 
-          padding: dynamicStyles.sectionPadding 
+        <View style={[styles.responsabilidadesSection, {
+          marginTop: dynamicStyles.sectionMargin,
+          padding: dynamicStyles.sectionPadding
         }]}>
           <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.titleSize, marginBottom: 2, color: "#1f2937" }}>RESPONSABILIDADES</Text>
 
@@ -463,6 +477,51 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           )}
         </View>
 
+        {/* Seção de Observações */}
+        <View style={[styles.observacoesSection, {
+          marginTop: dynamicStyles.sectionMargin,
+          padding: dynamicStyles.sectionPadding
+        }]}>
+          <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.titleSize, marginBottom: 2, color: "#1f2937" }}>OBSERVAÇÕES</Text>
+          <View style={{
+            borderWidth: 0.5,
+            borderColor: "#6b7280",
+            padding: dynamicStyles.sectionPadding,
+            minHeight: 30,
+            backgroundColor: "#f9fafb"
+          }}>
+            <Text style={{
+              fontSize: dynamicStyles.textSize,
+              color: "#374151",
+              lineHeight: 1.4
+            }}>
+              {pedido.obs ?
+                breakLongText(pedido.obs, 80)
+                : "_____________________________________________________________________________________________________________________________________________"
+              }
+            </Text>
+            {!pedido.obs && (
+              <>
+                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
+                  _____________________________________________________________________________________________________________________________________________
+                </Text>
+                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
+                  _____________________________________________________________________________________________________________________________________________
+                </Text>
+                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
+                  _____________________________________________________________________________________________________________________________________________
+                </Text>
+                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
+                  _____________________________________________________________________________________________________________________________________________
+                </Text>
+                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
+                  _____________________________________________________________________________________________________________________________________________
+                </Text>
+              </>
+            )}
+          </View>
+        </View>
+
         <Text
           style={{
             fontWeight: "bold",
@@ -480,9 +539,9 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           PRESCRITO NESTE CONTRATO.
         </Text>
 
-        <View style={[styles.assinaturaSection, { 
-          marginTop: dynamicStyles.sectionMargin, 
-          padding: dynamicStyles.sectionPadding 
+        <View style={[styles.assinaturaSection, {
+          marginTop: dynamicStyles.sectionMargin,
+          padding: dynamicStyles.sectionPadding
         }]}>
           <View
             style={{
