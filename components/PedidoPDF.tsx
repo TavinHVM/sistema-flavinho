@@ -84,7 +84,6 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
         {logoBase64 && <Image src={logoBase64} style={{ width: 50, height: 50 }} />}
-        <Image src={qrcodeBase64} style={{ width: 50, height: 50 }} />
         <View style={styles.empresaInfo}>
           <Text style={{ fontWeight: "bold", fontSize: 8 }}>
             FLAVINHO Espaço Locações & Festa
@@ -93,6 +92,12 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
           <Text style={{ fontSize: 7 }}>(62) 3273-4463  (62) 99137-9037</Text>
           <Text style={{ fontSize: 7 }}>CNPJ 25.192.935/0001-48 PIX</Text>
           <Text style={{ fontSize: 7 }}>Av. Bela Vista Qd. 18 Lt. 03 - Ap. de Goiânia - GO</Text>
+        </View>
+        <View style={{ alignItems: "center" }}>
+          <Image src={qrcodeBase64} style={{ width: 50, height: 50 }} />
+          <Text style={{ fontWeight: "bold", fontSize: 9, marginTop: 2, textAlign: "center" }}>
+            PEDIDO Nº {pedido.numero}
+          </Text>
         </View>
       </View>
 
