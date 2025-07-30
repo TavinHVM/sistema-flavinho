@@ -16,44 +16,44 @@ import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
 
 const styles = StyleSheet.create({
   page: {
-    padding: 20,
-    fontSize: 9,
+    padding: 15,
+    fontSize: 8,
     fontFamily: "Helvetica",
-    lineHeight: 1.4,
+    lineHeight: 1.2,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 6,
+    marginBottom: 4,
   },
   empresaInfo: {
     flex: 1,
-    paddingLeft: 8,
+    paddingLeft: 6,
   },
   titleCenter: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "bold",
     textAlign: "center",
-    marginVertical: 4,
+    marginVertical: 2,
   },
   subTextCenter: {
-    fontSize: 8,
+    fontSize: 7,
     textAlign: "center",
   },
   clausulas: {
-    marginVertical: 4,
+    marginVertical: 2,
   },
   clausulaItem: {
-    fontSize: 8,
-    marginBottom: 1,
+    fontSize: 7,
+    marginBottom: 0.5,
     textAlign: "justify",
   },
   table: {
     width: "100%",
     borderWidth: 1,
     borderColor: "#000",
-    marginTop: 6,
+    marginTop: 3,
   },
   tableRow: {
     flexDirection: "row",
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: "#000",
-    padding: 2,
+    padding: 1.5,
     textAlign: "center",
   },
   colQuant: { width: "15%" },
@@ -83,16 +83,16 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
-        {logoBase64 && <Image src={logoBase64} style={{ width: 60, height: 60 }} />}
-        <Image src={qrcodeBase64} style={{ width: 60, height: 60 }} />
+        {logoBase64 && <Image src={logoBase64} style={{ width: 50, height: 50 }} />}
+        <Image src={qrcodeBase64} style={{ width: 50, height: 50 }} />
         <View style={styles.empresaInfo}>
-          <Text style={{ fontWeight: "bold", fontSize: 9 }}>
+          <Text style={{ fontWeight: "bold", fontSize: 8 }}>
             FLAVINHO Espaço Locações & Festa
           </Text>
-          <Text>joaoflavio.20@hotmail.com</Text>
-          <Text>(62) 3273-4463  (62) 99137-9037</Text>
-          <Text>CNPJ 25.192.935/0001-48 PIX</Text>
-          <Text>Av. Bela Vista Qd. 18 Lt. 03 - Ap. de Goiânia - GO</Text>
+          <Text style={{ fontSize: 7 }}>joaoflavio.20@hotmail.com</Text>
+          <Text style={{ fontSize: 7 }}>(62) 3273-4463  (62) 99137-9037</Text>
+          <Text style={{ fontSize: 7 }}>CNPJ 25.192.935/0001-48 PIX</Text>
+          <Text style={{ fontSize: 7 }}>Av. Bela Vista Qd. 18 Lt. 03 - Ap. de Goiânia - GO</Text>
         </View>
       </View>
 
@@ -100,7 +100,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
       <Text style={styles.subTextCenter}>
         *TODOS OS MATERIAIS DEVERÃO SER CONFERIDOS PELO CLIENTE NO RECEBIMENTO DO MESMO.
       </Text>
-      <Text style={{ ...styles.subTextCenter, fontSize: 7, marginBottom: 4 }}>
+      <Text style={{ ...styles.subTextCenter, fontSize: 6, marginBottom: 2 }}>
         OBS.: QUALQUER DEFEITO NOS MESMOS SERÁ COBRADO O VALOR DO MESMO OU REPOSIÇÃO COM OUTRO DO MESMO MODELO.
       </Text>
 
@@ -115,11 +115,11 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
 
       <View
         style={{
-          marginTop: 4,
-          fontSize: 8,
+          marginTop: 2,
+          fontSize: 7,
           flexDirection: "row",
           justifyContent: "space-between",
-          gap: 10,
+          gap: 8,
         }}
       >
         <View style={{ width: "48%" }}>
@@ -182,24 +182,24 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
           </View>
         ))}
       </View>
-      <Text style={{ fontWeight: "bold", fontSize: 9, marginTop: 4, textAlign: "right" }}> TOTAL GERAL: R$ {pedido.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Text>
+      <Text style={{ fontWeight: "bold", fontSize: 8, marginTop: 2, textAlign: "right" }}> TOTAL GERAL: R$ {pedido.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</Text>
 
       {/* RESPONSABILIDADES - MANUAL */}
-      <View style={{ marginTop: 10 }}>
-        <Text style={{ fontWeight: "bold", fontSize: 9, marginBottom: 4 }}>RESPONSABILIDADES</Text>
+      <View style={{ marginTop: 6 }}>
+        <Text style={{ fontWeight: "bold", fontSize: 8, marginBottom: 2 }}>RESPONSABILIDADES</Text>
         {["RESP. ENTREGOU", "RESP. RECEBEU", "RESP. BUSCOU", "RESP. CONFERIU FORRO", "RESP. CONFERIU UTENSÍLIO"].map((label, index) => (
           <View
             key={index}
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              marginBottom: 3,
-              paddingHorizontal: 6,
+              marginBottom: 2,
+              paddingHorizontal: 4,
             }}
           >
-            <Text style={{ fontSize: 8, width: "35%" }}>{label}: ____________________</Text>
-            <Text style={{ fontSize: 8, width: "30%", textAlign: "center" }}>Data: ____/____/____</Text>
-            <Text style={{ fontSize: 8, width: "30%", textAlign: "right" }}>Horário: ____:____</Text>
+            <Text style={{ fontSize: 7, width: "35%" }}>{label}: ____________________</Text>
+            <Text style={{ fontSize: 7, width: "30%", textAlign: "center" }}>Data: ____/____/____</Text>
+            <Text style={{ fontSize: 7, width: "30%", textAlign: "right" }}>Horário: ____:____</Text>
           </View>
         ))}
       </View>
@@ -207,8 +207,8 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
       <Text
         style={{
           fontWeight: "bold",
-          fontSize: 10,
-          marginTop: 8,
+          fontSize: 8,
+          marginTop: 4,
           textAlign: "center",
         }}
       >
@@ -220,14 +220,14 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => (
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          marginTop: 12,
-          paddingHorizontal: 10,
+          marginTop: 6,
+          paddingHorizontal: 8,
         }}
       >
-        <Text style={{ fontSize: 9, fontWeight: "bold" }}>
+        <Text style={{ fontSize: 8, fontWeight: "bold" }}>
           ASSINATURA: ______________________________________
         </Text>
-        <Text style={{ fontSize: 9, fontWeight: "bold" }}>
+        <Text style={{ fontSize: 8, fontWeight: "bold" }}>
           CPF/CNPJ/RG: {formatCpfCnpjBR(pedido.cpf)}
         </Text>
       </View>
