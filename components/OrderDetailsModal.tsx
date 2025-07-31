@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import OrderMaterialsList from "./OrderMaterialsList";
 import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
@@ -9,6 +9,7 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { formatTelefoneBR } from "@/lib/formatNumber";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
 import DevolucaoModal from "./DevolucaoModal";
+import { supabase } from "../lib/supabaseClient";
 
 interface Props {
   pedido: Pedido | null;
@@ -21,60 +22,108 @@ interface Props {
 
 const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, onExcluir, onDevolucao }) => {
   const [devolucaoModalOpen, setDevolucaoModalOpen] = useState(false);
+  const [pedidoAtualizado, setPedidoAtualizado] = useState<Pedido | null>(pedido);
   
-  if (!pedido) return null;
+  useEffect(() => {
+    if (pedido && open) {
+      carregarDevolucoes();
+    }
+  }, [pedido, open]);
+
+  const carregarDevolucoes = async () => {
+    if (!pedido?.numero) return;
+
+    try {
+      // Buscar devoluções realizadas para este pedido
+      const { data: devolucoes, error } = await supabase
+        .from("devolucoes")
+        .select("nome_produto, quantidade_devolvida")
+        .eq("numero_pedido", pedido.numero);
+
+      if (error) {
+        console.error("Erro ao carregar devoluções:", error);
+        setPedidoAtualizado(pedido);
+        return;
+      }
+
+      // Agregar quantidades devolvidas por produto
+      const devolucoesAgregadas = devolucoes?.reduce((acc, dev) => {
+        acc[dev.nome_produto] = (acc[dev.nome_produto] || 0) + dev.quantidade_devolvida;
+        return acc;
+      }, {} as Record<string, number>) || {};
+
+      // Atualizar materiais com quantidades devolvidas
+      const materiaisAtualizados = pedido.materiais.map(material => ({
+        ...material,
+        quantidade_devolvida: devolucoesAgregadas[material.nome] || 0
+      }));
+
+      setPedidoAtualizado({
+        ...pedido,
+        materiais: materiaisAtualizados
+      });
+    } catch (error) {
+      console.error("Erro ao carregar devoluções:", error);
+      setPedidoAtualizado(pedido);
+    }
+  };
+  
+  if (!pedidoAtualizado) return null;
 
   const handleDevolucao = (itensDevolvidos: any[], observacoes: string) => {
-    if (onDevolucao && pedido) {
-      onDevolucao(pedido, itensDevolvidos, observacoes);
+    if (onDevolucao && pedidoAtualizado) {
+      onDevolucao(pedidoAtualizado, itensDevolvidos, observacoes);
+      // Recarregar devoluções após a operação
+      setTimeout(() => carregarDevolucoes(), 500);
     }
   };
 
   // Verificar se há itens pendentes de devolução
-  const temItensPendentes = pedido.materiais.some(item => 
+  const temItensPendentes = pedidoAtualizado.materiais.some(item => 
     (item.quantidade_devolvida || 0) < item.quantidade
   );
 
   const handleDownloadPDF = async () => {
     const blob = await pdf(
       <PedidoPDF pedido={{
-        ...pedido,
-        telefone: pedido.telefone || "",
-        residencial: pedido.residencial || "",
-        referencia: pedido.referencia || "",
-        endereco: pedido.endereco || "",
-        cpf: pedido.cpf || "",
-        data_devolucao: pedido.data_devolucao || "",
-        data_evento: pedido.data_evento || "",
-        cliente: pedido.cliente || "",
-        numero: pedido.numero || 0,
-        materiais: pedido.materiais || [],
-        valor_total: pedido.valor_total || 0,
-        valor_pago: pedido.valor_pago || 0,
-        valor_deve: pedido.valor_deve || 0,
+        ...pedidoAtualizado,
+        telefone: pedidoAtualizado.telefone || "",
+        residencial: pedidoAtualizado.residencial || "",
+        referencia: pedidoAtualizado.referencia || "",
+        endereco: pedidoAtualizado.endereco || "",
+        cpf: pedidoAtualizado.cpf || "",
+        data_devolucao: pedidoAtualizado.data_devolucao || "",
+        data_evento: pedidoAtualizado.data_evento || "",
+        data_locacao: pedidoAtualizado.data_locacao || "",
+        cliente: pedidoAtualizado.cliente || "",
+        numero: pedidoAtualizado.numero || 0,
+        materiais: pedidoAtualizado.materiais || [],
+        valor_total: pedidoAtualizado.valor_total || 0,
+        valor_pago: pedidoAtualizado.valor_pago || 0,
+        valor_deve: pedidoAtualizado.valor_deve || 0,
         // Campos de responsabilidades
-        resp_entregou: pedido.resp_entregou || "",
-        data_entregou: pedido.data_entregou || "",
-        hora_entregou: pedido.hora_entregou || "",
-        resp_recebeu: pedido.resp_recebeu || "",
-        data_recebeu: pedido.data_recebeu || "",
-        hora_recebeu: pedido.hora_recebeu || "",
-        resp_buscou: pedido.resp_buscou || "",
-        data_buscou: pedido.data_buscou || "",
-        hora_buscou: pedido.hora_buscou || "",
-        resp_forro: pedido.resp_forro || "",
-        data_forro: pedido.data_forro || "",
-        hora_forro: pedido.hora_forro || "",
-        resp_utensilio: pedido.resp_utensilio || "",
-        data_utensilio: pedido.data_utensilio || "",
-        hora_utensilio: pedido.hora_utensilio || "",
-        obs: pedido.obs || "",
+        resp_entregou: pedidoAtualizado.resp_entregou || "",
+        data_entregou: pedidoAtualizado.data_entregou || "",
+        hora_entregou: pedidoAtualizado.hora_entregou || "",
+        resp_recebeu: pedidoAtualizado.resp_recebeu || "",
+        data_recebeu: pedidoAtualizado.data_recebeu || "",
+        hora_recebeu: pedidoAtualizado.hora_recebeu || "",
+        resp_buscou: pedidoAtualizado.resp_buscou || "",
+        data_buscou: pedidoAtualizado.data_buscou || "",
+        hora_buscou: pedidoAtualizado.hora_buscou || "",
+        resp_forro: pedidoAtualizado.resp_forro || "",
+        data_forro: pedidoAtualizado.data_forro || "",
+        hora_forro: pedidoAtualizado.hora_forro || "",
+        resp_utensilio: pedidoAtualizado.resp_utensilio || "",
+        data_utensilio: pedidoAtualizado.data_utensilio || "",
+        hora_utensilio: pedidoAtualizado.hora_utensilio || "",
+        obs: pedidoAtualizado.obs || "",
       }} />
     ).toBlob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Pedido_${pedido.numero || pedido.cliente}.pdf`;
+    a.download = `Pedido_${pedidoAtualizado.numero || pedidoAtualizado.cliente}.pdf`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -90,7 +139,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
       >
         {/* Header fixo */}
         <div className="flex justify-between items-center p-6 border-b border-gray-700 bg-gray-800">
-          <h2 className="text-xl md:text-2xl font-bold text-white">Detalhes do Pedido - Pedido #{pedido.numero}</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Detalhes do Pedido - Pedido #{pedidoAtualizado.numero}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-red-500 text-3xl transition-colors duration-200">&times;</button>
         </div>
 
@@ -113,15 +162,15 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           {onEditar && (
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-3 text-sm flex items-center gap-2 transition-colors duration-200"
-              onClick={() => { onClose(); onEditar(pedido); }}
+              onClick={() => { onClose(); onEditar(pedidoAtualizado); }}
             >
               <FaEdit /> Editar
             </button>
           )}
-          {onExcluir && pedido.numero && (
+          {onExcluir && pedidoAtualizado.numero && (
             <button
               className="bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-3 text-sm flex items-center gap-2 transition-colors duration-200"
-              onClick={() => { onClose(); onExcluir(Number(pedido.numero)); }}
+              onClick={() => { onClose(); onExcluir(Number(pedidoAtualizado.numero)); }}
             >
               <FaTrash /> Excluir
             </button>
@@ -139,27 +188,27 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
               <div className="bg-gray-700/50 p-3 rounded-lg">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Número</span>
-                <p className="text-white font-semibold text-lg">{pedido.numero}</p>
+                <p className="text-white font-semibold text-lg">{pedidoAtualizado.numero}</p>
               </div>
               <div className="bg-gray-700/50 p-3 rounded-lg">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Data Locação</span>
-                <p className="text-white font-semibold">{formatDateBR(pedido.data_locacao)}</p>
+                <p className="text-white font-semibold">{formatDateBR(pedidoAtualizado.data_locacao)}</p>
               </div>
               <div className="bg-gray-700/50 p-3 rounded-lg">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Data Evento</span>
-                <p className="text-white font-semibold">{formatDateBR(pedido.data_evento)}</p>
+                <p className="text-white font-semibold">{formatDateBR(pedidoAtualizado.data_evento)}</p>
               </div>
               <div className="bg-gray-700/50 p-3 rounded-lg">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Data Devolução</span>
-                <p className="text-white font-semibold">{formatDateBR(pedido.data_devolucao)}</p>
+                <p className="text-white font-semibold">{formatDateBR(pedidoAtualizado.data_devolucao)}</p>
               </div>
               <div className="bg-gray-700/50 p-3 rounded-lg">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Cliente</span>
-                <p className="text-white font-semibold">{pedido.cliente}</p>
+                <p className="text-white font-semibold">{pedidoAtualizado.cliente}</p>
               </div>
               <div className="bg-gray-700/50 p-3 rounded-lg">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">CPF/CNPJ</span>
-                <p className="text-white font-semibold">{formatCpfCnpjBR(pedido.cpf)}</p>
+                <p className="text-white font-semibold">{formatCpfCnpjBR(pedidoAtualizado.cpf)}</p>
               </div>
             </div>
           </div>
@@ -172,23 +221,23 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <div className="bg-gray-700/50 p-3 rounded-lg">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Telefone</span>
-                <p className="text-white font-semibold">{formatTelefoneBR(pedido.telefone) || '-'}</p>
+                <p className="text-white font-semibold">{formatTelefoneBR(pedidoAtualizado.telefone) || '-'}</p>
               </div>
               <div className="bg-gray-700/50 p-3 rounded-lg">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Pagamento</span>
-                <p className="text-white font-semibold">{pedido.pagamento || '-'}</p>
+                <p className="text-white font-semibold">{pedidoAtualizado.pagamento || '-'}</p>
               </div>
               <div className="bg-gray-700/50 p-3 rounded-lg sm:col-span-2">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Endereço do Evento</span>
-                <p className="text-white font-semibold">{pedido.endereco || '-'}</p>
+                <p className="text-white font-semibold">{pedidoAtualizado.endereco || '-'}</p>
               </div>
               <div className="bg-gray-700/50 p-3 rounded-lg sm:col-span-2">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Endereço Residencial</span>
-                <p className="text-white font-semibold">{pedido.residencial || '-'}</p>
+                <p className="text-white font-semibold">{pedidoAtualizado.residencial || '-'}</p>
               </div>
               <div className="bg-gray-700/50 p-3 rounded-lg sm:col-span-2">
                 <span className="text-gray-400 text-xs uppercase tracking-wide">Referência</span>
-                <p className="text-white font-semibold">{pedido.referencia || '-'}</p>
+                <p className="text-white font-semibold">{pedidoAtualizado.referencia || '-'}</p>
               </div>
             </div>
           </div>
@@ -202,19 +251,19 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
               <div className="bg-gray-700/50 p-4 rounded-lg text-center">
                 <span className="text-gray-400 text-xs uppercase tracking-wide block mb-2">Valor Total</span>
                 <p className="text-blue-400 font-bold text-xl">
-                  {pedido.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  {pedidoAtualizado.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </p>
               </div>
               <div className="bg-gray-700/50 p-4 rounded-lg text-center">
                 <span className="text-gray-400 text-xs uppercase tracking-wide block mb-2">Valor Pago</span>
                 <p className="text-green-400 font-bold text-xl">
-                  {pedido.valor_pago?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
+                  {pedidoAtualizado.valor_pago?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
                 </p>
               </div>
               <div className="bg-gray-700/50 p-4 rounded-lg text-center">
                 <span className="text-gray-400 text-xs uppercase tracking-wide block mb-2">Valor a Pagar</span>
-                <p className={`font-bold text-xl ${(pedido.valor_deve || 0) > 0 ? 'text-red-400' : 'text-gray-400'}`}>
-                  {pedido.valor_deve?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
+                <p className={`font-bold text-xl ${(pedidoAtualizado.valor_deve || 0) > 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                  {pedidoAtualizado.valor_deve?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
                 </p>
               </div>
             </div>
@@ -235,15 +284,15 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Responsável:</span>
-                    <span className="text-white font-medium">{pedido.resp_entregou || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.resp_entregou || '-'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Data:</span>
-                    <span className="text-white font-medium">{pedido.data_entregou ? formatDateBR(pedido.data_entregou) : '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.data_entregou ? formatDateBR(pedidoAtualizado.data_entregou) : '-'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Hora:</span>
-                    <span className="text-white font-medium">{pedido.hora_entregou || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.hora_entregou || '-'}</span>
                   </div>
                 </div>
               </div>
@@ -256,15 +305,15 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Responsável:</span>
-                    <span className="text-white font-medium">{pedido.resp_recebeu || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.resp_recebeu || '-'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Data:</span>
-                    <span className="text-white font-medium">{pedido.data_recebeu ? formatDateBR(pedido.data_recebeu) : '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.data_recebeu ? formatDateBR(pedidoAtualizado.data_recebeu) : '-'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Hora:</span>
-                    <span className="text-white font-medium">{pedido.hora_recebeu || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.hora_recebeu || '-'}</span>
                   </div>
                 </div>
               </div>
@@ -277,15 +326,15 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Responsável:</span>
-                    <span className="text-white font-medium">{pedido.resp_buscou || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.resp_buscou || '-'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Data:</span>
-                    <span className="text-white font-medium">{pedido.data_buscou ? formatDateBR(pedido.data_buscou) : '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.data_buscou ? formatDateBR(pedidoAtualizado.data_buscou) : '-'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Hora:</span>
-                    <span className="text-white font-medium">{pedido.hora_buscou || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.hora_buscou || '-'}</span>
                   </div>
                 </div>
               </div>
@@ -298,15 +347,15 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Responsável:</span>
-                    <span className="text-white font-medium">{pedido.resp_forro || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.resp_forro || '-'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Data:</span>
-                    <span className="text-white font-medium">{pedido.data_forro ? formatDateBR(pedido.data_forro) : '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.data_forro ? formatDateBR(pedidoAtualizado.data_forro) : '-'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Hora:</span>
-                    <span className="text-white font-medium">{pedido.hora_forro || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.hora_forro || '-'}</span>
                   </div>
                 </div>
               </div>
@@ -319,15 +368,15 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                   <div className="flex justify-between sm:block">
                     <span className="text-gray-400 sm:block">Responsável:</span>
-                    <span className="text-white font-medium">{pedido.resp_utensilio || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.resp_utensilio || '-'}</span>
                   </div>
                   <div className="flex justify-between sm:block">
                     <span className="text-gray-400 sm:block">Data:</span>
-                    <span className="text-white font-medium">{pedido.data_utensilio ? formatDateBR(pedido.data_utensilio) : '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.data_utensilio ? formatDateBR(pedidoAtualizado.data_utensilio) : '-'}</span>
                   </div>
                   <div className="flex justify-between sm:block">
                     <span className="text-gray-400 sm:block">Hora:</span>
-                    <span className="text-white font-medium">{pedido.hora_utensilio || '-'}</span>
+                    <span className="text-white font-medium">{pedidoAtualizado.hora_utensilio || '-'}</span>
                   </div>
                 </div>
               </div>
@@ -336,7 +385,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           </div>
 
           {/* Observações */}
-          {pedido.obs && (
+          {pedidoAtualizado.obs && (
             <div className="bg-gradient-to-r from-indigo-900/20 to-purple-900/20 rounded-xl p-6 border border-gray-700">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 📝 Observações
@@ -349,35 +398,35 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
                     maxWidth: '100%',
                     wordBreak: 'break-all'
                   }}>
-                  {pedido.obs}
+                  {pedidoAtualizado.obs}
                 </p>
               </div>
             </div>
           )}
 
           {/* Informações de Devolução */}
-          {(pedido.data_devolucao_realizada || pedido.responsavel_devolucao || pedido.observacoes_devolucao) && (
+          {(pedidoAtualizado.data_devolucao_realizada || pedidoAtualizado.responsavel_devolucao || pedidoAtualizado.observacoes_devolucao) && (
             <div className="bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-xl p-6 border border-gray-700">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 🔄 Informações de Devolução
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                {pedido.data_devolucao_realizada && (
+                {pedidoAtualizado.data_devolucao_realizada && (
                   <div className="bg-gray-700/50 p-3 rounded-lg">
                     <span className="text-gray-400 text-xs uppercase tracking-wide">Data da Devolução</span>
-                    <p className="text-white font-semibold">{formatDateBR(pedido.data_devolucao_realizada)}</p>
+                    <p className="text-white font-semibold">{formatDateBR(pedidoAtualizado.data_devolucao_realizada)}</p>
                   </div>
                 )}
-                {pedido.responsavel_devolucao && (
+                {pedidoAtualizado.responsavel_devolucao && (
                   <div className="bg-gray-700/50 p-3 rounded-lg">
                     <span className="text-gray-400 text-xs uppercase tracking-wide">Responsável</span>
-                    <p className="text-white font-semibold">{pedido.responsavel_devolucao}</p>
+                    <p className="text-white font-semibold">{pedidoAtualizado.responsavel_devolucao}</p>
                   </div>
                 )}
-                {pedido.observacoes_devolucao && (
+                {pedidoAtualizado.observacoes_devolucao && (
                   <div className="bg-gray-700/50 p-3 rounded-lg sm:col-span-3">
                     <span className="text-gray-400 text-xs uppercase tracking-wide">Observações da Devolução</span>
-                    <p className="text-white font-semibold">{pedido.observacoes_devolucao}</p>
+                    <p className="text-white font-semibold">{pedidoAtualizado.observacoes_devolucao}</p>
                   </div>
                 )}
               </div>
@@ -389,7 +438,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               📋 Materiais
             </h3>
-            <OrderMaterialsList materiais={pedido.materiais} />
+            <OrderMaterialsList materiais={pedidoAtualizado.materiais} />
           </div>
 
         </div>
@@ -397,7 +446,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
 
       {/* Modal de Devolução */}
       <DevolucaoModal
-        pedido={pedido}
+        pedido={pedidoAtualizado}
         open={devolucaoModalOpen}
         onClose={() => setDevolucaoModalOpen(false)}
         onConfirmarDevolucao={handleDevolucao}
