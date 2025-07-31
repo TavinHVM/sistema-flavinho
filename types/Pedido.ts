@@ -4,11 +4,12 @@ export interface PedidoItem {
   valor_unit: number;
   valor_total: number;
   preco: number;
+  quantidade_devolvida?: number;
 }
 
 export interface Pedido {
   id?: string;
-  numero?: string;
+  numero?: number;
   data_locacao: string;
   data_evento: string;
   data_devolucao: string;
@@ -42,4 +43,8 @@ export interface Pedido {
   data_utensilio?: string;
   hora_utensilio?: string;
   obs?: string;
+  // Campos de devolução
+  data_devolucao_realizada?: string;
+  responsavel_devolucao?: string;
+  observacoes_devolucao?: string;
 }

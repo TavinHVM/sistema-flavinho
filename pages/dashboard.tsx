@@ -77,6 +77,12 @@ export default function Dashboard() {
                 >
                   Estoque
                 </button>
+                <button
+                  onClick={() => router.push("/devolucoes")}
+                  className="w-full bg-purple-500 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-purple-600 transition-all flex items-center justify-center"
+                >
+                  Relatório de Devoluções
+                </button>
                 {isAdmin && (
                   <button
                     onClick={() => router.push("/user-management")}

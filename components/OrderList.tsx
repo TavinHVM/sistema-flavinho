@@ -3,6 +3,7 @@ import { FaSortUp, FaSortDown } from "react-icons/fa";
 import OrderDetailsModal from "./OrderDetailsModal";
 import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
+import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
 
 interface Material {
   nome: string;
@@ -16,12 +17,13 @@ interface OrderListProps {
   search: string;
   onEditar?: (pedido: Pedido & { materiais: Material[] }) => void;
   onExcluir?: (id: number) => void;
+  onDevolucao?: (pedido: Pedido, itensDevolvidos: any[], observacoes: string) => void;
 }
 
-type SortKey = "numero" | "cpf" | "cliente" | "data_locacao" | "data_evento" | "endereco" | "valor_total" | "valor_pago" | "valor_deve" | null;
+type SortKey = "numero" | "cpf" | "cliente" | "data_locacao" | "data_evento" | "data_devolucao" | "endereco" | "valor_total" | "valor_pago" | "valor_deve" | null;
 type SortOrder = "asc" | "desc" | null;
 
-const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) => {
+const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir, onDevolucao }) => {
   const [modalPedido, setModalPedido] = useState<Pedido | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -76,7 +78,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
         return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
       }
       // Para datas, comparar como string
-      if (sortKey === "data_locacao" || sortKey === "data_evento") {
+      if (sortKey === "data_locacao" || sortKey === "data_evento" || sortKey === "data_devolucao") {
         const aStr = (aValue ?? "") as string;
         const bStr = (bValue ?? "") as string;
         return sortOrder === "asc"
@@ -112,7 +114,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
             </th>
             <th className="p-3 min-w-[120px] cursor-pointer select-none" onClick={() => handleSort("cpf")}>
               <span className="flex items-center">
-                CPF {getSortIcon("cpf")}
+                CPF/CNPJ {getSortIcon("cpf")}
               </span>
             </th>
             <th className="p-3 min-w-[140px] cursor-pointer select-none" onClick={() => handleSort("cliente")}>
@@ -128,6 +130,11 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
             <th className="p-3 min-w-[110px] cursor-pointer select-none" onClick={() => handleSort("data_evento")}>
               <span className="flex items-center gap-1">
                 Data Evento {getSortIcon("data_evento")}
+              </span>
+            </th>
+            <th className="p-3 min-w-[110px] cursor-pointer select-none" onClick={() => handleSort("data_devolucao")}>
+              <span className="flex items-center gap-1">
+                Data Devolução {getSortIcon("data_devolucao")}
               </span>
             </th>
             <th className="p-3 min-w-[140px] cursor-pointer select-none" onClick={() => handleSort("endereco")}>
@@ -150,6 +157,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
                 Devido {getSortIcon("valor_deve")}
               </span>
             </th>
+            <th className="p-3 min-w-[100px]">Status Devolução</th>
             <th className="p-3"></th>
           </tr>
         </thead>
@@ -161,10 +169,34 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
               onClick={() => handleVerMais(p)}
             >
               <td className="p-3 text-gray-400">{p.numero}</td>
-              <td className="p-3 text-gray-300 font font-semibold">{p.cpf}</td>
+              <td className="p-3 text-gray-300 font font-semibold">{formatCpfCnpjBR(p.cpf)}</td>
               <td className="p-3 text-gray-50 font-semibold">{p.cliente}</td>
               <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_locacao)}</td>
               <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_evento) || '-'}</td>
+              <td className="p-3 text-gray-300 font-semibold">
+                {(() => {
+                  if (!p.data_devolucao) return '-';
+
+                  const hoje = new Date();
+                  const dataDevolucao = new Date(p.data_devolucao);
+                  const diasParaDevolucao = Math.ceil((dataDevolucao.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+
+                  // Verificar se há itens pendentes
+                  const totalItens = p.materiais?.reduce((total, item) => total + item.quantidade, 0) || 0;
+                  const totalDevolvido = p.materiais?.reduce((total, item) => total + (item.quantidade_devolvida || 0), 0) || 0;
+                  const pendente = totalItens - totalDevolvido;
+
+                  if (pendente === 0) {
+                    return <span className="text-green-400">{formatDateBR(p.data_devolucao)}</span>;
+                  } else if (diasParaDevolucao <= 0) {
+                    return <span className="text-red-400 font-bold">{formatDateBR(p.data_devolucao)} 🔴</span>;
+                  } else if (diasParaDevolucao <= 2) {
+                    return <span className="text-yellow-400 font-bold">{formatDateBR(p.data_devolucao)} ⚠️</span>;
+                  } else {
+                    return <span className="text-gray-300">{formatDateBR(p.data_devolucao)}</span>;
+                  }
+                })()}
+              </td>
               <td className="p-3 text-gray-300 font-semibold">{p.endereco || '-'}</td>
               <td className="p-3 text-gray-300 font-bold">
                 <span className="font-bold text-emerald-400">
@@ -181,6 +213,42 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
                   {p.valor_deve?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
                 </span>
               </td>
+              <td className="p-3">
+                {(() => {
+                  const totalItens = p.materiais?.reduce((total, item) => total + item.quantidade, 0) || 0;
+                  const totalDevolvido = p.materiais?.reduce((total, item) => total + (item.quantidade_devolvida || 0), 0) || 0;
+                  const pendente = totalItens - totalDevolvido;
+
+                  // Verificar se está próximo da data de devolução
+                  const hoje = new Date();
+                  const dataDevolucao = p.data_devolucao ? new Date(p.data_devolucao) : null;
+                  const diasParaDevolucao = dataDevolucao ? Math.ceil((dataDevolucao.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24)) : null;
+
+                  if (totalItens === 0) {
+                    return <span className="text-gray-400 text-xs">Sem itens</span>;
+                  } else if (pendente === 0) {
+                    return (
+                      <span className="bg-green-900/30 text-green-400 px-2 py-1 rounded-full text-xs font-medium border border-green-600/30">
+                        ✓ Devolvido
+                      </span>
+                    );
+                  } else if (totalDevolvido > 0) {
+                    const urgencia = diasParaDevolucao !== null && diasParaDevolucao <= 0 ? ' 🔴' : diasParaDevolucao !== null && diasParaDevolucao <= 2 ? ' ⚠️' : '';
+                    return (
+                      <span className="bg-yellow-900/30 text-yellow-400 px-2 py-1 rounded-full text-xs font-medium border border-yellow-600/30">
+                        ⚠ Parcial ({pendente} pendente){urgencia}
+                      </span>
+                    );
+                  } else {
+                    const urgencia = diasParaDevolucao !== null && diasParaDevolucao <= 0 ? ' 🔴' : diasParaDevolucao !== null && diasParaDevolucao <= 2 ? ' ⚠️' : '';
+                    return (
+                      <span className="bg-red-900/30 text-red-400 px-2 py-1 rounded-full text-xs font-medium border border-red-600/30">
+                        ⏳ Pendente ({pendente} itens){urgencia}
+                      </span>
+                    );
+                  }
+                })()}
+              </td>
               <td className="p-3"></td>
             </tr>
           ))}
@@ -189,6 +257,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir }) =
       <OrderDetailsModal pedido={modalPedido} open={modalOpen} onClose={handleCloseModal}
         onEditar={onEditar}
         onExcluir={onExcluir}
+        onDevolucao={onDevolucao}
       />
     </div>
   );

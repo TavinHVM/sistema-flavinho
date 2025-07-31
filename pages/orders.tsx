@@ -144,6 +144,29 @@ export default function Orders() {
       setToast({ type: 'error', message: 'Preencha o nome do cliente e pelo menos um item.' });
       return;
     }
+
+    // Validação: Verificar se há estoque suficiente
+    for (const item of form.materiais) {
+      if (!item.nome || item.quantidade <= 0) {
+        setToast({ type: 'error', message: 'Todos os itens devem ter nome e quantidade válidos.' });
+        return;
+      }
+      
+      const produto = produtos.find((p) => p.nome === item.nome);
+      if (!produto) {
+        setToast({ type: 'error', message: `Produto "${item.nome}" não encontrado no estoque.` });
+        return;
+      }
+      
+      if (produto.quantidade_empresa < item.quantidade) {
+        setToast({ 
+          type: 'error', 
+          message: `Estoque insuficiente para "${item.nome}". Disponível: ${produto.quantidade_empresa}, Solicitado: ${item.quantidade}` 
+        });
+        return;
+      }
+    }
+
     // Atualizar estoque
     for (const item of form.materiais) {
       const produto = produtos.find((p) => p.nome === item.nome);
@@ -242,6 +265,79 @@ export default function Orders() {
       fetchPedidos();
     } else {
       setToast({ type: 'error', message: 'Erro ao salvar pedido!' });
+    }
+  };
+
+  // Função para processar devolução
+  const processarDevolucao = async (pedido: Pedido, itensDevolvidos: any[], observacoes: string) => {
+    try {
+      const usuario = localStorage.getItem("user") 
+        ? JSON.parse(localStorage.getItem("user")!).nome 
+        : "Não informado";
+
+      // Inserir registros na tabela de devoluções
+      for (const item of itensDevolvidos) {
+        const { error: devolucaoError } = await supabase
+          .from("devolucoes")
+          .insert({
+            numero_pedido: pedido.numero,
+            nome_produto: item.nome,
+            quantidade_devolvida: item.devolucao_atual,
+            responsavel_devolucao: usuario,
+            observacoes: observacoes || null,
+          });
+
+        if (devolucaoError) {
+          setToast({ type: 'error', message: `Erro ao registrar devolução: ${devolucaoError.message}` });
+          return;
+        }
+
+        // Atualizar estoque - mover de "rua" de volta para "empresa"
+        const produto = produtos.find((p) => p.nome === item.nome);
+        if (produto) {
+          const novaEmpresa = produto.quantidade_empresa + item.devolucao_atual;
+          const novaRua = produto.quantidade_rua - item.devolucao_atual;
+          
+          if (novaRua < 0) {
+            setToast({ type: 'error', message: `Erro: Tentativa de devolver mais itens do que está em rota para "${item.nome}"` });
+            return;
+          }
+
+          const { error: estoqueError } = await supabase
+            .from("produtos")
+            .update({ 
+              quantidade_empresa: novaEmpresa, 
+              quantidade_rua: novaRua 
+            })
+            .eq("numero", produto.numero);
+
+          if (estoqueError) {
+            setToast({ type: 'error', message: 'Erro ao atualizar estoque!' });
+            return;
+          }
+        }
+      }
+
+      setToast({ type: 'success', message: 'Devolução registrada com sucesso!' });
+      fetchPedidos();
+      
+      // Atualizar lista de produtos para refletir as mudanças no estoque
+      const { data } = await supabase.from("produtos").select("*");
+      if (data) {
+        setProdutos(
+          data.map((p: Record<string, unknown>) => ({
+            id: p.id ? String(p.id) : String(p.numero),
+            numero: String(p.numero ?? ""),
+            nome: String(p.nome ?? ""),
+            quantidade_empresa: Number(p.quantidade_empresa ?? 0),
+            quantidade_rua: Number(p.quantidade_rua ?? 0),
+            preco: Number(p.preco ?? 0),
+          }))
+        );
+      }
+    } catch (error) {
+      console.error('Erro ao processar devolução:', error);
+      setToast({ type: 'error', message: 'Erro ao processar devolução!' });
     }
   };
 
@@ -400,6 +496,7 @@ export default function Orders() {
             }, 100);
           }}
           onExcluir={(id) => setConfirmDelete({ open: true, id })}
+          onDevolucao={processarDevolucao}
         />
       </main>
     </>

@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import OrderMaterialsList from "./OrderMaterialsList";
 import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
-import { FaFilePdf } from "react-icons/fa";
+import { FaFilePdf, FaUndo } from "react-icons/fa";
 import { pdf } from "@react-pdf/renderer";
 import PedidoPDF from "./PedidoPDF";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { formatTelefoneBR } from "@/lib/formatNumber";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
+import DevolucaoModal from "./DevolucaoModal";
 
 interface Props {
   pedido: Pedido | null;
@@ -15,10 +16,24 @@ interface Props {
   onClose: () => void;
   onEditar?: (pedido: Pedido) => void;
   onExcluir?: (id: number) => void;
+  onDevolucao?: (pedido: Pedido, itensDevolvidos: any[], observacoes: string) => void;
 }
 
-const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, onExcluir }) => {
+const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, onExcluir, onDevolucao }) => {
+  const [devolucaoModalOpen, setDevolucaoModalOpen] = useState(false);
+  
   if (!pedido) return null;
+
+  const handleDevolucao = (itensDevolvidos: any[], observacoes: string) => {
+    if (onDevolucao && pedido) {
+      onDevolucao(pedido, itensDevolvidos, observacoes);
+    }
+  };
+
+  // Verificar se há itens pendentes de devolução
+  const temItensPendentes = pedido.materiais.some(item => 
+    (item.quantidade_devolvida || 0) < item.quantidade
+  );
 
   const handleDownloadPDF = async () => {
     const blob = await pdf(
@@ -32,7 +47,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
         data_devolucao: pedido.data_devolucao || "",
         data_evento: pedido.data_evento || "",
         cliente: pedido.cliente || "",
-        numero: pedido.numero || "",
+        numero: pedido.numero || 0,
         materiais: pedido.materiais || [],
         valor_total: pedido.valor_total || 0,
         valor_pago: pedido.valor_pago || 0,
@@ -87,6 +102,14 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
           >
             <FaFilePdf className="text-red-400" /> Salvar PDF
           </button>
+          {temItensPendentes && onDevolucao && (
+            <button
+              className="bg-orange-600 hover:bg-orange-700 text-white rounded-lg px-4 py-3 text-sm flex items-center gap-2 transition-colors duration-200"
+              onClick={() => setDevolucaoModalOpen(true)}
+            >
+              <FaUndo /> Registrar Devolução
+            </button>
+          )}
           {onEditar && (
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-3 text-sm flex items-center gap-2 transition-colors duration-200"
@@ -332,6 +355,35 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
             </div>
           )}
 
+          {/* Informações de Devolução */}
+          {(pedido.data_devolucao_realizada || pedido.responsavel_devolucao || pedido.observacoes_devolucao) && (
+            <div className="bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-xl p-6 border border-gray-700">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                🔄 Informações de Devolução
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                {pedido.data_devolucao_realizada && (
+                  <div className="bg-gray-700/50 p-3 rounded-lg">
+                    <span className="text-gray-400 text-xs uppercase tracking-wide">Data da Devolução</span>
+                    <p className="text-white font-semibold">{formatDateBR(pedido.data_devolucao_realizada)}</p>
+                  </div>
+                )}
+                {pedido.responsavel_devolucao && (
+                  <div className="bg-gray-700/50 p-3 rounded-lg">
+                    <span className="text-gray-400 text-xs uppercase tracking-wide">Responsável</span>
+                    <p className="text-white font-semibold">{pedido.responsavel_devolucao}</p>
+                  </div>
+                )}
+                {pedido.observacoes_devolucao && (
+                  <div className="bg-gray-700/50 p-3 rounded-lg sm:col-span-3">
+                    <span className="text-gray-400 text-xs uppercase tracking-wide">Observações da Devolução</span>
+                    <p className="text-white font-semibold">{pedido.observacoes_devolucao}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Materiais */}
           <div className="bg-gradient-to-r from-gray-900/50 to-slate-900/50 rounded-xl p-6 border border-gray-700">
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
@@ -342,6 +394,14 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
 
         </div>
       </div>
+
+      {/* Modal de Devolução */}
+      <DevolucaoModal
+        pedido={pedido}
+        open={devolucaoModalOpen}
+        onClose={() => setDevolucaoModalOpen(false)}
+        onConfirmarDevolucao={handleDevolucao}
+      />
     </div>
   );
 };
