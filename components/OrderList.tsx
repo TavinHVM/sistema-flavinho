@@ -17,13 +17,13 @@ interface OrderListProps {
   search: string;
   onEditar?: (pedido: Pedido & { materiais: Material[] }) => void;
   onExcluir?: (id: number) => void;
-  onDevolucao?: (pedido: Pedido, itensDevolvidos: any[], observacoes: string) => void;
+  onDevolucao?: (pedido: Pedido, itensDevolvidos: { nome: string; quantidade: number; devolucao_atual: number }[], observacoes: string) => void;
 }
 
 type SortKey = "numero" | "cpf" | "cliente" | "data_locacao" | "data_evento" | "data_devolucao" | "endereco" | "valor_total" | "valor_pago" | "valor_deve" | null;
 type SortOrder = "asc" | "desc" | null;
 
-const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir, onDevolucao }) => {
+const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir, onDevolucao }) => {
   const [modalPedido, setModalPedido] = useState<Pedido | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -61,9 +61,18 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, onEditar, onExcluir, onD
     setModalPedido(null);
   };
 
-  // Os pedidos já vêm filtrados da página principal (orders.tsx)
-  // que já faz a filtragem por cliente e CPF
-  const pedidosFiltrados = pedidos;
+  // Filtrar pedidos baseado na busca
+  const pedidosFiltrados = pedidos.filter(pedido => {
+    if (!search) return true;
+    
+    const searchLower = search.toLowerCase();
+    return (
+      pedido.cliente.toLowerCase().includes(searchLower) ||
+      pedido.cpf.includes(search) ||
+      (pedido.numero?.toString() || '').includes(search) ||
+      pedido.endereco.toLowerCase().includes(searchLower)
+    );
+  });
 
   const pedidosOrdenados = (() => {
     if (!sortKey || !sortOrder) return pedidosFiltrados;

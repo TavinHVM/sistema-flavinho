@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import OrderMaterialsList from "./OrderMaterialsList";
 import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
@@ -17,20 +17,14 @@ interface Props {
   onClose: () => void;
   onEditar?: (pedido: Pedido) => void;
   onExcluir?: (id: number) => void;
-  onDevolucao?: (pedido: Pedido, itensDevolvidos: any[], observacoes: string) => void;
+  onDevolucao?: (pedido: Pedido, itensDevolvidos: { nome: string; quantidade: number; devolucao_atual: number }[], observacoes: string) => void;
 }
 
 const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, onExcluir, onDevolucao }) => {
   const [devolucaoModalOpen, setDevolucaoModalOpen] = useState(false);
   const [pedidoAtualizado, setPedidoAtualizado] = useState<Pedido | null>(pedido);
   
-  useEffect(() => {
-    if (pedido && open) {
-      carregarDevolucoes();
-    }
-  }, [pedido, open]);
-
-  const carregarDevolucoes = async () => {
+  const carregarDevolucoes = useCallback(async () => {
     if (!pedido?.numero) return;
 
     try {
@@ -66,11 +60,17 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
       console.error("Erro ao carregar devoluções:", error);
       setPedidoAtualizado(pedido);
     }
-  };
+  }, [pedido]);
+
+  useEffect(() => {
+    if (pedido && open) {
+      carregarDevolucoes();
+    }
+  }, [pedido, open, carregarDevolucoes]);
   
   if (!pedidoAtualizado) return null;
 
-  const handleDevolucao = (itensDevolvidos: any[], observacoes: string) => {
+  const handleDevolucao = (itensDevolvidos: { nome: string; quantidade: number; devolucao_atual: number }[], observacoes: string) => {
     if (onDevolucao && pedidoAtualizado) {
       onDevolucao(pedidoAtualizado, itensDevolvidos, observacoes);
       // Recarregar devoluções após a operação

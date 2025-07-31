@@ -215,6 +215,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={[styles.header, { marginBottom: dynamicStyles.headerMargin }]}>
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
           {logoBase64 && <Image src={logoBase64} style={{ width: 40, height: 40 }} />}
           <View style={styles.empresaInfo}>
             <Text style={styles.empresaNome}>
@@ -226,6 +227,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
             <Text style={styles.empresaContato}>Av. Bela Vista Qd. 18 Lt. 03 - Ap. de Goiânia - GO</Text>
           </View>
           <View style={{ alignItems: "center" }}>
+            {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image src={qrcodeBase64} style={{ width: 40, height: 40 }} />
             <Text style={{ fontWeight: "bold", fontSize: 8, marginTop: 2, textAlign: "center", color: "#1e40af" }}>
               PEDIDO Nº {pedido.numero}

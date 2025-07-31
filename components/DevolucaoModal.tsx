@@ -36,7 +36,7 @@ const DevolucaoModal: React.FC<Props> = ({ pedido, open, onClose, onConfirmarDev
       }
 
       // Agregar quantidades devolvidas por produto
-      const devolucoesAgregadas = devolucoes?.reduce((acc: Record<string, number>, dev: any) => {
+      const devolucoesAgregadas = devolucoes?.reduce((acc, dev) => {
         acc[dev.nome_produto] = (acc[dev.nome_produto] || 0) + dev.quantidade_devolvida;
         return acc;
       }, {} as Record<string, number>) || {};

@@ -15,6 +15,20 @@ interface DevolucaoRelatorio {
   observacoes?: string;
 }
 
+interface DevolucaoSupabase {
+  id: string;
+  numero_pedido: number;
+  nome_produto: string;
+  quantidade_devolvida: number;
+  responsavel_devolucao: string;
+  data_devolucao: string;
+  observacoes?: string;
+  pedidos: {
+    cliente: string;
+    cpf: string;
+  } | null;
+}
+
 const RelatoriosDevolucao: React.FC = () => {
   const [devolucoes, setDevolucoes] = useState<DevolucaoRelatorio[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +62,7 @@ const RelatoriosDevolucao: React.FC = () => {
             cpf
           )
         `)
-        .order("data_devolucao", { ascending: false });
+        .order("data_devolucao", { ascending: false }) as { data: DevolucaoSupabase[] | null; error: unknown };
 
       if (error) {
         console.error("Erro ao carregar devoluções:", error);
@@ -56,7 +70,7 @@ const RelatoriosDevolucao: React.FC = () => {
       }
 
       // Formatar dados para o relatório
-      const devolucaesFormatadas = devolucoes?.map((dev: any) => ({
+      const devolucaesFormatadas = devolucoes?.map((dev) => ({
         id: dev.id,
         numero_pedido: dev.numero_pedido,
         cliente: dev.pedidos?.cliente || "Cliente não encontrado",

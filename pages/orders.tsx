@@ -269,10 +269,11 @@ export default function Orders() {
   };
 
   // Função para processar devolução
-  const processarDevolucao = async (pedido: Pedido, itensDevolvidos: any[], observacoes: string) => {
+  const processarDevolucao = async (pedido: Pedido, itensDevolvidos: { nome: string; quantidade: number; devolucao_atual: number }[], observacoes: string) => {
     try {
-      const usuario = localStorage.getItem("user") 
-        ? JSON.parse(localStorage.getItem("user")!).nome 
+      const userItem = localStorage.getItem("user");
+      const usuario = userItem 
+        ? JSON.parse(userItem).nome 
         : "Não informado";
 
       // Inserir registros na tabela de devoluções

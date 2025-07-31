@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import Image from 'next/image';
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import Header from "@/components/Header";
@@ -86,7 +87,7 @@ export default function Login() {
         <header className="mb-8 w-full max-w-md">
           <div className="w-full flex items-center justify-center relative">
             <div className="flex flex-col items-center justify-center">
-              <img
+              <Image
                 src="/favicon.ico"
                 alt="Favicon"
                 width={112}
