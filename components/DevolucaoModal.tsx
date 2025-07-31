@@ -13,7 +13,7 @@ interface Props {
   pedido: Pedido | null;
   open: boolean;
   onClose: () => void;
-  onConfirmarDevolucao: (itensDevolvidos: DevolucaoItem[], observacoes: string) => void;
+  onConfirmarDevolucao: (itens: DevolucaoItem[], observacoes: string) => void;
 }
 
 const DevolucaoModal: React.FC<Props> = ({ pedido, open, onClose, onConfirmarDevolucao }) => {
@@ -36,7 +36,7 @@ const DevolucaoModal: React.FC<Props> = ({ pedido, open, onClose, onConfirmarDev
       }
 
       // Agregar quantidades devolvidas por produto
-      const devolucoesAgregadas = devolucoes?.reduce((acc, dev) => {
+      const devolucoesAgregadas = devolucoes?.reduce((acc: Record<string, number>, dev: any) => {
         acc[dev.nome_produto] = (acc[dev.nome_produto] || 0) + dev.quantidade_devolvida;
         return acc;
       }, {} as Record<string, number>) || {};
@@ -111,79 +111,84 @@ const DevolucaoModal: React.FC<Props> = ({ pedido, open, onClose, onConfirmarDev
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700 bg-gray-800">
-          <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
-            <FaUndo className="text-blue-400" />
-            Registrar Devolução - Pedido #{pedido.numero}
-          </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-red-500 text-3xl transition-colors duration-200">&times;</button>
+        <div className="p-6 border-b border-gray-700 bg-gradient-to-r from-blue-900 to-purple-900">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <FaUndo className="text-blue-300 text-xl" />
+              <div>
+                <h2 className="text-xl font-semibold text-white">Registrar Devolução</h2>
+                <p className="text-blue-200 text-sm">Pedido #{pedido.numero} - {pedido.cliente}</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-gray-400 hover:text-white transition-colors p-2"
+            >
+              <FaTimes className="text-xl" />
+            </button>
+          </div>
         </div>
 
-        {/* Conteúdo */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          
-          {/* Informações do Cliente */}
-          <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-xl p-4 border border-gray-700">
-            <h3 className="text-lg font-semibold text-white mb-2">Cliente: {pedido.cliente}</h3>
-            <p className="text-gray-300">CPF: {pedido.cpf}</p>
-          </div>
-
-          {/* Responsável pela Devolução */}
-          <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {/* Responsável */}
+          <div className="mb-6 bg-gray-700/50 rounded-xl p-4 border border-gray-600">
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Responsável pela Devolução *
+              Responsável pela Devolução <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
               value={responsavel}
               onChange={(e) => setResponsavel(e.target.value)}
               className="w-full p-3 bg-gray-600 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Nome do funcionário responsável"
+              placeholder="Nome de quem está recebendo os itens"
               required
             />
           </div>
 
           {/* Lista de Itens */}
-          <div className="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
-            <h3 className="text-lg font-semibold text-white mb-4">Itens para Devolução</h3>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              📦 Itens para Devolução
+            </h3>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               {itens.map((item, index) => (
-                <div key={index} className="bg-gray-600/50 rounded-lg p-4 border border-gray-500">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div key={`${item.nome}-${index}`} className="bg-gray-700/50 rounded-xl p-4 border border-gray-600">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="flex-1">
-                      <h4 className="text-white font-semibold">{item.nome}</h4>
-                      <div className="text-sm text-gray-300 mt-1">
-                        <span>Alugado: {item.quantidade}</span>
-                        {item.quantidade_devolvida > 0 && (
-                          <span className="ml-4 text-green-400">Já devolvido: {item.quantidade_devolvida}</span>
-                        )}
-                        <span className="ml-4 text-yellow-400">Pendente: {item.quantidade_pendente}</span>
+                      <h4 className="font-medium text-white mb-2">{item.nome}</h4>
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-400">Total:</span>
+                          <span className="text-white font-semibold ml-1">{item.quantidade}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Devolvido:</span>
+                          <span className="text-green-400 font-semibold ml-1">{item.quantidade_devolvida}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Pendente:</span>
+                          <span className="text-yellow-400 font-semibold ml-1">{item.quantidade_pendente}</span>
+                        </div>
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-3">
-                      <label className="text-sm text-gray-300 whitespace-nowrap">
-                        Devolver agora:
-                      </label>
+                      <span className="text-gray-300 text-sm whitespace-nowrap">Devolver agora:</span>
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => handleQuantidadeChange(index, item.devolucao_atual - 1)}
+                          onClick={() => handleQuantidadeChange(index, Math.max(0, item.devolucao_atual - 1))}
                           disabled={item.devolucao_atual <= 0}
                           className="w-8 h-8 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg flex items-center justify-center transition-colors duration-200"
                         >
                           -
                         </button>
-                        <input
-                          type="number"
-                          min="0"
-                          max={item.quantidade_pendente}
-                          value={item.devolucao_atual}
-                          onChange={(e) => handleQuantidadeChange(index, parseInt(e.target.value) || 0)}
-                          className="w-20 p-2 bg-gray-700 border border-gray-500 rounded-lg text-white text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
+                        <span className="w-12 text-center text-white font-semibold bg-gray-600 py-1 px-2 rounded">
+                          {item.devolucao_atual}
+                        </span>
                         <button
-                          onClick={() => handleQuantidadeChange(index, item.devolucao_atual + 1)}
+                          onClick={() => handleQuantidadeChange(index, Math.min(item.quantidade_pendente, item.devolucao_atual + 1))}
                           disabled={item.devolucao_atual >= item.quantidade_pendente}
                           className="w-8 h-8 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg flex items-center justify-center transition-colors duration-200"
                         >
@@ -230,16 +235,17 @@ const DevolucaoModal: React.FC<Props> = ({ pedido, open, onClose, onConfirmarDev
         <div className="flex justify-end gap-3 p-6 border-t border-gray-700 bg-gray-800">
           <button
             onClick={onClose}
-            className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg flex items-center gap-2 transition-colors duration-200"
+            className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors duration-200"
           >
-            <FaTimes /> Cancelar
+            Cancelar
           </button>
           <button
             onClick={handleConfirmar}
             disabled={totalItensDevolucao === 0 || !responsavel.trim()}
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg flex items-center gap-2 transition-colors duration-200"
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center gap-2"
           >
-            <FaCheck /> Confirmar Devolução
+            <FaCheck />
+            Confirmar Devolução
           </button>
         </div>
       </div>

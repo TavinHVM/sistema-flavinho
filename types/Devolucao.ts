@@ -1,6 +1,6 @@
 export interface Devolucao {
   id?: string;
-  numero_pedido: string;
+  numero_pedido: number; // Mudado de string para number
   nome_produto: string;
   quantidade_devolvida: number;
   responsavel_devolucao: string;
@@ -10,7 +10,7 @@ export interface Devolucao {
 }
 
 export interface RelatorioItem {
-  numero: string;
+  numero: number; // Mudado de string para number
   cliente: string;
   cpf: string;
   data_evento: string;
