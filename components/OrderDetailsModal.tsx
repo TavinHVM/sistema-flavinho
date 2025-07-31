@@ -90,7 +90,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
       >
         {/* Header fixo */}
         <div className="flex justify-between items-center p-6 border-b border-gray-700 bg-gray-800">
-          <h2 className="text-xl md:text-2xl font-bold text-white">Detalhes do Pedido</h2>
+          <h2 className="text-xl md:text-2xl font-bold text-white">Detalhes do Pedido - Pedido #{pedido.numero}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-red-500 text-3xl transition-colors duration-200">&times;</button>
         </div>
 
