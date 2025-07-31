@@ -16,6 +16,8 @@ interface Produto {
   id: string;
   nome: string;
   preco?: number;
+  quantidade_empresa: number;
+  quantidade_rua: number;
 }
 
 interface OrderFormProps {
@@ -138,90 +140,178 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
       {/* Materiais */}
       <div className="mt-10 border-t-2 border-t-gray-500">
-        <h2 className="text-white text-base font-semibold mt-2 text-center">Itens</h2>
+        <h2 className="text-white text-lg font-semibold mt-4 mb-6 text-center flex items-center justify-center gap-2">
+          📋 Itens do Pedido
+        </h2>
       </div>
-      {/* Tabela de itens com overflow-x no mobile */}
-      <div className="overflow-x-auto w-full">
-        <table className="w-full min-w-[450px] text-sm text-gray-200">
-          <thead className="bg-gray-700 text-gray-300 text-left">
-            <tr>
-              <th className="p-2 font-medium">Quant.</th>
-              <th className="p-2 font-medium">Item</th>
-              <th className="p-2 font-medium">Valor Unit.</th>
-              <th className="p-2 font-medium">Valor Total</th>
-              <th className="p-2"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {form.materiais.map((mat: Material, idx: number) => (
-              <tr key={mat.nome + '-' + idx} className="border-b border-gray-600 hover:bg-gray-700 transition">
-                <td className="p-2">
-                  <input
-                    type="number"
-                    min={1}
-                    value={mat.quantidade}
-                    onChange={e => handleMaterialFieldChange(idx, "quantidade", parseInt(e.target.value))}
-                    className="w-16 px-2 py-1 rounded bg-gray-100 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </td>
-                <td className="p-2 min-w-[160px]">
-                  <select
-                    value={mat.nome}
-                    onChange={e => handleMaterialFieldChange(idx, "nome", e.target.value)}
-                    className="min-w-[140px] px-2 py-1 rounded bg-gray-100 text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Selecione</option>
-                    {produtos
-                      .slice()
-                      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
-                      .map(p => (
-                        <option key={p.id} value={p.nome}>{p.nome}</option>
-                      ))}
-                  </select>
-                </td>
 
-                <td className="p-2">
-                  <input
-                    type="text"
-                    disabled
-                    value={getPrecoProduto(mat.nome) ? (getPrecoProduto(mat.nome) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''}
-                    className="w-24 px-2 py-1 rounded bg-gray-100 text-gray-700 border border-gray-300"
-                  />
-                </td>
-                <td className="p-2 text-green-300 font-medium">
-                  R$ {mat.valor_total?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </td>
-                <td className="p-2 text-right">
-                  {form.materiais.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeMaterial(idx)}
-                      className="text-red-400 hover:text-red-300 text-sm transition font-bold mr-3"
-                    >
-                      <FaTrash className="inline mr-1" />
-                      Remover
-                    </button>
-                  )}
-                </td>
+      {/* Container responsivo para a tabela */}
+      <div className="bg-gray-700/30 rounded-xl p-4 border border-gray-600">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px] text-sm">
+            <thead>
+              <tr className="bg-gray-700 text-gray-200 border-b border-gray-600">
+                <th className="p-3 text-left rounded-tl-lg font-semibold w-20">Qtd.</th>
+                <th className="p-3 text-left font-semibold min-w-[200px]">Item</th>
+                <th className="p-3 text-center font-semibold w-32">Valor Unit.</th>
+                <th className="p-3 text-center font-semibold w-32">Valor Total</th>
+                <th className="p-3 text-center rounded-tr-lg font-semibold w-20">Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="bg-gray-800/50">
+              {form.materiais.map((mat: Material, idx: number) => (
+                <tr key={mat.nome + '-' + idx} className="border-b border-gray-600/50 hover:bg-gray-700/30 transition-colors">
+                  
+                  {/* Coluna Quantidade */}
+                  <td className="p-3">
+                    {(() => {
+                      const produto = produtos.find(p => p.nome === mat.nome);
+                      const estoqueDisponivel = produto?.quantidade_empresa || 0;
+                      const quantidadeExcedida = mat.quantidade > estoqueDisponivel;
+                      
+                      return (
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min={1}
+                            max={estoqueDisponivel}
+                            value={mat.quantidade}
+                            onChange={e => handleMaterialFieldChange(idx, "quantidade", parseInt(e.target.value))}
+                            className={`w-16 px-3 py-2 rounded-lg text-black border-2 focus:outline-none focus:ring-2 transition-all ${
+                              quantidadeExcedida && mat.nome
+                                ? 'bg-red-50 border-red-400 focus:ring-red-300 focus:border-red-500' 
+                                : 'bg-white border-gray-300 focus:ring-blue-300 focus:border-blue-500'
+                            }`}
+                            title={mat.nome ? `Máximo disponível: ${estoqueDisponivel}` : ''}
+                          />
+                          {quantidadeExcedida && mat.nome && (
+                            <div className="absolute top-12 left-0 bg-red-600 text-white text-xs px-2 py-1 rounded-md shadow-lg z-20 whitespace-nowrap">
+                              ⚠️ Máx: {estoqueDisponivel}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </td>
 
-      <button
-        type="button"
-        onClick={addMaterial}
-        className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg shadow transition"
-      >
-        + Adicionar Item
-      </button>
+                  {/* Coluna Item */}
+                  <td className="p-3">
+                    <div className="relative">
+                      <select
+                        value={mat.nome}
+                        onChange={e => handleMaterialFieldChange(idx, "nome", e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg bg-white text-black border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all"
+                      >
+                        <option value="" className="text-gray-500">Selecione um item</option>
+                        {produtos
+                          .slice()
+                          .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+                          .map(p => {
+                            const estoqueDisponivel = p.quantidade_empresa;
+                            const estoqueTexto = estoqueDisponivel > 0 
+                              ? ` (${estoqueDisponivel} disponível)`
+                              : ' (SEM ESTOQUE)';
+                            const isDisponivel = estoqueDisponivel > 0;
+                            
+                            return (
+                              <option 
+                                key={p.id} 
+                                value={p.nome}
+                                disabled={!isDisponivel}
+                                style={{ 
+                                  color: isDisponivel ? 'black' : '#999',
+                                  backgroundColor: isDisponivel ? 'white' : '#f5f5f5'
+                                }}
+                              >
+                                {p.nome}{estoqueTexto}
+                              </option>
+                            );
+                          })}
+                      </select>
+                      
+                      {/* Badge de estoque */}
+                      {mat.nome && (() => {
+                        const produto = produtos.find(p => p.nome === mat.nome);
+                        const estoqueDisponivel = produto?.quantidade_empresa || 0;
+                        
+                        return (
+                          <div className="absolute -bottom-7 left-0 z-10">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-sm ${
+                              estoqueDisponivel > 10 
+                                ? 'bg-green-100 text-green-800 border border-green-200' 
+                                : estoqueDisponivel > 0 
+                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                                : 'bg-red-100 text-red-800 border border-red-200'
+                            }`}>
+                              📦 {estoqueDisponivel} em estoque
+                            </span>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </td>
 
-      <div className="flex justify-end items-center mt-2 border-b-2 border-b-gray-500 mb-2">
-        <span className="text-gray-300 text-base font-semibold mr-2 mb-2">Total Geral:</span>
-        <span className="text-green-400 text-xl font-bold mb-2">
-          R$ {totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-        </span>
+                  {/* Coluna Valor Unitário */}
+                  <td className="p-3 text-center">
+                    <div className="bg-gray-100 px-3 py-2 rounded-lg border">
+                      <span className="text-gray-700 font-medium">
+                        {getPrecoProduto(mat.nome) ? 
+                          `R$ ${(getPrecoProduto(mat.nome) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` 
+                          : 'R$ 0,00'
+                        }
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Coluna Valor Total */}
+                  <td className="p-3 text-center">
+                    <div className="bg-green-100 px-3 py-2 rounded-lg border border-green-200">
+                      <span className="text-green-800 font-bold">
+                        R$ {mat.valor_total?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Coluna Ações */}
+                  <td className="p-3 text-center">
+                    {form.materiais.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeMaterial(idx)}
+                        className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-all duration-200 flex items-center justify-center mx-auto shadow-sm hover:shadow-md"
+                        title="Remover item"
+                      >
+                        <FaTrash className="text-sm" />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Botão Adicionar Item */}
+        <div className="mt-6 flex justify-center">
+          <button
+            type="button"
+            onClick={addMaterial}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200 flex items-center gap-2 hover:shadow-lg transform hover:scale-105"
+          >
+            <span className="text-lg">+</span>
+            Adicionar Item
+          </button>
+        </div>
+
+        {/* Total Geral */}
+        <div className="mt-6 pt-4 border-t border-gray-600">
+          <div className="flex justify-between items-center bg-gray-700/50 p-4 rounded-lg">
+            <span className="text-gray-300 text-lg font-semibold">Total Geral:</span>
+            <span className="text-green-400 text-2xl font-bold">
+              R$ {totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Linha 5: Entrega, Busca, Pagamento */}
