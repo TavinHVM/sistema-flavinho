@@ -5,6 +5,7 @@ import SectionTitle from "@/components/SectionTitle";
 import OrderForm from "@/components/OrderForm";
 import OrderList from "@/components/OrderList";
 import { Pedido, PedidoItem } from "../types/Pedido";
+import { ConjuntoCompleto } from "../types/Conjunto";
 import PainelAdminButton from "@/components/PainelAdminButton";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -68,8 +69,10 @@ export default function Orders() {
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [produtos, setProdutos] = useState<ProdutoLocal[]>([]);
+  const [conjuntos, setConjuntos] = useState<ConjuntoCompleto[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingConjuntos, setLoadingConjuntos] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
@@ -104,6 +107,83 @@ export default function Orders() {
     fetchProdutos();
   }, []);
 
+  // Recarregar conjuntos sempre que os produtos mudarem
+  useEffect(() => {
+    if (produtos.length > 0) {
+      fetchConjuntos();
+    }
+  }, [produtos]);
+
+  const fetchConjuntos = async () => {
+    try {
+      setLoadingConjuntos(true);
+      // Buscar conjuntos ativos
+      const { data: conjuntosData } = await supabase
+        .from("conjuntos")
+        .select("*")
+        .eq("ativo", true)
+        .order("nome");
+
+      if (conjuntosData) {
+        // Buscar itens de cada conjunto
+        const conjuntosCompletos: ConjuntoCompleto[] = [];
+        
+        for (const conjunto of conjuntosData) {
+          const { data: itensData } = await supabase
+            .from("conjunto_itens")
+            .select("*")
+            .eq("conjunto_id", conjunto.id);
+
+          if (itensData) {
+            // Calcular preços individuais e economia
+            let precoTotalIndividual = 0;
+            const itensDetalhados = itensData.map((item: { produto_nome: string; quantidade: number }) => {
+              const produto = produtos.find(p => p.nome === item.produto_nome);
+              const precoUnitario = produto?.preco || 0;
+              const precoTotalItem = precoUnitario * item.quantidade;
+              precoTotalIndividual += precoTotalItem;
+              
+              return {
+                produto_nome: item.produto_nome,
+                quantidade: item.quantidade,
+                preco_unitario: precoUnitario,
+                preco_total_individual: precoTotalItem,
+              };
+            });
+
+            const economia = Math.max(0, precoTotalIndividual - conjunto.preco_promocional);
+
+            conjuntosCompletos.push({
+              ...conjunto,
+              itens: itensData.map((item: { produto_nome: string; quantidade: number }) => ({
+                produto_nome: item.produto_nome,
+                quantidade: item.quantidade,
+              })),
+              itens_detalhados: itensDetalhados,
+              preco_total_individual: precoTotalIndividual,
+              economia: economia,
+            });
+          } else {
+            // Se não há itens, adicionar com valores zerados
+            conjuntosCompletos.push({
+              ...conjunto,
+              itens: [],
+              itens_detalhados: [],
+              preco_total_individual: 0,
+              economia: 0,
+            });
+          }
+        }
+
+        setConjuntos(conjuntosCompletos);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar conjuntos:", error);
+    } finally {
+      setLoadingConjuntos(false);
+    }
+  };
+
   const fetchPedidos = async () => {
     setLoading(true);
     const { data } = await supabase.from("pedidos").select("*").order("created_at", { ascending: false });
@@ -136,48 +216,79 @@ export default function Orders() {
   const removeMaterial = (idx: number) => {
     const materiais = [...form.materiais];
     materiais.splice(idx, 1);
+    
+    // Se não sobrou nenhum item, adicionar um item vazio
+    if (materiais.length === 0) {
+      materiais.push({ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 });
+    }
+    
     setForm({ ...form, materiais });
   };
 
   const salvarPedido = async () => {
-    if (!form.cliente || form.materiais.length === 0) {
+    // Filtrar apenas itens com nome preenchido
+    const itensValidos = form.materiais.filter(item => item.nome.trim() !== '');
+    
+    if (!form.cliente || itensValidos.length === 0) {
       setToast({ type: 'error', message: 'Preencha o nome do cliente e pelo menos um item.' });
       return;
     }
 
     // Validação: Verificar se há estoque suficiente
-    for (const item of form.materiais) {
-      if (!item.nome || item.quantidade <= 0) {
-        setToast({ type: 'error', message: 'Todos os itens devem ter nome e quantidade válidos.' });
+    for (const item of itensValidos) {
+      if (item.quantidade <= 0) {
+        setToast({ type: 'error', message: 'Todos os itens devem ter quantidade válida.' });
         return;
       }
       
-      const produto = produtos.find((p) => p.nome === item.nome);
+      // Extrair nome real do produto se for item de conjunto
+      let nomeProduto = item.nome;
+      if (item.nome.includes('[CONJUNTO:')) {
+        // Extrair o nome do produto após o "] "
+        const match = item.nome.match(/\] (.+)$/);
+        if (match) {
+          nomeProduto = match[1];
+        }
+      }
+      
+      const produto = produtos.find((p) => p.nome === nomeProduto);
       if (!produto) {
-        setToast({ type: 'error', message: `Produto "${item.nome}" não encontrado no estoque.` });
+        setToast({ type: 'error', message: `Produto "${nomeProduto}" não encontrado no estoque.` });
         return;
       }
       
       if (produto.quantidade_empresa < item.quantidade) {
         setToast({ 
           type: 'error', 
-          message: `Estoque insuficiente para "${item.nome}". Disponível: ${produto.quantidade_empresa}, Solicitado: ${item.quantidade}` 
+          message: `Estoque insuficiente para "${nomeProduto}". Disponível: ${produto.quantidade_empresa}, Solicitado: ${item.quantidade}` 
         });
         return;
       }
     }
 
     // Atualizar estoque
-    for (const item of form.materiais) {
-      const produto = produtos.find((p) => p.nome === item.nome);
+    for (const item of itensValidos) {
+      // Extrair nome real do produto se for item de conjunto
+      let nomeProduto = item.nome;
+      if (item.nome.includes('[CONJUNTO:')) {
+        // Extrair o nome do produto após o "] "
+        const match = item.nome.match(/\] (.+)$/);
+        if (match) {
+          nomeProduto = match[1];
+        }
+      }
+      
+      const produto = produtos.find((p) => p.nome === nomeProduto);
       if (produto) {
         const novaEmpresa = produto.quantidade_empresa - item.quantidade;
         const novaRua = produto.quantidade_rua + item.quantidade;
         await supabase.from("produtos").update({ quantidade_empresa: novaEmpresa, quantidade_rua: novaRua }).eq("numero", produto.numero);
       }
     }
-    // Calcular valor total
-    const valor_total = form.materiais.reduce((acc: number, m: PedidoItem) => acc + (m.valor_total || 0), 0) || "0";
+    
+    // Calcular valor total apenas com itens válidos
+    const valor_total = itensValidos.reduce((acc: number, m: PedidoItem) => acc + (m.valor_total || 0), 0) || "0";
+    
     // Se for edição (form.numero existe em pedidos), faz update
     const pedidoParaSalvar = {
       data_locacao: form.data_locacao ? toISODate(form.data_locacao) : null,
@@ -193,7 +304,7 @@ export default function Orders() {
       valor_total,
       valor_pago: form.valor_pago,
       valor_deve: form.valor_deve,
-      materiais: form.materiais,
+      materiais: itensValidos, // Usar apenas itens válidos
       created_at: new Date().toISOString(),
       // Campos de responsabilidades
       resp_entregou: form.resp_entregou || null,
@@ -397,6 +508,7 @@ export default function Orders() {
             form={form}
             setForm={setForm}
             produtos={produtos}
+            conjuntos={conjuntos}
             onSubmit={salvarPedido}
             handleMaterialChange={
               handleMaterialChange as (idx: number, field: string, value: string | number) => void
@@ -404,6 +516,8 @@ export default function Orders() {
             addMaterial={addMaterial}
             removeMaterial={removeMaterial}
             loading={loading}
+            loadingConjuntos={loadingConjuntos}
+            onRefreshConjuntos={fetchConjuntos}
             isEditing={isEditing}
             onCancelEdit={() => {
               setForm({

@@ -69,26 +69,32 @@ export default function Dashboard() {
                   onClick={() => router.push("/orders")}
                   className="w-full bg-blue-500 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-blue-600 transition-all flex items-center justify-center"
                 >
-                  Pedidos
+                  📋 Pedidos
                 </button>
                 <button
                   onClick={() => router.push("/")}
                   className="w-full bg-green-500 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-green-600 transition-all flex items-center justify-center"
                 >
-                  Estoque
+                  📦 Estoque
+                </button>
+                <button
+                  onClick={() => router.push("/conjuntos")}
+                  className="w-full bg-pink-500 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-pink-600 transition-all flex items-center justify-center"
+                >
+                  🎁 Conjuntos
                 </button>
                 <button
                   onClick={() => router.push("/devolucoes")}
                   className="w-full bg-purple-500 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-purple-600 transition-all flex items-center justify-center"
                 >
-                  Relatório de Devoluções
+                  📊 Relatório de Devoluções
                 </button>
                 {isAdmin && (
                   <button
                     onClick={() => router.push("/user-management")}
                     className="w-full bg-orange-500 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-orange-600 transition-all flex items-center justify-center"
                   >
-                    Gerenciar Usuários
+                    👥 Gerenciar Usuários
                   </button>
                 )}
               </div>
