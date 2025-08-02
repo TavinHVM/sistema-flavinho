@@ -218,7 +218,7 @@ export default function UserManagement() {
       }
       
       fetchUsers();
-    } catch (error) {
+    } catch {
       setToast({ type: 'error', message: 'Erro ao excluir usuários!' });
     } finally {
       setConfirmMultipleDelete({ open: false, ids: [], loading: false });

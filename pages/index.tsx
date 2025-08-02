@@ -171,7 +171,7 @@ export default function Home() {
       } else {
         setToast({ type: 'error', message: 'Erro ao excluir produtos!' });
       }
-    } catch (error) {
+    } catch {
       setToast({ type: 'error', message: 'Erro ao excluir produtos!' });
     } finally {
       setConfirmMultipleDelete({ open: false, ids: [], loading: false });

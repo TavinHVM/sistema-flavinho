@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../lib/supabaseClient";
 import Header from "@/components/Header";
 import SectionTitle from "@/components/SectionTitle";
@@ -113,14 +113,7 @@ export default function Orders() {
     fetchProdutos();
   }, []);
 
-  // Recarregar conjuntos sempre que os produtos mudarem
-  useEffect(() => {
-    if (produtos.length > 0) {
-      fetchConjuntos();
-    }
-  }, [produtos]);
-
-  const fetchConjuntos = async () => {
+  const fetchConjuntos = useCallback(async () => {
     try {
       setLoadingConjuntos(true);
       // Buscar conjuntos ativos
@@ -188,7 +181,14 @@ export default function Orders() {
     } finally {
       setLoadingConjuntos(false);
     }
-  };
+  }, [produtos]);
+
+  // Recarregar conjuntos sempre que os produtos mudarem
+  useEffect(() => {
+    if (produtos.length > 0) {
+      fetchConjuntos();
+    }
+  }, [produtos, fetchConjuntos]);
 
   const fetchPedidos = async () => {
     setLoading(true);
@@ -512,7 +512,7 @@ export default function Orders() {
       } else {
         setToast({ type: 'error', message: 'Erro ao excluir pedidos!' });
       }
-    } catch (error) {
+    } catch {
       setToast({ type: 'error', message: 'Erro ao excluir pedidos!' });
     } finally {
       setConfirmMultipleDelete({ open: false, ids: [], loading: false });

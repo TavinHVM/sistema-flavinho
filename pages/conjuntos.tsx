@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import Header from "@/components/Header";
@@ -73,12 +73,6 @@ export default function Conjuntos() {
 
   // Recarregar conjuntos sempre que os produtos mudarem
   useEffect(() => {
-    if (produtos.length > 0) {
-      fetchConjuntos();
-    }
-  }, [produtos]);
-
-  useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 4000);
       return () => clearTimeout(timer);
@@ -106,7 +100,7 @@ export default function Conjuntos() {
     }
   };
 
-  const fetchConjuntos = async () => {
+  const fetchConjuntos = useCallback(async () => {
     setLoading(true);
     try {
       // Buscar conjuntos
@@ -175,7 +169,14 @@ export default function Conjuntos() {
       setLoading(false);
       setLoadingData(false);
     }
-  };
+  }, [produtos]);
+
+  // Recarregar conjuntos sempre que os produtos mudarem
+  useEffect(() => {
+    if (produtos.length > 0) {
+      fetchConjuntos();
+    }
+  }, [produtos, fetchConjuntos]);
 
   const salvarConjunto = async () => {
     if (!form.nome || form.itens.length === 0 || !form.itens.some(item => item.produto_nome) || form.preco_promocional <= 0) {
@@ -340,7 +341,7 @@ export default function Conjuntos() {
       } else {
         setToast({ type: 'error', message: 'Erro ao excluir conjuntos!' });
       }
-    } catch (error) {
+    } catch {
       setToast({ type: 'error', message: 'Erro ao excluir conjuntos!' });
     } finally {
       setConfirmMultipleDelete({ open: false, ids: [], loading: false });

@@ -1,5 +1,4 @@
 import { FaTrash, FaEdit, FaCheckSquare, FaSquare, FaTrashAlt } from "react-icons/fa";
-import { useState } from "react";
 import MultipleSelectionBar from "./MultipleSelectionBar";
 import { useMultipleSelection } from "../hooks/useMultipleSelection";
 
