@@ -6,6 +6,7 @@ import UserForm from "@/components/UserForm";
 import UserList from "@/components/UserList";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
+import ConfirmMultipleDeleteModal from "@/components/ConfirmMultipleDeleteModal";
 import RefreshButton from "@/components/RefreshButton";
 import SectionTitle from "@/components/SectionTitle";
 
@@ -33,6 +34,11 @@ export default function UserManagement() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
+  const [confirmMultipleDelete, setConfirmMultipleDelete] = useState<{ open: boolean; ids: string[]; loading: boolean }>({ 
+    open: false, 
+    ids: [], 
+    loading: false 
+  });
   const router = useRouter();
 
   const fetchUsers = async () => {
@@ -157,6 +163,10 @@ export default function UserManagement() {
     setConfirmDelete({ open: true, id });
   };
 
+  const handleDeleteMultiple = async (ids: string[]) => {
+    setConfirmMultipleDelete({ open: true, ids, loading: false });
+  };
+
   const confirmDeleteUser = async () => {
     if (!confirmDelete.id) return;
     setLoading(true);
@@ -175,6 +185,44 @@ export default function UserManagement() {
     }
     setToast({ type: 'success', message: "Usuário excluído com sucesso!" });
     fetchUsers();
+  };
+
+  const confirmDeleteMultiple = async () => {
+    setConfirmMultipleDelete(prev => ({ ...prev, loading: true }));
+    
+    try {
+      let sucessos = 0;
+      let erros = 0;
+      
+      for (const id of confirmMultipleDelete.ids) {
+        const res = await fetch("/api/delete-user", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        
+        if (res.ok) {
+          sucessos++;
+        } else {
+          erros++;
+        }
+      }
+
+      if (sucessos > 0) {
+        setToast({ 
+          type: 'success', 
+          message: `${sucessos} usuários excluídos com sucesso!${erros > 0 ? ` (${erros} falharam)` : ''}` 
+        });
+      } else {
+        setToast({ type: 'error', message: 'Erro ao excluir usuários!' });
+      }
+      
+      fetchUsers();
+    } catch (error) {
+      setToast({ type: 'error', message: 'Erro ao excluir usuários!' });
+    } finally {
+      setConfirmMultipleDelete({ open: false, ids: [], loading: false });
+    }
   };
 
   useEffect(() => {
@@ -226,6 +274,14 @@ export default function UserManagement() {
         onCancel={() => setConfirmDelete({ open: false, id: null })}
         message="Tem certeza que deseja excluir este usuário?"
       />
+      <ConfirmMultipleDeleteModal
+        isOpen={confirmMultipleDelete.open}
+        onClose={() => setConfirmMultipleDelete({ open: false, ids: [], loading: false })}
+        onConfirm={confirmDeleteMultiple}
+        itemCount={confirmMultipleDelete.ids.length}
+        itemName="usuários"
+        loading={confirmMultipleDelete.loading}
+      />
       <main className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-white px-2">
         <UserForm form={form} setForm={setForm} onSubmit={handleRegister} loading={loading} />
         {(message && !toast) && (
@@ -247,7 +303,13 @@ export default function UserManagement() {
             />
           </div>
 
-          <UserList users={users} search={search} onEditar={handleEdit} onExcluir={handleDelete} />
+          <UserList 
+            users={users} 
+            search={search} 
+            onEditar={handleEdit} 
+            onExcluir={handleDelete} 
+            onExcluirMultiplos={handleDeleteMultiple}
+          />
           {editingUserId && (
             <div
               className={`mt-4 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-md transition-all duration-300

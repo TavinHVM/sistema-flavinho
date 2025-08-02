@@ -15,6 +15,7 @@ import RefreshButton from "@/components/RefreshButton";
 import PainelAdminButton from "@/components/PainelAdminButton";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
+import ConfirmMultipleDeleteModal from "@/components/ConfirmMultipleDeleteModal";
 import logoBase64 from "@/components/logoBase64";
 
 type Produto = {
@@ -42,6 +43,11 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: string | null }>({ open: false, id: null });
+  const [confirmMultipleDelete, setConfirmMultipleDelete] = useState<{ open: boolean; ids: number[]; loading: boolean }>({ 
+    open: false, 
+    ids: [], 
+    loading: false 
+  });
   const router = useRouter();
   const exportMenuRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
@@ -141,6 +147,35 @@ export default function Home() {
 
   const excluirProduto = async (numero: number) => {
     setConfirmDelete({ open: true, id: numero.toString() });
+  };
+
+  const excluirMultiplosProdutos = async (numeros: number[]) => {
+    setConfirmMultipleDelete({ open: true, ids: numeros, loading: false });
+  };
+
+  const confirmarExclusaoMultipla = async () => {
+    setConfirmMultipleDelete(prev => ({ ...prev, loading: true }));
+    
+    try {
+      const { error } = await supabase
+        .from("produtos")
+        .delete()
+        .in("numero", confirmMultipleDelete.ids);
+
+      if (!error) {
+        setToast({ 
+          type: 'success', 
+          message: `${confirmMultipleDelete.ids.length} produtos excluídos com sucesso!` 
+        });
+        fetchProdutos();
+      } else {
+        setToast({ type: 'error', message: 'Erro ao excluir produtos!' });
+      }
+    } catch (error) {
+      setToast({ type: 'error', message: 'Erro ao excluir produtos!' });
+    } finally {
+      setConfirmMultipleDelete({ open: false, ids: [], loading: false });
+    }
   };
 
   const confirmarExclusaoProduto = async () => {
@@ -338,6 +373,14 @@ export default function Home() {
         onCancel={() => setConfirmDelete({ open: false, id: null })}
         message="Tem certeza que deseja excluir este produto?"
       />
+      <ConfirmMultipleDeleteModal
+        isOpen={confirmMultipleDelete.open}
+        onClose={() => setConfirmMultipleDelete({ open: false, ids: [], loading: false })}
+        onConfirm={confirmarExclusaoMultipla}
+        itemCount={confirmMultipleDelete.ids.length}
+        itemName="produtos"
+        loading={confirmMultipleDelete.loading}
+      />
       <main className="min-h-screen flex flex-col justify-between bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-0 md:mt-0 mb-0 md:mb-0 p-2 sm:p-4 md:p-8 max-w-full md:max-w-4xl mx-auto">
         {isAdmin && (
           <div className="mt-0 mb-14">
@@ -391,6 +434,7 @@ export default function Home() {
               // Fechar modal antes de excluir
               excluirProduto(numero);
             }}
+            onExcluirMultiplos={excluirMultiplosProdutos}
           />
         </section>
         <div className="flex justify-center text-xs text-gray-400 text-center mt-auto">

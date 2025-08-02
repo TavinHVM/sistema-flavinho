@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { FaSortUp, FaSortDown } from "react-icons/fa";
+import { FaSortUp, FaSortDown, FaCheckSquare, FaSquare, FaTrashAlt } from "react-icons/fa";
 import OrderDetailsModal from "./OrderDetailsModal";
+import MultipleSelectionBar from "./MultipleSelectionBar";
 import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
+import { useMultipleSelection } from "../hooks/useMultipleSelection";
 
 interface Material {
   nome: string;
@@ -17,18 +19,33 @@ interface OrderListProps {
   search: string;
   onEditar?: (pedido: Pedido & { materiais: Material[] }) => void;
   onExcluir?: (id: number) => void;
+  onExcluirMultiplos?: (ids: number[]) => void;
   onDevolucao?: (pedido: Pedido, itensDevolvidos: { nome: string; quantidade: number; devolucao_atual: number }[], observacoes: string) => void;
 }
 
 type SortKey = "numero" | "cpf" | "cliente" | "data_locacao" | "data_evento" | "data_devolucao" | "endereco" | "valor_total" | "valor_pago" | "valor_deve" | null;
 type SortOrder = "asc" | "desc" | null;
 
-const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir, onDevolucao }) => {
+const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcluir, onExcluirMultiplos, onDevolucao }) => {
   const [modalPedido, setModalPedido] = useState<Pedido | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const [sortKey, setSortKey] = useState<SortKey>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+
+  // Hook para seleção múltipla
+  const multipleSelection = useMultipleSelection({
+    items: pedidos,
+    getItemId: (pedido) => pedido.numero || 0,
+  });
+
+  const handleDeleteSelected = () => {
+    if (onExcluirMultiplos && multipleSelection.hasSelections) {
+      const selectedIds = multipleSelection.getSelectedItemsData().map(pedido => pedido.numero || 0);
+      onExcluirMultiplos(selectedIds);
+      multipleSelection.exitSelectionMode();
+    }
+  };
 
   const handleSort = (key: SortKey) => {
     if (sortKey !== key) {
@@ -112,15 +129,62 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
   })();
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
-        <thead>
-          <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
-            <th className="p-3 min-w-[60px] cursor-pointer select-none" onClick={() => handleSort("numero")}>
-              <span className="flex items-center">
-                Nº {getSortIcon("numero")}
-              </span>
-            </th>
+    <>
+      <MultipleSelectionBar
+        isVisible={multipleSelection.isSelectionMode}
+        selectedCount={multipleSelection.selectedCount}
+        isAllSelected={multipleSelection.isAllSelected}
+        isPartiallySelected={multipleSelection.isPartiallySelected}
+        onToggleAll={multipleSelection.toggleAll}
+        onDeleteSelected={handleDeleteSelected}
+        onCancel={multipleSelection.exitSelectionMode}
+        itemName="pedidos"
+      />
+      
+      <div className="overflow-x-auto" style={{ marginTop: multipleSelection.isSelectionMode ? '60px' : '0' }}>
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
+            {!multipleSelection.isSelectionMode && onExcluirMultiplos && (
+              <button
+                onClick={multipleSelection.enterSelectionMode}
+                className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded flex items-center gap-2 transition-colors text-sm"
+                title="Ativar modo de seleção múltipla"
+              >
+                <FaTrashAlt />
+                Seleção Múltipla
+              </button>
+            )}
+          </div>
+        </div>
+
+        <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
+          <thead>
+            <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
+              {multipleSelection.isSelectionMode && (
+                <th className="p-3 w-12">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      multipleSelection.toggleAll();
+                    }}
+                    className="text-white hover:text-gray-300 transition-colors"
+                    title={multipleSelection.isAllSelected ? "Desmarcar todos" : "Selecionar todos"}
+                  >
+                    {multipleSelection.isAllSelected ? (
+                      <FaCheckSquare className="text-lg" />
+                    ) : multipleSelection.isPartiallySelected ? (
+                      <FaCheckSquare className="text-lg opacity-50" />
+                    ) : (
+                      <FaSquare className="text-lg" />
+                    )}
+                  </button>
+                </th>
+              )}
+              <th className="p-3 min-w-[60px] cursor-pointer select-none" onClick={() => handleSort("numero")}>
+                <span className="flex items-center">
+                  Nº {getSortIcon("numero")}
+                </span>
+              </th>
             <th className="p-3 min-w-[120px] cursor-pointer select-none" onClick={() => handleSort("cpf")}>
               <span className="flex items-center">
                 CPF/CNPJ {getSortIcon("cpf")}
@@ -170,19 +234,86 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
             <th className="p-3"></th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-800">
+        <tbody className="divide-y divide-gray-800 cursor-pointer">
           {pedidosOrdenados.map((p, idx) => (
             <tr
               key={p.id || p.numero || idx}
-              className="hover:bg-gray-800 transition-colors duration-150 cursor-pointer even:bg-gray-900 odd:bg-gray-950"
-              onClick={() => handleVerMais(p)}
+              className={`hover:bg-gray-800 transition-colors duration-150 even:bg-gray-900 odd:bg-gray-950 ${
+                multipleSelection.isSelectionMode && multipleSelection.isSelected(p) 
+                  ? 'bg-blue-900/30 border-l-4 border-blue-500' 
+                  : ''
+              }`}
+              onClick={!multipleSelection.isSelectionMode ? () => handleVerMais(p) : undefined}
             >
-              <td className="p-3 text-gray-400">{p.numero}</td>
-              <td className="p-3 text-gray-300 font font-semibold">{formatCpfCnpjBR(p.cpf)}</td>
-              <td className="p-3 text-gray-50 font-semibold">{p.cliente}</td>
-              <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_locacao)}</td>
-              <td className="p-3 text-gray-300 font-semibold">{formatDateBR(p.data_evento) || '-'}</td>
-              <td className="p-3 text-gray-300 font-semibold">
+              {multipleSelection.isSelectionMode && (
+                <td className="p-3 w-12">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      multipleSelection.toggleItem(p);
+                    }}
+                    className="text-white hover:text-blue-400 transition-colors"
+                  >
+                    {multipleSelection.isSelected(p) ? (
+                      <FaCheckSquare className="text-lg text-blue-400" />
+                    ) : (
+                      <FaSquare className="text-lg" />
+                    )}
+                  </button>
+                </td>
+              )}
+              <td 
+                className={`p-3 text-gray-400 ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
+                {p.numero}
+              </td>
+              <td 
+                className={`p-3 text-gray-300 font-semibold ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
+                {formatCpfCnpjBR(p.cpf)}
+              </td>
+              <td 
+                className={`p-3 text-gray-50 font-semibold ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
+                {p.cliente}
+              </td>
+              <td 
+                className={`p-3 text-gray-300 font-semibold ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
+                {formatDateBR(p.data_locacao)}
+              </td>
+              <td 
+                className={`p-3 text-gray-300 font-semibold ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
+                {formatDateBR(p.data_evento) || '-'}
+              </td>
+              <td 
+                className={`p-3 text-gray-300 font-semibold ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
                 {(() => {
                   if (!p.data_devolucao) return '-';
 
@@ -206,23 +337,55 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                   }
                 })()}
               </td>
-              <td className="p-3 text-gray-300 font-semibold">{p.endereco || '-'}</td>
-              <td className="p-3 text-gray-300 font-bold">
+              <td 
+                className={`p-3 text-gray-300 font-semibold ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
+                {p.endereco || '-'}
+              </td>
+              <td 
+                className={`p-3 text-gray-300 font-bold ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
                 <span className="font-bold text-emerald-400">
                   {p.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </span>
               </td>
-              <td className="p-3 text-gray-300 font-bold">
+              <td 
+                className={`p-3 text-gray-300 font-bold ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
                 <span className="font-bold text-green-400">
                   {p.valor_pago?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
                 </span>
               </td>
-              <td className="p-3 text-gray-300 font-bold">
+              <td 
+                className={`p-3 text-gray-300 font-bold ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
                 <span className={`font-bold ${(p.valor_deve || 0) > 0 ? 'text-red-400' : 'text-gray-400'}`}>
                   {p.valor_deve?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
                 </span>
               </td>
-              <td className="p-3">
+              <td 
+                className={`p-3 ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
                 {(() => {
                   const totalItens = p.materiais?.reduce((total, item) => total + item.quantidade, 0) || 0;
                   const totalDevolvido = p.materiais?.reduce((total, item) => total + (item.quantidade_devolvida || 0), 0) || 0;
@@ -258,7 +421,14 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                   }
                 })()}
               </td>
-              <td className="p-3"></td>
+              <td className="p-3">
+                {/* No modo de seleção, não mostra botões de ação */}
+                {!multipleSelection.isSelectionMode && (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    {/* Botões de ação aqui se necessário */}
+                  </div>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -269,6 +439,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
         onDevolucao={onDevolucao}
       />
     </div>
+    </>
   );
 };
 

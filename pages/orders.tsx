@@ -9,6 +9,7 @@ import { ConjuntoCompleto } from "../types/Conjunto";
 import PainelAdminButton from "@/components/PainelAdminButton";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
+import ConfirmMultipleDeleteModal from "@/components/ConfirmMultipleDeleteModal";
 import RefreshButton from "@/components/RefreshButton";
 
 type PedidoItemField = keyof PedidoItem;
@@ -76,6 +77,11 @@ export default function Orders() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
+  const [confirmMultipleDelete, setConfirmMultipleDelete] = useState<{ open: boolean; ids: number[]; loading: boolean }>({ 
+    open: false, 
+    ids: [], 
+    loading: false 
+  });
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
@@ -484,6 +490,35 @@ export default function Orders() {
     );
   }
 
+  const excluirMultiplosPedidos = async (ids: number[]) => {
+    setConfirmMultipleDelete({ open: true, ids, loading: false });
+  };
+
+  const confirmarExclusaoMultipla = async () => {
+    setConfirmMultipleDelete(prev => ({ ...prev, loading: true }));
+    
+    try {
+      const { error } = await supabase
+        .from("pedidos")
+        .delete()
+        .in("numero", confirmMultipleDelete.ids);
+
+      if (!error) {
+        setToast({ 
+          type: 'success', 
+          message: `${confirmMultipleDelete.ids.length} pedidos excluídos com sucesso!` 
+        });
+        fetchPedidos();
+      } else {
+        setToast({ type: 'error', message: 'Erro ao excluir pedidos!' });
+      }
+    } catch (error) {
+      setToast({ type: 'error', message: 'Erro ao excluir pedidos!' });
+    } finally {
+      setConfirmMultipleDelete({ open: false, ids: [], loading: false });
+    }
+  };
+
   return (
     <>
       <Header />
@@ -500,6 +535,14 @@ export default function Orders() {
         }}
         onCancel={() => setConfirmDelete({ open: false, id: null })}
         message="Tem certeza que deseja excluir este pedido?"
+      />
+      <ConfirmMultipleDeleteModal
+        isOpen={confirmMultipleDelete.open}
+        onClose={() => setConfirmMultipleDelete({ open: false, ids: [], loading: false })}
+        onConfirm={confirmarExclusaoMultipla}
+        itemCount={confirmMultipleDelete.ids.length}
+        itemName="pedidos"
+        loading={confirmMultipleDelete.loading}
       />
       <main className="p-2 sm:p-4 max-w-full md:max-w-3xl mx-auto bg-[rgb(26,34,49)] text-white rounded-lg shadow-lg mt-4 mb-4">
         <PainelAdminButton />
@@ -611,6 +654,7 @@ export default function Orders() {
             }, 100);
           }}
           onExcluir={(id) => setConfirmDelete({ open: true, id })}
+          onExcluirMultiplos={excluirMultiplosPedidos}
           onDevolucao={processarDevolucao}
         />
       </main>

@@ -10,6 +10,8 @@ import RefreshButton from "@/components/RefreshButton";
 import PainelAdminButton from "@/components/PainelAdminButton";
 import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
+import ConfirmMultipleDeleteModal from "@/components/ConfirmMultipleDeleteModal";
+import { useMultipleSelection } from "@/hooks/useMultipleSelection";
 import { Conjunto, ConjuntoCompleto } from "../types/Conjunto";
 
 type Produto = {
@@ -31,6 +33,11 @@ export default function Conjuntos() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
+  const [confirmMultipleDelete, setConfirmMultipleDelete] = useState<{ open: boolean; ids: number[]; loading: boolean }>({ 
+    open: false, 
+    ids: [], 
+    loading: false 
+  });
   
   // Estados do formulário
   const [form, setForm] = useState<Conjunto>({
@@ -40,6 +47,12 @@ export default function Conjuntos() {
     itens: [{ produto_nome: "", quantidade: 1 }]
   });
   const [editando, setEditando] = useState<number | null>(null);
+
+  // Hook para seleção múltipla
+  const conjuntoSelection = useMultipleSelection<ConjuntoCompleto>({
+    items: conjuntos,
+    getItemId: (conjunto) => conjunto.id || 0
+  });
 
   useEffect(() => {
     const userStr = localStorage.getItem("user");
@@ -300,6 +313,40 @@ export default function Conjuntos() {
     }
   };
 
+  const confirmarExclusaoMultipla = () => {
+    const ids = Array.from(conjuntoSelection.selectedItems) as number[];
+    if (ids.length === 0) return;
+    
+    setConfirmMultipleDelete({ open: true, ids, loading: false });
+  };
+
+  const excluirMultiplosConjuntos = async (ids: number[]) => {
+    setConfirmMultipleDelete(prev => ({ ...prev, loading: true }));
+    
+    try {
+      const { error } = await supabase
+        .from("conjuntos")
+        .delete()
+        .in("id", ids);
+
+      if (!error) {
+        setToast({ 
+          type: 'success', 
+          message: `${ids.length} conjuntos excluídos com sucesso!` 
+        });
+        conjuntoSelection.clearSelection();
+        conjuntoSelection.exitSelectionMode();
+        fetchConjuntos();
+      } else {
+        setToast({ type: 'error', message: 'Erro ao excluir conjuntos!' });
+      }
+    } catch (error) {
+      setToast({ type: 'error', message: 'Erro ao excluir conjuntos!' });
+    } finally {
+      setConfirmMultipleDelete({ open: false, ids: [], loading: false });
+    }
+  };
+
   const toggleAtivoConjunto = async (id: number, ativo: boolean) => {
     try {
       const { error } = await supabase
@@ -333,6 +380,15 @@ export default function Conjuntos() {
         onConfirm={confirmarExclusao}
         onCancel={() => setConfirmDelete({ open: false, id: null })}
         message="Tem certeza que deseja excluir este conjunto? Esta ação não pode ser desfeita."
+      />
+
+      <ConfirmMultipleDeleteModal
+        isOpen={confirmMultipleDelete.open}
+        onClose={() => setConfirmMultipleDelete({ open: false, ids: [], loading: false })}
+        onConfirm={() => excluirMultiplosConjuntos(confirmMultipleDelete.ids)}
+        loading={confirmMultipleDelete.loading}
+        itemCount={confirmMultipleDelete.ids.length}
+        itemName="conjuntos"
       />
       
       <main className="p-2 sm:p-4 max-w-7xl mx-auto">
@@ -378,6 +434,8 @@ export default function Conjuntos() {
               onEditar={editarConjunto}
               onExcluir={excluirConjunto}
               onToggleAtivo={toggleAtivoConjunto}
+              conjuntoSelection={conjuntoSelection}
+              onExcluirMultiplos={confirmarExclusaoMultipla}
             />
             
             {loadingData && (
