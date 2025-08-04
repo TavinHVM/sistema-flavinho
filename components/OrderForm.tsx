@@ -123,7 +123,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
     if (tipoDesconto === 'porcentagem') {
       desconto = Math.round((totalBruto * valorDesconto) / 100); // em centavos
     } else if (tipoDesconto === 'valor') {
-      desconto = reaisParaCentavos(valorDesconto); // converter para centavos
+      desconto = valorDesconto; // já em centavos
     }
 
     return {
@@ -552,14 +552,26 @@ const OrderForm: React.FC<OrderFormProps> = ({
                   </label>
                   <input
                     className="rounded p-2 text-black w-full"
-                    type="number"
-                    step={form.desconto_tipo === 'valor' ? '0.01' : '0.1'}
+                    type={form.desconto_tipo === 'valor' ? 'text' : 'number'}
+                    step={form.desconto_tipo === 'valor' ? undefined : '0.1'}
                     min="0"
                     max={form.desconto_tipo === 'porcentagem' ? '100' : undefined}
                     placeholder={form.desconto_tipo === 'valor' ? '0,00' : '0'}
-                    value={form.desconto_valor || ''}
+                    value={form.desconto_tipo === 'valor' 
+                      ? formatarInputDeCentavos(form.desconto_valor || 0) 
+                      : (form.desconto_valor || '')
+                    }
                     onChange={e => {
-                      const valor = parseFloat(e.target.value) || 0;
+                      let valor = 0;
+                      if (form.desconto_tipo === 'valor') {
+                        // Para desconto em valor, converter de reais para centavos
+                        const raw = e.target.value.replace(/\D/g, "");
+                        valor = parseInt(raw, 10) || 0;
+                      } else {
+                        // Para porcentagem, manter como está
+                        valor = parseFloat(e.target.value) || 0;
+                      }
+                      
                       const calculados = calcularDesconto(totalGeral, form.desconto_tipo, valor);
                       
                       setForm({ 
