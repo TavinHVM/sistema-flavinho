@@ -8,7 +8,6 @@ import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
 import { 
   formatarMoedaDeCentavos, 
   formatarInputDeCentavos, 
-  reaisParaCentavos
 } from "@/lib/currencyUtils";
 
 interface Material {
