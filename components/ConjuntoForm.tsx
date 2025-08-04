@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaPlus, FaTrash, FaEdit, FaSave } from "react-icons/fa";
 import { Conjunto, ConjuntoItem } from "../types/Conjunto";
+import { formatarMoedaDeCentavos } from "../lib/currencyUtils";
 
 interface Produto {
   id: string;
@@ -60,10 +61,7 @@ const ConjuntoForm: React.FC<ConjuntoFormProps> = ({
   };
 
   const formatarMoeda = (centavos: number) => {
-    return (centavos / 100).toLocaleString('pt-BR', { 
-      style: 'currency', 
-      currency: 'BRL' 
-    });
+    return formatarMoedaDeCentavos(centavos);
   };
 
   const precoIndividual = calcularPrecoIndividual();
@@ -119,7 +117,7 @@ const ConjuntoForm: React.FC<ConjuntoFormProps> = ({
           </label>
           <input
             type="text"
-            value={form.preco_promocional ? (form.preco_promocional / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''}
+            value={form.preco_promocional ? formatarMoedaDeCentavos(form.preco_promocional) : ''}
             onChange={(e) => {
               const valor = e.target.value.replace(/\D/g, '');
               setForm({ ...form, preco_promocional: Number(valor) });

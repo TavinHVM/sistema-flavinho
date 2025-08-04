@@ -13,6 +13,7 @@ import logoBase64 from "./logoBase64";
 import qrcodeBase64 from "./qrcodeBase64";
 import { formatTelefoneBR } from "@/lib/formatNumber";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
+import { formatarMoedaDeCentavos } from "../lib/currencyUtils";
 
 const styles = StyleSheet.create({
   page: {
@@ -282,30 +283,30 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 <Text style={{ color: "#374151" }}>{pedido.cliente}</Text>
               </Text>
               <Text style={{ marginBottom: 1, fontSize: dynamicStyles.textSize }}>
-                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>LOCAL: </Text>
+                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>LOCAL DO EVENTO: </Text>
                 <Text style={{ color: "#374151" }}>{pedido.endereco}</Text>
               </Text>
               <Text style={{ marginBottom: 1, fontSize: dynamicStyles.textSize }}>
-                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>RESIDENCIAL: </Text>
+                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>ENDEREÇO RESIDENCIAL: </Text>
                 <Text style={{ color: "#374151" }}>{pedido.residencial}</Text>
               </Text>
             </View>
 
             <View style={{ width: "48%" }}>
               <Text style={{ marginBottom: 1, fontSize: dynamicStyles.textSize }}>
-                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>EVENTO: </Text>
+                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>DATA EVENTO: </Text>
                 <Text style={{ color: "#374151" }}>{formatDateBR(pedido.data_evento)}</Text>
               </Text>
               <Text style={{ marginBottom: 1, fontSize: dynamicStyles.textSize }}>
-                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>DEVOLUÇÃO: </Text>
+                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>DATA DEVOLUÇÃO: </Text>
                 <Text style={{ color: "#374151" }}>{formatDateBR(pedido.data_devolucao)}</Text>
               </Text>
               <Text style={{ marginBottom: 1, fontSize: dynamicStyles.textSize }}>
-                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>CELULAR: </Text>
+                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>NÚMERO DE CELULAR: </Text>
                 <Text style={{ color: "#374151" }}>{formatTelefoneBR(pedido.telefone)}</Text>
               </Text>
               <Text style={{ marginBottom: 1, fontSize: dynamicStyles.textSize }}>
-                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>REFERÊNCIA: </Text>
+                <Text style={{ fontWeight: "bold", color: "#1f2937" }}>PONTO DE REFERÊNCIA: </Text>
                 <Text style={{ color: "#374151" }}>{pedido.referencia}</Text>
               </Text>
             </View>
@@ -343,7 +344,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding },
                 i % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
               ]}>
-                {mat.valor_unit?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                {formatarMoedaDeCentavos(mat.valor_unit || 0)}
               </Text>
               <Text style={[
                 styles.tableCell,
@@ -351,7 +352,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding },
                 i % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
               ]}>
-                {mat.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                {formatarMoedaDeCentavos(mat.valor_total || 0)}
               </Text>
             </View>
           ))}
@@ -362,13 +363,26 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           padding: dynamicStyles.sectionPadding
         }]}>
           <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.titleSize, marginBottom: 1, color: "#1f2937", textAlign: "right" }}>
-            TOTAL GERAL: R$ {pedido.valor_total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            TOTAL BRUTO: {formatarMoedaDeCentavos(pedido.valor_total)}
           </Text>
+          
+          {/* Mostrar desconto se houver */}
+          {pedido.desconto_tipo && pedido.valor_desconto && pedido.valor_desconto > 0 && (
+            <>
+              <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.textSize, marginBottom: 1, color: "#dc2626", textAlign: "right" }}>
+                DESCONTO ({pedido.desconto_tipo === 'porcentagem' ? `${pedido.desconto_valor}%` : 'VALOR FIXO'}): -{formatarMoedaDeCentavos(pedido.valor_desconto)}
+              </Text>
+              <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.titleSize, marginBottom: 1, color: "#059669", textAlign: "right" }}>
+                TOTAL COM DESCONTO: {formatarMoedaDeCentavos(pedido.valor_final || pedido.valor_total)}
+              </Text>
+            </>
+          )}
+          
           <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.textSize, marginBottom: 1, color: "#059669", textAlign: "right" }}>
-            VALOR PAGO: R$ {pedido.valor_pago.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            VALOR PAGO: {formatarMoedaDeCentavos(pedido.valor_pago)}
           </Text>
           <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.textSize, marginBottom: 1, color: "#dc2626", textAlign: "right" }}>
-            VALOR A PAGAR: R$ {pedido.valor_deve.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            VALOR A PAGAR: {formatarMoedaDeCentavos(pedido.valor_deve)}
           </Text>
         </View>
 

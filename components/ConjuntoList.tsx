@@ -3,6 +3,7 @@ import { FaEdit, FaTrash, FaEye, FaSortUp, FaSortDown, FaCheckSquare, FaSquare, 
 import { ConjuntoCompleto } from "../types/Conjunto";
 import MultipleSelectionBar from "./MultipleSelectionBar";
 import { useMultipleSelection } from "../hooks/useMultipleSelection";
+import { formatarMoedaDeCentavos } from "../lib/currencyUtils";
 
 interface ConjuntoListProps {
   conjuntos: ConjuntoCompleto[];
@@ -80,10 +81,7 @@ const ConjuntoList: React.FC<ConjuntoListProps> = ({
   };
 
   const formatarMoeda = (centavos: number) => {
-    return (centavos / 100).toLocaleString('pt-BR', { 
-      style: 'currency', 
-      currency: 'BRL' 
-    });
+    return formatarMoedaDeCentavos(centavos);
   };
 
   // Filtrar conjuntos baseado na busca

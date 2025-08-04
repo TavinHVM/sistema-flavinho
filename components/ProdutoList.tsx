@@ -3,6 +3,7 @@ import { useState } from "react";
 import ProdutoDetailsModal from "./ProdutoDetailsModal";
 import MultipleSelectionBar from "./MultipleSelectionBar";
 import { useMultipleSelection } from "../hooks/useMultipleSelection";
+import { formatarMoedaDeCentavos } from "../lib/currencyUtils";
 
 interface Produto {
   numero: number;
@@ -131,7 +132,7 @@ export default function ProdutoList({
   })();
 
   function formatarMoeda(valor: number) {
-    return (valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return formatarMoedaDeCentavos(valor);
   }
 
   return (
@@ -262,7 +263,7 @@ export default function ProdutoList({
                     multipleSelection.toggleItem(produto);
                   } : undefined}
                 >
-                  <span className="text-slate-400 font-bold">R$ </span>
+                  <span className="text-slate-400 font-bold"></span>
                   <span className="text-emerald-400 font-bold">{formatarMoeda(produto.preco)}</span>
                 </td>
                 <td 

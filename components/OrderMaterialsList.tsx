@@ -1,5 +1,6 @@
 import React from "react";
 import { PedidoItem } from "../types/Pedido";
+import { formatarMoedaDeCentavos } from "../lib/currencyUtils";
 
 interface Props {
   materiais: PedidoItem[];
@@ -39,10 +40,10 @@ const OrderMaterialsList: React.FC<Props> = ({ materiais }) => {
                   </span>
                 </td>
                 <td className="border px-2 py-1 text-right">
-                  {mat.valor_unit?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  {formatarMoedaDeCentavos(mat.valor_unit || 0)}
                 </td>
                 <td className="border px-2 py-1 text-right">
-                  {mat.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  {formatarMoedaDeCentavos(mat.valor_total || 0)}
                 </td>
               </tr>
             );

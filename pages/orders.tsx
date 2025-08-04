@@ -11,6 +11,7 @@ import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
 import ConfirmMultipleDeleteModal from "@/components/ConfirmMultipleDeleteModal";
 import RefreshButton from "@/components/RefreshButton";
+import { reaisParaCentavos } from "@/lib/currencyUtils";
 
 type PedidoItemField = keyof PedidoItem;
 // Função utilitária para converter data pt-BR para ISO (yyyy-mm-dd)
@@ -30,7 +31,7 @@ type ProdutoLocal = {
   nome: string;
   quantidade_empresa: number;
   quantidade_rua: number;
-  preco: number; // Adicionado campo preco
+  preco: number; // em centavos
 };
 
 export default function Orders() {
@@ -50,6 +51,11 @@ export default function Orders() {
     valor_total: 0,
     valor_pago: 0,
     valor_deve: 0,
+    // Campos de desconto
+    desconto_tipo: null,
+    desconto_valor: 0,
+    valor_desconto: 0,
+    valor_final: 0,
     // Campos de responsabilidades
     resp_entregou: "",
     data_entregou: "",
@@ -105,7 +111,7 @@ export default function Orders() {
             nome: String(p.nome ?? ""),
             quantidade_empresa: Number(p.quantidade_empresa ?? 0),
             quantidade_rua: Number(p.quantidade_rua ?? 0),
-            preco: Number(p.preco ?? 0), // Adicionado campo preco
+            preco: Number(p.preco ?? 0), // já vem em centavos do banco
           }))
         );
       }
@@ -134,11 +140,11 @@ export default function Orders() {
             .eq("conjunto_id", conjunto.id);
 
           if (itensData) {
-            // Calcular preços individuais e economia
+            // Calcular preços individuais e economia (todos em centavos)
             let precoTotalIndividual = 0;
             const itensDetalhados = itensData.map((item: { produto_nome: string; quantidade: number }) => {
               const produto = produtos.find(p => p.nome === item.produto_nome);
-              const precoUnitario = produto?.preco || 0;
+              const precoUnitario = produto?.preco || 0; // já em centavos
               const precoTotalItem = precoUnitario * item.quantidade;
               precoTotalIndividual += precoTotalItem;
               
@@ -150,10 +156,12 @@ export default function Orders() {
               };
             });
 
-            const economia = Math.max(0, precoTotalIndividual - conjunto.preco_promocional);
+            const precoPromocionalCentavos = conjunto.preco_promocional; // já vem em centavos do banco
+            const economia = Math.max(0, precoTotalIndividual - precoPromocionalCentavos);
 
             conjuntosCompletos.push({
               ...conjunto,
+              preco_promocional: precoPromocionalCentavos, // manter em centavos
               itens: itensData.map((item: { produto_nome: string; quantidade: number }) => ({
                 produto_nome: item.produto_nome,
                 quantidade: item.quantidade,
@@ -166,6 +174,7 @@ export default function Orders() {
             // Se não há itens, adicionar com valores zerados
             conjuntosCompletos.push({
               ...conjunto,
+              preco_promocional: conjunto.preco_promocional, // já vem em centavos do banco
               itens: [],
               itens_detalhados: [],
               preco_total_individual: 0,
@@ -292,8 +301,24 @@ export default function Orders() {
       }
     }
     
-    // Calcular valor total apenas com itens válidos
-    const valor_total = itensValidos.reduce((acc: number, m: PedidoItem) => acc + (m.valor_total || 0), 0) || "0";
+    // Calcular valor total apenas com itens válidos (já em centavos)
+    const valor_total_bruto = itensValidos.reduce((acc: number, m: PedidoItem) => acc + (m.valor_total || 0), 0) || 0;
+    
+    // Calcular desconto e valor final (manter em centavos)
+    let valor_desconto = 0;
+    let valor_final = valor_total_bruto;
+    
+    if (form.desconto_tipo && form.desconto_valor && form.desconto_valor > 0) {
+      if (form.desconto_tipo === 'porcentagem') {
+        valor_desconto = Math.round((valor_total_bruto * form.desconto_valor) / 100);
+      } else if (form.desconto_tipo === 'valor') {
+        valor_desconto = reaisParaCentavos(form.desconto_valor);
+      }
+      valor_final = Math.max(0, valor_total_bruto - valor_desconto);
+    }
+    
+    // Recalcular valor_deve baseado no valor final
+    const valor_deve_calculado = Math.max(0, valor_final - (form.valor_pago || 0));
     
     // Se for edição (form.numero existe em pedidos), faz update
     const pedidoParaSalvar = {
@@ -307,9 +332,14 @@ export default function Orders() {
       residencial: form.residencial,
       referencia: form.referencia,
       pagamento: form.pagamento,
-      valor_total,
+      valor_total: valor_total_bruto,
       valor_pago: form.valor_pago,
-      valor_deve: form.valor_deve,
+      valor_deve: valor_deve_calculado,
+      // Campos de desconto
+      desconto_tipo: form.desconto_tipo || null,
+      desconto_valor: form.desconto_valor || null,
+      valor_desconto: valor_desconto,
+      valor_final: valor_final,
       materiais: itensValidos, // Usar apenas itens válidos
       created_at: new Date().toISOString(),
       // Campos de responsabilidades
@@ -360,6 +390,11 @@ export default function Orders() {
         valor_total: 0,
         valor_pago: 0,
         valor_deve: 0,
+        // Campos de desconto
+        desconto_tipo: null,
+        desconto_valor: 0,
+        valor_desconto: 0,
+        valor_final: 0,
         // Campos de responsabilidades
         resp_entregou: "",
         data_entregou: "",
@@ -596,6 +631,11 @@ export default function Orders() {
                 data_utensilio: "",
                 hora_utensilio: "",
                 obs: "",
+                // Campos de desconto
+                desconto_tipo: null,
+                desconto_valor: 0,
+                valor_desconto: 0,
+                valor_final: 0,
               });
               setIsEditing(false);
             }}
@@ -646,6 +686,11 @@ export default function Orders() {
               data_utensilio: pedido.data_utensilio || "",
               hora_utensilio: pedido.hora_utensilio || "",
               obs: pedido.obs || "",
+              // Campos de desconto
+              desconto_tipo: pedido.desconto_tipo || null,
+              desconto_valor: pedido.desconto_valor || 0,
+              valor_desconto: pedido.valor_desconto || 0,
+              valor_final: pedido.valor_final || 0,
             });
             setIsEditing(true);
             setTimeout(() => {

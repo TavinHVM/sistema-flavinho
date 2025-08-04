@@ -5,18 +5,26 @@ import SectionTitle from "./SectionTitle";
 import { FaTrash, FaGift } from "react-icons/fa";
 import { formatTelefoneBR } from "@/lib/formatNumber";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
+import { useEffect } from "react";
+import { 
+  formatarMoedaDeCentavos, 
+  formatarInputDeCentavos, 
+  stringNumericaParaCentavos,
+  centavosParaReais,
+  reaisParaCentavos
+} from "@/lib/currencyUtils";
 
 interface Material {
   nome: string;
   quantidade: number;
-  valor_unit: number;
-  valor_total: number;
+  valor_unit: number; // em centavos
+  valor_total: number; // em centavos
 }
 
 interface Produto {
   id: string;
   nome: string;
-  preco?: number;
+  preco?: number; // em centavos
   quantidade_empresa: number;
   quantidade_rua: number;
 }
@@ -53,7 +61,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
 }) => {
   function getPrecoProduto(nome: string): number {
     const prod = produtos.find((p) => p.nome === nome);
-    return prod && prod.preco ? prod.preco : 0;
+    return prod && prod.preco ? prod.preco : 0; // Retorna em centavos
   }
 
   function adicionarConjunto(conjunto: ConjuntoCompleto) {
@@ -64,22 +72,20 @@ const OrderForm: React.FC<OrderFormProps> = ({
     const novosMateriais = [...materiaisLimpos];
     
     conjunto.itens.forEach(item => {
-      const valorUnitarioProporcional = conjunto.preco_promocional / 100 / conjunto.itens.reduce((total, i) => total + i.quantidade, 0);
+      const valorUnitarioProporcional = Math.round(conjunto.preco_promocional / conjunto.itens.reduce((total, i) => total + i.quantidade, 0));
       novosMateriais.push({
         nome: `[CONJUNTO: ${conjunto.nome}] ${item.produto_nome}`,
         quantidade: item.quantidade,
-        valor_unit: valorUnitarioProporcional,
+        valor_unit: valorUnitarioProporcional, // já em centavos
         valor_total: valorUnitarioProporcional * item.quantidade,
-        preco: conjunto.preco_promocional
+        preco: conjunto.preco_promocional // em centavos
       });
     });
 
-    // Se não há itens limpos e só conjuntos, adicionar um item vazio no final para permitir adicionar produtos individuais
-    if (materiaisLimpos.length === 0) {
-      novosMateriais.push({ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 });
-    }
-
-    setForm({ ...form, materiais: novosMateriais });
+      // Se não há itens limpos e só conjuntos, adicionar um item vazio no final para permitir adicionar produtos individuais
+      if (materiaisLimpos.length === 0) {
+        novosMateriais.push({ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 });
+      }    setForm({ ...form, materiais: novosMateriais });
   }
 
   function handleMaterialFieldChange(idx: number, field: string, value: string | number) {
@@ -88,14 +94,14 @@ const OrderForm: React.FC<OrderFormProps> = ({
       materiais[idx].nome = value as string;
       // Verificar se é um item de conjunto (não deve ser alterado diretamente)
       if (!materiais[idx].nome.includes('[CONJUNTO:')) {
-        materiais[idx].valor_unit = getPrecoProduto(value as string) / 100;
+        materiais[idx].valor_unit = getPrecoProduto(value as string); // em centavos
         materiais[idx].valor_total = materiais[idx].quantidade * materiais[idx].valor_unit;
       }
     } else if (field === "quantidade") {
       materiais[idx].quantidade = Number(value);
       // Verificar se é um item de conjunto (não deve ser alterado diretamente)
       if (!materiais[idx].nome.includes('[CONJUNTO:')) {
-        materiais[idx].valor_unit = getPrecoProduto(materiais[idx].nome) / 100;
+        materiais[idx].valor_unit = getPrecoProduto(materiais[idx].nome); // em centavos
         materiais[idx].valor_total = materiais[idx].quantidade * materiais[idx].valor_unit;
       } else {
         // Para itens de conjunto, manter o preço proporcional
@@ -107,15 +113,44 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
   const totalGeral = form.materiais.reduce((acc, mat) => acc + (mat.valor_total || 0), 0);
 
+  // Função para calcular valores de desconto
+  function calcularDesconto(totalBruto: number, tipoDesconto: 'valor' | 'porcentagem' | null | undefined, valorDesconto: number | null | undefined) {
+    if (!tipoDesconto || !valorDesconto || valorDesconto <= 0) {
+      return {
+        valor_desconto: 0,
+        valor_final: totalBruto
+      };
+    }
+
+    let desconto = 0;
+    if (tipoDesconto === 'porcentagem') {
+      desconto = Math.round((totalBruto * valorDesconto) / 100); // em centavos
+    } else if (tipoDesconto === 'valor') {
+      desconto = reaisParaCentavos(valorDesconto); // converter para centavos
+    }
+
+    return {
+      valor_desconto: desconto,
+      valor_final: Math.max(0, totalBruto - desconto)
+    };
+  }
+
+  // Calcular valores atuais baseados no totalGeral (já em centavos)
+  const valoresCalculados = calcularDesconto(totalGeral, form.desconto_tipo, form.desconto_valor);
+  const valorFinalAtual = valoresCalculados.valor_final;
+  const valorDescontoAtual = valoresCalculados.valor_desconto;
+
   function formatarMoeda(valor: number) {
     if (!valor) return "";
-    return (valor / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return formatarMoedaDeCentavos(valor);
   }
 
   return (
     <div className="mt-8 bg-gray-800 rounded-lg p-3 flex flex-col gap-2 w-full" id="order-form-scroll">
       <div className="flex items-center justify-center mb-3">
-        <SectionTitle className="text-2xl">Novo Pedido</SectionTitle>
+        <SectionTitle className="text-2xl">
+          {isEditing ? 'Editar Pedido' : 'Novo Pedido'}
+        </SectionTitle>
       </div>
       {/* Linha 1: Datas */}
       <div className="flex flex-col sm:flex-row gap-2 w-full">
@@ -156,7 +191,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
       {/* Linha 3: Endereço, Telefone, Referência */}
       <div className="flex flex-col sm:flex-row gap-2 w-full">
         <div className="flex-1 min-w-0">
-          <label className="text-xs text-gray-300 font-semibold">Endereço</label>
+          <label className="text-xs text-gray-300 font-semibold">Local do evento</label>
           <input className="rounded p-2 text-black w-full" placeholder="Rua, número, bairro" value={form.endereco} onChange={e => setForm({ ...form, endereco: e.target.value })} />
         </div>
         <div className="flex-1 min-w-0">
@@ -227,7 +262,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
                       <div className="flex justify-between items-start mb-2">
                         <h4 className="text-white font-medium text-sm flex-1 mr-2">{conjunto.nome}</h4>
                         <span className="text-purple-400 font-bold text-sm whitespace-nowrap">
-                          {((conjunto.preco_promocional || 0) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                          {formatarMoedaDeCentavos(conjunto.preco_promocional || 0)}
                         </span>
                       </div>
                       
@@ -244,7 +279,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
                           {conjunto.preco_total_individual && conjunto.preco_total_individual > 0 ? (
                             <>
                               <span className="text-red-400 line-through">
-                                {((conjunto.preco_total_individual) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                {formatarMoedaDeCentavos(conjunto.preco_total_individual)}
                               </span>
                               <span className="text-green-400 font-semibold text-xs">
                                 {(((conjunto.economia || 0) / conjunto.preco_total_individual) * 100).toFixed(1)}% OFF
@@ -423,9 +458,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
                           : 'text-gray-700'
                       }`}>
                         {mat.nome.includes('[CONJUNTO:') 
-                          ? `R$ ${mat.valor_unit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                          ? formatarMoedaDeCentavos(mat.valor_unit)
                           : getPrecoProduto(mat.nome) ? 
-                            `R$ ${(getPrecoProduto(mat.nome) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` 
+                            formatarMoedaDeCentavos(getPrecoProduto(mat.nome)) 
                             : 'R$ 0,00'
                         }
                       </span>
@@ -436,14 +471,14 @@ const OrderForm: React.FC<OrderFormProps> = ({
                   <td className="p-2 sm:p-3 text-center">
                     <div className="bg-green-100 px-2 sm:px-3 py-1 sm:py-2 rounded border border-green-200">
                       <span className="text-green-800 font-bold text-xs sm:text-sm">
-                        R$ {mat.valor_total?.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0,00'}
+                        {formatarMoedaDeCentavos(mat.valor_total || 0)}
                       </span>
                       {/* Mostrar valor unitário em mobile */}
                       <div className="block sm:hidden text-gray-600 text-xs mt-1">
                         {mat.nome.includes('[CONJUNTO:') 
-                          ? `R$ ${mat.valor_unit.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} un.`
+                          ? `${formatarMoedaDeCentavos(mat.valor_unit)} un.`
                           : getPrecoProduto(mat.nome) ? 
-                            `R$ ${(getPrecoProduto(mat.nome) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} un.` 
+                            `${formatarMoedaDeCentavos(getPrecoProduto(mat.nome))} un.` 
                             : 'R$ 0,00 un.'
                         }
                       </div>
@@ -483,10 +518,95 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
         {/* Total Geral */}
         <div className="mt-6 pt-4 border-t border-gray-600">
-          <div className="flex justify-between items-center bg-gray-700/50 p-4 rounded-lg">
-            <span className="text-gray-300 text-lg font-semibold">Total Geral:</span>
+          <div className="flex justify-between items-center bg-gray-700/50 p-4 rounded-lg mb-4">
+            <span className="text-gray-300 text-lg font-semibold">Total Bruto:</span>
+            <span className="text-blue-400 text-2xl font-bold">
+              {formatarMoedaDeCentavos(totalGeral)}
+            </span>
+          </div>
+
+          {/* Seção de Desconto */}
+          <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-600 mb-4">
+            <h3 className="text-gray-300 text-lg font-semibold mb-3">Desconto</h3>
+            
+            {/* Tipo de Desconto */}
+            <div className="flex flex-col sm:flex-row gap-2 mb-3">
+              <div className="flex-1 min-w-0">
+                <label className="text-xs text-gray-300 font-semibold">Tipo de Desconto</label>
+                <select
+                  className="rounded p-2 text-black w-full"
+                  value={form.desconto_tipo || ''}
+                  onChange={e => {
+                    const tipo = e.target.value as 'valor' | 'porcentagem' | '';
+                    setForm({ 
+                      ...form, 
+                      desconto_tipo: tipo || null,
+                      desconto_valor: 0,
+                      valor_desconto: 0,
+                      valor_final: totalGeral
+                    });
+                  }}
+                >
+                  <option value="">Sem desconto</option>
+                  <option value="valor">Valor fixo (R$)</option>
+                  <option value="porcentagem">Porcentagem (%)</option>
+                </select>
+              </div>
+              
+              {form.desconto_tipo && (
+                <div className="flex-1 min-w-0">
+                  <label className="text-xs text-gray-300 font-semibold">
+                    {form.desconto_tipo === 'valor' ? 'Valor do Desconto (R$)' : 'Porcentagem do Desconto (%)'}
+                  </label>
+                  <input
+                    className="rounded p-2 text-black w-full"
+                    type="number"
+                    step={form.desconto_tipo === 'valor' ? '0.01' : '0.1'}
+                    min="0"
+                    max={form.desconto_tipo === 'porcentagem' ? '100' : undefined}
+                    placeholder={form.desconto_tipo === 'valor' ? '0,00' : '0'}
+                    value={form.desconto_valor || ''}
+                    onChange={e => {
+                      const valor = parseFloat(e.target.value) || 0;
+                      const calculados = calcularDesconto(totalGeral, form.desconto_tipo, valor);
+                      
+                      setForm({ 
+                        ...form, 
+                        desconto_valor: valor,
+                        valor_desconto: calculados.valor_desconto,
+                        valor_final: calculados.valor_final,
+                        valor_deve: calculados.valor_final - form.valor_pago
+                      });
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Mostrar valores calculados do desconto */}
+            {form.desconto_tipo && form.desconto_valor && form.desconto_valor > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                <div className="bg-gray-700/50 p-3 rounded-lg">
+                  <span className="text-gray-400 text-xs uppercase tracking-wide block">Desconto Aplicado</span>
+                  <span className="text-red-400 text-lg font-bold">
+                    - {formatarMoedaDeCentavos(valorDescontoAtual)}
+                  </span>
+                </div>
+                <div className="bg-gray-700/50 p-3 rounded-lg">
+                  <span className="text-gray-400 text-xs uppercase tracking-wide block">Valor Final</span>
+                  <span className="text-green-400 text-lg font-bold">
+                    {formatarMoedaDeCentavos(valorFinalAtual)}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Total Final */}
+          <div className="flex justify-between items-center bg-green-900/30 border border-green-600/50 p-4 rounded-lg">
+            <span className="text-gray-300 text-lg font-semibold">Total Final:</span>
             <span className="text-green-400 text-2xl font-bold">
-              R$ {totalGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+              {formatarMoedaDeCentavos(valorFinalAtual)}
             </span>
           </div>
         </div>
@@ -508,13 +628,12 @@ const OrderForm: React.FC<OrderFormProps> = ({
             className="rounded p-2 text-black w-full"
             type="text"
             placeholder="0,00"
-            value={formatarMoeda(form.valor_pago * 100)}
+            value={formatarInputDeCentavos(form.valor_pago)}
             onChange={e => {
               const raw = e.target.value.replace(/\D/g, "");
               const valorPagoEmCentavos = parseInt(raw, 10) || 0;
-              const valorPago = valorPagoEmCentavos / 100;
-              const valorDeve = totalGeral - valorPago;
-              setForm({ ...form, valor_pago: valorPago, valor_deve: valorDeve });
+              const valorDeve = valorFinalAtual - valorPagoEmCentavos;
+              setForm({ ...form, valor_pago: valorPagoEmCentavos, valor_deve: valorDeve });
             }}
           />
         </div>
@@ -524,7 +643,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
             className="rounded p-2 text-gray-500 bg-gray-200 w-full"
             type="text"
             disabled
-            value={`R$ ${form.valor_deve.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+            value={formatarMoedaDeCentavos(form.valor_deve)}
           />
         </div>
       </div>

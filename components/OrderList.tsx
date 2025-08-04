@@ -6,12 +6,13 @@ import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
 import { useMultipleSelection } from "../hooks/useMultipleSelection";
+import { formatarMoedaDeCentavos } from "@/lib/currencyUtils";
 
 interface Material {
   nome: string;
   quantidade: number;
-  valor_unit: number;
-  valor_total: number;
+  valor_unit: number; // em centavos
+  valor_total: number; // em centavos
 }
 
 interface OrderListProps {
@@ -101,6 +102,14 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
       if (sortKey === "valor_total" || sortKey === "valor_pago" || sortKey === "valor_deve") {
         const aNum = typeof aValue === "number" ? aValue : Number(aValue) || 0;
         const bNum = typeof bValue === "number" ? bValue : Number(bValue) || 0;
+        
+        // Para valor_total, considerar valor_final se houver desconto
+        if (sortKey === "valor_total") {
+          const aFinal = a.valor_final && a.valor_final !== a.valor_total ? a.valor_final : aNum;
+          const bFinal = b.valor_final && b.valor_final !== b.valor_total ? b.valor_final : bNum;
+          return sortOrder === "asc" ? aFinal - bFinal : bFinal - aFinal;
+        }
+        
         return sortOrder === "asc" ? aNum - bNum : bNum - aNum;
       }
       // Para datas, comparar como string
@@ -354,7 +363,17 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                 } : undefined}
               >
                 <span className="font-bold text-emerald-400">
-                  {p.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  {/* Mostrar valor final se houver desconto, senão mostrar valor total */}
+                  {p.valor_final && p.valor_final !== p.valor_total 
+                    ? formatarMoedaDeCentavos(p.valor_final)
+                    : formatarMoedaDeCentavos(p.valor_total || 0)
+                  }
+                  {/* Indicador de desconto */}
+                  {p.valor_final && p.valor_final !== p.valor_total && (
+                    <span className="ml-1 text-xs text-yellow-400" title={`Desconto aplicado. Valor bruto: ${formatarMoedaDeCentavos(p.valor_total || 0)}`}>
+                      🏷️
+                    </span>
+                  )}
                 </span>
               </td>
               <td 
@@ -365,7 +384,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                 } : undefined}
               >
                 <span className="font-bold text-green-400">
-                  {p.valor_pago?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
+                  {formatarMoedaDeCentavos(p.valor_pago || 0)}
                 </span>
               </td>
               <td 
@@ -376,7 +395,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                 } : undefined}
               >
                 <span className={`font-bold ${(p.valor_deve || 0) > 0 ? 'text-red-400' : 'text-gray-400'}`}>
-                  {p.valor_deve?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
+                  {formatarMoedaDeCentavos(p.valor_deve || 0)}
                 </span>
               </td>
               <td 

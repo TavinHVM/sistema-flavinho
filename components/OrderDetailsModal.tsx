@@ -10,6 +10,7 @@ import { formatTelefoneBR } from "@/lib/formatNumber";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
 import DevolucaoModal from "./DevolucaoModal";
 import { supabase } from "../lib/supabaseClient";
+import { formatarMoedaDeCentavos } from "../lib/currencyUtils";
 
 interface Props {
   pedido: Pedido | null;
@@ -101,6 +102,11 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
         valor_total: pedidoAtualizado.valor_total || 0,
         valor_pago: pedidoAtualizado.valor_pago || 0,
         valor_deve: pedidoAtualizado.valor_deve || 0,
+        // Campos de desconto
+        desconto_tipo: pedidoAtualizado.desconto_tipo || null,
+        desconto_valor: pedidoAtualizado.desconto_valor || 0,
+        valor_desconto: pedidoAtualizado.valor_desconto || 0,
+        valor_final: pedidoAtualizado.valor_final || 0,
         // Campos de responsabilidades
         resp_entregou: pedidoAtualizado.resp_entregou || "",
         data_entregou: pedidoAtualizado.data_entregou || "",
@@ -247,23 +253,50 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               💰 Valores
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-gray-700/50 p-4 rounded-lg text-center">
-                <span className="text-gray-400 text-xs uppercase tracking-wide block mb-2">Valor Total</span>
+                <span className="text-gray-400 text-xs uppercase tracking-wide block mb-2">Valor Bruto</span>
                 <p className="text-blue-400 font-bold text-xl">
-                  {pedidoAtualizado.valor_total?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  {formatarMoedaDeCentavos(pedidoAtualizado.valor_total || 0)}
                 </p>
               </div>
+              
+              {/* Mostrar desconto se houver */}
+              {pedidoAtualizado.desconto_tipo && pedidoAtualizado.valor_desconto && pedidoAtualizado.valor_desconto > 0 && (
+                <>
+                  <div className="bg-gray-700/50 p-4 rounded-lg text-center">
+                    <span className="text-gray-400 text-xs uppercase tracking-wide block mb-2">
+                      Desconto ({pedidoAtualizado.desconto_tipo === 'porcentagem' 
+                        ? `${pedidoAtualizado.desconto_valor}%` 
+                        : 'Valor Fixo'})
+                    </span>
+                    <p className="text-red-400 font-bold text-xl">
+                      - {formatarMoedaDeCentavos(pedidoAtualizado.valor_desconto || 0)}
+                    </p>
+                  </div>
+                  <div className="bg-gray-700/50 p-4 rounded-lg text-center">
+                    <span className="text-gray-400 text-xs uppercase tracking-wide block mb-2">Valor Final</span>
+                    <p className="text-green-400 font-bold text-xl">
+                      {formatarMoedaDeCentavos(pedidoAtualizado.valor_final || 0)}
+                    </p>
+                  </div>
+                </>
+              )}
+              
               <div className="bg-gray-700/50 p-4 rounded-lg text-center">
                 <span className="text-gray-400 text-xs uppercase tracking-wide block mb-2">Valor Pago</span>
                 <p className="text-green-400 font-bold text-xl">
-                  {pedidoAtualizado.valor_pago?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
+                  {formatarMoedaDeCentavos(pedidoAtualizado.valor_pago || 0)}
                 </p>
               </div>
+            </div>
+            
+            {/* Valor a pagar - linha separada para dar destaque */}
+            <div className="mt-4 pt-4 border-t border-gray-600">
               <div className="bg-gray-700/50 p-4 rounded-lg text-center">
                 <span className="text-gray-400 text-xs uppercase tracking-wide block mb-2">Valor a Pagar</span>
-                <p className={`font-bold text-xl ${(pedidoAtualizado.valor_deve || 0) > 0 ? 'text-red-400' : 'text-gray-400'}`}>
-                  {pedidoAtualizado.valor_deve?.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'R$ 0,00'}
+                <p className={`font-bold text-2xl ${(pedidoAtualizado.valor_deve || 0) > 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                  {formatarMoedaDeCentavos(pedidoAtualizado.valor_deve || 0)}
                 </p>
               </div>
             </div>

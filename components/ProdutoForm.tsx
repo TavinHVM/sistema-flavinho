@@ -1,5 +1,6 @@
 import { FaEdit, FaPlus } from "react-icons/fa";
 import { forwardRef } from "react";
+import { formatarMoedaDeCentavos } from "../lib/currencyUtils";
 
 interface ProdutoFormProps {
   form: { nome: string; quantidade_empresa: string; quantidade_rua: string; preco: string };
@@ -15,7 +16,7 @@ const ProdutoForm = forwardRef<HTMLDivElement, ProdutoFormProps>(
       if (!valor) return "";
       const numero = parseInt(valor, 10);
       if (isNaN(numero)) return "";
-      return (numero / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return formatarMoedaDeCentavos(numero);
     }
 
     return (
