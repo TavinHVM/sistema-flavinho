@@ -5,12 +5,9 @@ import SectionTitle from "./SectionTitle";
 import { FaTrash, FaGift } from "react-icons/fa";
 import { formatTelefoneBR } from "@/lib/formatNumber";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
-import { useEffect } from "react";
 import { 
   formatarMoedaDeCentavos, 
   formatarInputDeCentavos, 
-  stringNumericaParaCentavos,
-  centavosParaReais,
   reaisParaCentavos
 } from "@/lib/currencyUtils";
 
@@ -139,11 +136,6 @@ const OrderForm: React.FC<OrderFormProps> = ({
   const valoresCalculados = calcularDesconto(totalGeral, form.desconto_tipo, form.desconto_valor);
   const valorFinalAtual = valoresCalculados.valor_final;
   const valorDescontoAtual = valoresCalculados.valor_desconto;
-
-  function formatarMoeda(valor: number) {
-    if (!valor) return "";
-    return formatarMoedaDeCentavos(valor);
-  }
 
   return (
     <div className="mt-8 bg-gray-800 rounded-lg p-3 flex flex-col gap-2 w-full" id="order-form-scroll">
