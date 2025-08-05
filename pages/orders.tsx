@@ -11,7 +11,6 @@ import Toast from "@/components/Toast";
 import ConfirmModal from "@/components/ConfirmModal";
 import ConfirmMultipleDeleteModal from "@/components/ConfirmMultipleDeleteModal";
 import RefreshButton from "@/components/RefreshButton";
-import { reaisParaCentavos } from "@/lib/currencyUtils";
 
 type PedidoItemField = keyof PedidoItem;
 // Função utilitária para converter data pt-BR para ISO (yyyy-mm-dd)
