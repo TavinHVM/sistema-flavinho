@@ -9,17 +9,18 @@ interface Props {
 const OrderMaterialsList: React.FC<Props> = ({ materiais }) => {
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full text-xs border border-gray-800">
-        <thead>
-          <tr className="bg-gray-700">
-            <th className="border px-2 py-1">Material</th>
-            <th className="border px-2 py-1">Alugado</th>
-            <th className="border px-2 py-1">Devolvido</th>
-            <th className="border px-2 py-1">Pendente</th>
-            <th className="border px-2 py-1">Valor Unit.</th>
-            <th className="border px-2 py-1">Valor Total</th>
-          </tr>
-        </thead>
+      <div className="max-h-[600px] overflow-y-auto border border-gray-800 rounded-lg">
+        <table className="min-w-full text-xs">
+          <thead className="sticky top-0 z-10">
+            <tr className="bg-gray-700">
+              <th className="border px-2 py-1">Material</th>
+              <th className="border px-2 py-1">Alugado</th>
+              <th className="border px-2 py-1">Devolvido</th>
+              <th className="border px-2 py-1">Pendente</th>
+              <th className="border px-2 py-1">Valor Unit.</th>
+              <th className="border px-2 py-1">Valor Total</th>
+            </tr>
+          </thead>
         <tbody>
           {(materiais || []).map((mat, idx) => {
             const quantidadeDevolvida = mat.quantidade_devolvida || 0;
@@ -50,6 +51,7 @@ const OrderMaterialsList: React.FC<Props> = ({ materiais }) => {
           })}
         </tbody>
       </table>
+      </div>
       
       {/* Legenda */}
       <div className="mt-3 flex flex-wrap gap-4 text-xs">

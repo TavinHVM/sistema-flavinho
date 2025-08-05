@@ -163,9 +163,9 @@ const ConjuntoList: React.FC<ConjuntoListProps> = ({
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="max-h-[600px] overflow-y-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-700 text-gray-200">
+            <thead className="bg-gray-700 text-gray-200 sticky top-0 z-10">
               <tr>
                 {selection.isSelectionMode && (
                   <th className="p-3 w-12">

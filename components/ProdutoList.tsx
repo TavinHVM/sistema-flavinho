@@ -164,49 +164,50 @@ export default function ProdutoList({
           </div>
         </div>
 
-        <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
-          <thead>
-            <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
-              {multipleSelection.isSelectionMode && (
-                <th className="p-3 w-12">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      multipleSelection.toggleAll();
-                    }}
-                    className="text-white hover:text-gray-300 transition-colors"
-                    title={multipleSelection.isAllSelected ? "Desmarcar todos" : "Selecionar todos"}
-                  >
-                    {multipleSelection.isAllSelected ? (
-                      <FaCheckSquare className="text-lg" />
-                    ) : multipleSelection.isPartiallySelected ? (
-                      <FaCheckSquare className="text-lg opacity-50" />
-                    ) : (
-                      <FaSquare className="text-lg" />
-                    )}
-                  </button>
+        <div className="max-h-[600px] overflow-y-auto bg-gray-900 rounded-lg">
+          <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
+                {multipleSelection.isSelectionMode && (
+                  <th className="p-3 w-12">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        multipleSelection.toggleAll();
+                      }}
+                      className="text-white hover:text-gray-300 transition-colors"
+                      title={multipleSelection.isAllSelected ? "Desmarcar todos" : "Selecionar todos"}
+                    >
+                      {multipleSelection.isAllSelected ? (
+                        <FaCheckSquare className="text-lg" />
+                      ) : multipleSelection.isPartiallySelected ? (
+                        <FaCheckSquare className="text-lg opacity-50" />
+                      ) : (
+                        <FaSquare className="text-lg" />
+                      )}
+                    </button>
+                  </th>
+                )}
+                <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("numero")}>
+                  N° {getSortIcon("numero")}
                 </th>
-              )}
-              <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("numero")}>
-                N° {getSortIcon("numero")}
-              </th>
-              <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("nome")}>
-                Nome {getSortIcon("nome")}
-              </th>
-              <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("preco")}>
-                Preço {getSortIcon("preco")}
-              </th>
-              <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("quantidade_empresa")}>
-                Na empresa {getSortIcon("quantidade_empresa")}
-              </th>
-              <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("quantidade_rua")}>
-                Em rota de entrega {getSortIcon("quantidade_rua")}
-              </th>
-              <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("total")}>
-                Total {getSortIcon("total")}
-              </th>
-            </tr>
-          </thead>
+                <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("nome")}>
+                  Nome {getSortIcon("nome")}
+                </th>
+                <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("preco")}>
+                  Preço {getSortIcon("preco")}
+                </th>
+                <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("quantidade_empresa")}>
+                  Na empresa {getSortIcon("quantidade_empresa")}
+                </th>
+                <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("quantidade_rua")}>
+                  Em rota de entrega {getSortIcon("quantidade_rua")}
+                </th>
+                <th className="p-3 cursor-pointer select-none" onClick={() => handleSort("total")}>
+                  Total {getSortIcon("total")}
+                </th>
+              </tr>
+            </thead>
           <tbody className="divide-y divide-gray-800">
             {sortedProdutos.map((produto) => (
               <tr
@@ -296,9 +297,10 @@ export default function ProdutoList({
               </tr>
             ))}
           </tbody>
-      </table>
-      <ProdutoDetailsModal produto={modalProduto} open={modalOpen} onClose={handleCloseModal} onEditar={onEditar} onExcluir={onExcluir} />
-    </div>
+        </table>
+        </div>
+        <ProdutoDetailsModal produto={modalProduto} open={modalOpen} onClose={handleCloseModal} onEditar={onEditar} onExcluir={onExcluir} />
+      </div>
     </>
   );
 }

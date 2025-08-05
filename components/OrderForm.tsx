@@ -313,17 +313,18 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
       {/* Container responsivo para a tabela */}
       <div className="bg-gray-700/30 rounded-xl p-2 sm:p-4 border border-gray-600">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[320px] sm:min-w-[600px] text-xs sm:text-sm">
-            <thead>
-              <tr className="bg-gray-700 text-gray-200 border-b border-gray-600">
-                <th className="p-2 sm:p-3 text-left rounded-tl-lg font-semibold w-16 sm:w-20">Qtd.</th>
-                <th className="p-2 sm:p-3 text-left font-semibold min-w-[120px] sm:min-w-[200px]">Item</th>
-                <th className="p-2 sm:p-3 text-center font-semibold w-20 sm:w-32 hidden sm:table-cell">Valor Unit.</th>
-                <th className="p-2 sm:p-3 text-center font-semibold w-24 sm:w-32">Total</th>
-                <th className="p-2 sm:p-3 text-center rounded-tr-lg font-semibold w-16 sm:w-20">Ações</th>
-              </tr>
-            </thead>
+        <div className="max-h-[600px] overflow-y-auto">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[320px] sm:min-w-[600px] text-xs sm:text-sm">
+              <thead className="sticky top-0 z-10">
+                <tr className="bg-gray-700 text-gray-200 border-b border-gray-600">
+                  <th className="p-2 sm:p-3 text-left rounded-tl-lg font-semibold w-16 sm:w-20">Qtd.</th>
+                  <th className="p-2 sm:p-3 text-left font-semibold min-w-[120px] sm:min-w-[200px]">Item</th>
+                  <th className="p-2 sm:p-3 text-center font-semibold w-20 sm:w-32 hidden sm:table-cell">Valor Unit.</th>
+                  <th className="p-2 sm:p-3 text-center font-semibold w-24 sm:w-32">Total</th>
+                  <th className="p-2 sm:p-3 text-center rounded-tr-lg font-semibold w-16 sm:w-20">Ações</th>
+                </tr>
+              </thead>
             <tbody className="bg-gray-800/50">
               {form.materiais.map((mat: Material, idx: number) => (
                 <tr key={mat.nome + '-' + idx} className="border-b border-gray-600/50 hover:bg-gray-700/30 transition-colors">
@@ -505,6 +506,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
         {/* Botão Adicionar Item */}

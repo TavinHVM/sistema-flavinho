@@ -67,35 +67,36 @@ export default function UserList({ users, search, onEditar, onExcluir, onExcluir
           </div>
         </div>
 
-        <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
-          <thead>
-            <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
-              {multipleSelection.isSelectionMode && (
-                <th className="p-3 w-12">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      multipleSelection.toggleAll();
-                    }}
-                    className="text-white hover:text-gray-300 transition-colors"
-                    title={multipleSelection.isAllSelected ? "Desmarcar todos" : "Selecionar todos"}
-                  >
-                    {multipleSelection.isAllSelected ? (
-                      <FaCheckSquare className="text-lg" />
-                    ) : multipleSelection.isPartiallySelected ? (
-                      <FaCheckSquare className="text-lg opacity-50" />
-                    ) : (
-                      <FaSquare className="text-lg" />
-                    )}
-                  </button>
-                </th>
-              )}
-              <th className="p-3">Nome</th>
-              <th className="p-3">Email</th>
-              <th className="p-3">Cargo</th>
-              {!multipleSelection.isSelectionMode && <th className="p-3">Ações</th>}
-            </tr>
-          </thead>
+        <div className="max-h-[600px] overflow-y-auto bg-gray-900 rounded-lg">
+          <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
+                {multipleSelection.isSelectionMode && (
+                  <th className="p-3 w-12">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        multipleSelection.toggleAll();
+                      }}
+                      className="text-white hover:text-gray-300 transition-colors"
+                      title={multipleSelection.isAllSelected ? "Desmarcar todos" : "Selecionar todos"}
+                    >
+                      {multipleSelection.isAllSelected ? (
+                        <FaCheckSquare className="text-lg" />
+                      ) : multipleSelection.isPartiallySelected ? (
+                        <FaCheckSquare className="text-lg opacity-50" />
+                      ) : (
+                        <FaSquare className="text-lg" />
+                      )}
+                    </button>
+                  </th>
+                )}
+                <th className="p-3">Nome</th>
+                <th className="p-3">Email</th>
+                <th className="p-3">Cargo</th>
+                {!multipleSelection.isSelectionMode && <th className="p-3">Ações</th>}
+              </tr>
+            </thead>
           <tbody className="divide-y divide-gray-800">
             {filtered.map((user) => (
               <tr
@@ -178,6 +179,7 @@ export default function UserList({ users, search, onEditar, onExcluir, onExcluir
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </>
   );

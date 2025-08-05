@@ -269,18 +269,19 @@ const RelatoriosDevolucao: React.FC = () => {
 
       {/* Tabela de Devoluções */}
       <div className="overflow-x-auto">
-        <table className="w-full text-sm text-left">
-          <thead className="bg-gray-700 text-gray-300">
-            <tr>
-              <th className="px-4 py-3">Data/Hora</th>
-              <th className="px-4 py-3">Pedido</th>
-              <th className="px-4 py-3">Cliente</th>
-              <th className="px-4 py-3">Produto</th>
-              <th className="px-4 py-3">Qtd</th>
-              <th className="px-4 py-3">Responsável</th>
-              <th className="px-4 py-3">Observações</th>
-            </tr>
-          </thead>
+        <div className="max-h-[600px] overflow-y-auto bg-gray-800 rounded-lg">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-gray-700 text-gray-300 sticky top-0 z-10">
+              <tr>
+                <th className="px-4 py-3">Data/Hora</th>
+                <th className="px-4 py-3">Pedido</th>
+                <th className="px-4 py-3">Cliente</th>
+                <th className="px-4 py-3">Produto</th>
+                <th className="px-4 py-3">Qtd</th>
+                <th className="px-4 py-3">Responsável</th>
+                <th className="px-4 py-3">Observações</th>
+              </tr>
+            </thead>
           <tbody className="divide-y divide-gray-700">
             {devolucoesFiltradas.length === 0 ? (
               <tr>
@@ -324,6 +325,7 @@ const RelatoriosDevolucao: React.FC = () => {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

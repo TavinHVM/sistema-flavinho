@@ -166,38 +166,40 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
           </div>
         </div>
 
-        <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
-          <thead>
-            <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
-              {multipleSelection.isSelectionMode && (
-                <th className="p-3 w-12">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      multipleSelection.toggleAll();
-                    }}
-                    className="text-white hover:text-gray-300 transition-colors"
-                    title={multipleSelection.isAllSelected ? "Desmarcar todos" : "Selecionar todos"}
-                  >
-                    {multipleSelection.isAllSelected ? (
-                      <FaCheckSquare className="text-lg" />
-                    ) : multipleSelection.isPartiallySelected ? (
-                      <FaCheckSquare className="text-lg opacity-50" />
-                    ) : (
-                      <FaSquare className="text-lg" />
-                    )}
-                  </button>
+        {/* Container com altura limitada e scroll */}
+        <div className="max-h-[600px] overflow-y-auto border border-gray-700 rounded-lg scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+          <table className="w-full text-sm bg-gray-900 rounded-lg overflow-hidden">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-gray-700 text-left text-white uppercase text-xs tracking-wider">
+                {multipleSelection.isSelectionMode && (
+                  <th className="p-3 w-12">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        multipleSelection.toggleAll();
+                      }}
+                      className="text-white hover:text-gray-300 transition-colors"
+                      title={multipleSelection.isAllSelected ? "Desmarcar todos" : "Selecionar todos"}
+                    >
+                      {multipleSelection.isAllSelected ? (
+                        <FaCheckSquare className="text-lg" />
+                      ) : multipleSelection.isPartiallySelected ? (
+                        <FaCheckSquare className="text-lg opacity-50" />
+                      ) : (
+                        <FaSquare className="text-lg" />
+                      )}
+                    </button>
+                  </th>
+                )}
+                <th className="p-3 min-w-[60px] cursor-pointer select-none" onClick={() => handleSort("numero")}>
+                  <span className="flex items-center">
+                    Nº {getSortIcon("numero")}
+                  </span>
                 </th>
-              )}
-              <th className="p-3 min-w-[60px] cursor-pointer select-none" onClick={() => handleSort("numero")}>
+              <th className="p-3 min-w-[120px] cursor-pointer select-none" onClick={() => handleSort("cpf")}>
                 <span className="flex items-center">
-                  Nº {getSortIcon("numero")}
+                  CPF/CNPJ {getSortIcon("cpf")}
                 </span>
-              </th>
-            <th className="p-3 min-w-[120px] cursor-pointer select-none" onClick={() => handleSort("cpf")}>
-              <span className="flex items-center">
-                CPF/CNPJ {getSortIcon("cpf")}
-              </span>
             </th>
             <th className="p-3 min-w-[140px] cursor-pointer select-none" onClick={() => handleSort("cliente")}>
               <span className="flex items-center">
@@ -456,6 +458,7 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
           ))}
         </tbody>
       </table>
+      </div>
       <OrderDetailsModal pedido={modalPedido} open={modalOpen} onClose={handleCloseModal}
         onEditar={onEditar}
         onExcluir={onExcluir}

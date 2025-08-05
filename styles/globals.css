@@ -25,3 +25,22 @@ body {
 body, html, #__next {
   /* Removido overflow e height global para permitir scroll nas páginas que precisam */
 }
+
+/* Estilos customizados para scrollbars das tabelas */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: rgb(55, 65, 81);
+  border-radius: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: rgb(107, 114, 128);
+  border-radius: 8px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: rgb(156, 163, 175);
+}
