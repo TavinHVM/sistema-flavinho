@@ -239,8 +239,10 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                 Devido {getSortIcon("valor_deve")}
               </span>
             </th>
-            <th className="p-3 min-w-[100px]">Status Devolução</th>
-            <th className="p-3"></th>
+            <th className="p-3 min-w-[140px] text-center">
+              <span className="whitespace-nowrap">Status Devolução</span>
+            </th>
+            <th className="p-3 min-w-[60px]"></th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-800 cursor-pointer">
@@ -399,46 +401,48 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                 </span>
               </td>
               <td 
-                className={`p-3 ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                className={`p-3 text-center ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
                 onClick={multipleSelection.isSelectionMode ? (e) => {
                   e.stopPropagation();
                   multipleSelection.toggleItem(p);
                 } : undefined}
               >
-                {(() => {
-                  const totalItens = p.materiais?.reduce((total, item) => total + item.quantidade, 0) || 0;
-                  const totalDevolvido = p.materiais?.reduce((total, item) => total + (item.quantidade_devolvida || 0), 0) || 0;
-                  const pendente = totalItens - totalDevolvido;
+                <div className="flex justify-center">
+                  {(() => {
+                    const totalItens = p.materiais?.reduce((total, item) => total + item.quantidade, 0) || 0;
+                    const totalDevolvido = p.materiais?.reduce((total, item) => total + (item.quantidade_devolvida || 0), 0) || 0;
+                    const pendente = totalItens - totalDevolvido;
 
-                  // Verificar se está próximo da data de devolução
-                  const hoje = new Date();
-                  const dataDevolucao = p.data_devolucao ? new Date(p.data_devolucao) : null;
-                  const diasParaDevolucao = dataDevolucao ? Math.ceil((dataDevolucao.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24)) : null;
+                    // Verificar se está próximo da data de devolução
+                    const hoje = new Date();
+                    const dataDevolucao = p.data_devolucao ? new Date(p.data_devolucao) : null;
+                    const diasParaDevolucao = dataDevolucao ? Math.ceil((dataDevolucao.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24)) : null;
 
-                  if (totalItens === 0) {
-                    return <span className="text-gray-400 text-xs">Sem itens</span>;
-                  } else if (pendente === 0) {
-                    return (
-                      <span className="bg-green-900/30 text-green-400 px-2 py-1 rounded-full text-xs font-medium border border-green-600/30">
-                        ✓ Devolvido
-                      </span>
-                    );
-                  } else if (totalDevolvido > 0) {
-                    const urgencia = diasParaDevolucao !== null && diasParaDevolucao <= 0 ? ' 🔴' : diasParaDevolucao !== null && diasParaDevolucao <= 2 ? ' ⚠️' : '';
-                    return (
-                      <span className="bg-yellow-900/30 text-yellow-400 px-2 py-1 rounded-full text-xs font-medium border border-yellow-600/30">
-                        ⚠ Parcial ({pendente} pendente){urgencia}
-                      </span>
-                    );
-                  } else {
-                    const urgencia = diasParaDevolucao !== null && diasParaDevolucao <= 0 ? ' 🔴' : diasParaDevolucao !== null && diasParaDevolucao <= 2 ? ' ⚠️' : '';
-                    return (
-                      <span className="bg-red-900/30 text-red-400 px-2 py-1 rounded-full text-xs font-medium border border-red-600/30">
-                        ⏳ Pendente ({pendente} itens){urgencia}
-                      </span>
-                    );
-                  }
-                })()}
+                    if (totalItens === 0) {
+                      return <span className="text-gray-400 text-xs whitespace-nowrap">Sem itens</span>;
+                    } else if (pendente === 0) {
+                      return (
+                        <span className="bg-green-900/30 text-green-400 px-2 py-1 rounded-full text-xs font-medium border border-green-600/30 whitespace-nowrap">
+                          ✓ Devolvido
+                        </span>
+                      );
+                    } else if (totalDevolvido > 0) {
+                      const urgencia = diasParaDevolucao !== null && diasParaDevolucao <= 0 ? ' 🔴' : diasParaDevolucao !== null && diasParaDevolucao <= 2 ? ' ⚠️' : '';
+                      return (
+                        <span className="bg-yellow-900/30 text-yellow-400 px-2 py-1 rounded-full text-xs font-medium border border-yellow-600/30 whitespace-nowrap">
+                          ⚠ Parcial ({pendente}){urgencia}
+                        </span>
+                      );
+                    } else {
+                      const urgencia = diasParaDevolucao !== null && diasParaDevolucao <= 0 ? ' 🔴' : diasParaDevolucao !== null && diasParaDevolucao <= 2 ? ' ⚠️' : '';
+                      return (
+                        <span className="bg-red-900/30 text-red-400 px-2 py-1 rounded-full text-xs font-medium border border-red-600/30 whitespace-nowrap">
+                          ⏳ Pendente ({pendente}){urgencia}
+                        </span>
+                      );
+                    }
+                  })()}
+                </div>
               </td>
               <td className="p-3">
                 {/* No modo de seleção, não mostra botões de ação */}

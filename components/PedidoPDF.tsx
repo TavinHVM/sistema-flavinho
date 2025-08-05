@@ -362,28 +362,167 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           marginTop: dynamicStyles.sectionMargin,
           padding: dynamicStyles.sectionPadding
         }]}>
-          <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.titleSize, marginBottom: 1, color: "#1f2937", textAlign: "right" }}>
-            TOTAL BRUTO: {formatarMoedaDeCentavos(pedido.valor_total)}
+          <Text style={{ 
+            fontWeight: "bold", 
+            fontSize: dynamicStyles.titleSize + 1, 
+            marginBottom: 4, 
+            color: "#1f2937", 
+            textAlign: "center",
+            textTransform: "uppercase",
+            letterSpacing: 0.5
+          }}>
+            RESUMO FINANCEIRO
           </Text>
           
-          {/* Mostrar desconto se houver */}
-          {pedido.desconto_tipo && pedido.valor_desconto && pedido.valor_desconto > 0 && (
-            <>
-              <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.textSize, marginBottom: 1, color: "#dc2626", textAlign: "right" }}>
-                DESCONTO ({pedido.desconto_tipo === 'porcentagem' ? `${pedido.desconto_valor}%` : 'VALOR FIXO'}): -{formatarMoedaDeCentavos(pedido.valor_desconto)}
+          <View style={{
+            borderWidth: 1,
+            borderColor: "#22c55e",
+            backgroundColor: "#ffffff",
+            padding: dynamicStyles.sectionPadding + 1,
+            borderRadius: 4
+          }}>
+            {/* Valor Bruto */}
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingVertical: 2,
+              borderBottomWidth: 0.5,
+              borderBottomColor: "#e5e7eb",
+              marginBottom: 2
+            }}>
+              <Text style={{ 
+                fontSize: dynamicStyles.textSize + 1, 
+                fontWeight: "bold",
+                color: "#374151" 
+              }}>
+                TOTAL BRUTO:
               </Text>
-              <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.titleSize, marginBottom: 1, color: "#059669", textAlign: "right" }}>
-                TOTAL COM DESCONTO: {formatarMoedaDeCentavos(pedido.valor_final || pedido.valor_total)}
+              <Text style={{ 
+                fontSize: dynamicStyles.titleSize, 
+                fontWeight: "bold",
+                color: "#1f2937" 
+              }}>
+                {formatarMoedaDeCentavos(pedido.valor_total)}
               </Text>
-            </>
-          )}
-          
-          <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.textSize, marginBottom: 1, color: "#059669", textAlign: "right" }}>
-            VALOR PAGO: {formatarMoedaDeCentavos(pedido.valor_pago)}
-          </Text>
-          <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.textSize, marginBottom: 1, color: "#dc2626", textAlign: "right" }}>
-            VALOR A PAGAR: {formatarMoedaDeCentavos(pedido.valor_deve)}
-          </Text>
+            </View>
+            
+            {/* Mostrar desconto se houver */}
+            {pedido.desconto_tipo && pedido.valor_desconto && pedido.valor_desconto > 0 && (
+              <>
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingVertical: 2,
+                  borderBottomWidth: 0.5,
+                  borderBottomColor: "#e5e7eb",
+                  marginBottom: 2,
+                  backgroundColor: "#fef2f2",
+                  paddingHorizontal: 3,
+                  marginHorizontal: -3
+                }}>
+                  <Text style={{ 
+                    fontSize: dynamicStyles.textSize + 1, 
+                    fontWeight: "bold",
+                    color: "#dc2626" 
+                  }}>
+                    DESCONTO ({pedido.desconto_tipo === 'porcentagem' ? `${pedido.desconto_valor}%` : 'VALOR FIXO'}):
+                  </Text>
+                  <Text style={{ 
+                    fontSize: dynamicStyles.titleSize, 
+                    fontWeight: "bold",
+                    color: "#dc2626" 
+                  }}>
+                    -{formatarMoedaDeCentavos(pedido.valor_desconto)}
+                  </Text>
+                </View>
+                
+                <View style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingVertical: 2,
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#22c55e",
+                  marginBottom: 3,
+                  backgroundColor: "#f0fdf4",
+                  paddingHorizontal: 3,
+                  marginHorizontal: -3
+                }}>
+                  <Text style={{ 
+                    fontSize: dynamicStyles.textSize + 1, 
+                    fontWeight: "bold",
+                    color: "#059669" 
+                  }}>
+                    TOTAL COM DESCONTO:
+                  </Text>
+                  <Text style={{ 
+                    fontSize: dynamicStyles.titleSize + 1, 
+                    fontWeight: "bold",
+                    color: "#059669" 
+                  }}>
+                    {formatarMoedaDeCentavos(pedido.valor_final || pedido.valor_total)}
+                  </Text>
+                </View>
+              </>
+            )}
+            
+            {/* Valor Pago */}
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingVertical: 2,
+              marginBottom: 2
+            }}>
+              <Text style={{ 
+                fontSize: dynamicStyles.textSize + 1, 
+                fontWeight: "bold",
+                color: "#374151" 
+              }}>
+                VALOR PAGO:
+              </Text>
+              <Text style={{ 
+                fontSize: dynamicStyles.titleSize, 
+                fontWeight: "bold",
+                color: "#059669" 
+              }}>
+                {formatarMoedaDeCentavos(pedido.valor_pago)}
+              </Text>
+            </View>
+            
+            {/* Valor a Pagar - Destaque especial */}
+            <View style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingVertical: 4,
+              backgroundColor: (pedido.valor_deve || 0) > 0 ? "#fef2f2" : "#f0fdf4",
+              marginHorizontal: -3,
+              paddingHorizontal: 3,
+              borderWidth: 1,
+              borderColor: (pedido.valor_deve || 0) > 0 ? "#dc2626" : "#22c55e",
+              borderRadius: 2
+            }}>
+              <Text style={{ 
+                fontSize: dynamicStyles.titleSize, 
+                fontWeight: "bold",
+                color: "#1f2937",
+                textTransform: "uppercase",
+                letterSpacing: 0.5
+              }}>
+                VALOR A PAGAR:
+              </Text>
+              <Text style={{ 
+                fontSize: dynamicStyles.titleSize + 2, 
+                fontWeight: "bold",
+                color: (pedido.valor_deve || 0) > 0 ? "#dc2626" : "#059669"
+              }}>
+                {formatarMoedaDeCentavos(pedido.valor_deve)}
+              </Text>
+            </View>
+          </View>
         </View>
 
         {/* RESPONSABILIDADES - Layout dinâmico */}
@@ -396,20 +535,20 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           {dynamicStyles.compactResponsabilities ? (
             // Layout compacto para tabelas longas
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 1 }}>
-              <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold" }}>
-                ENTREGOU: {pedido.resp_entregou || "___________"} - {pedido.data_entregou ? formatDateBR(pedido.data_entregou) : "__/__"} - {pedido.hora_entregou || "__:__"}
+              <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold", color: "#1f2937" }}>
+                RESP. ENTREGOU: {pedido.resp_entregou || "___________"} - DATA: {pedido.data_entregou ? formatDateBR(pedido.data_entregou) : "___/___/___"} - HORA: {pedido.hora_entregou || "___:___"}
               </Text>
-              <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold" }}>
-                RECEBEU: {pedido.resp_recebeu || "___________"} - {pedido.data_recebeu ? formatDateBR(pedido.data_recebeu) : "__/__"} - {pedido.hora_recebeu || "__:__"}
+              <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold", color: "#1f2937" }}>
+                RESP. RECEBEU: {pedido.resp_recebeu || "___________"} - DATA: {pedido.data_recebeu ? formatDateBR(pedido.data_recebeu) : "___/___/___"} - HORA: {pedido.hora_recebeu || "___:___"}
               </Text>
-              <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold" }}>
-                BUSCOU: {pedido.resp_buscou || "___________"} - {pedido.data_buscou ? formatDateBR(pedido.data_buscou) : "__/__"} - {pedido.hora_buscou || "__:__"}
+              <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold", color: "#1f2937" }}>
+                RESP. BUSCOU: {pedido.resp_buscou || "___________"} - DATA: {pedido.data_buscou ? formatDateBR(pedido.data_buscou) : "___/___/___"} - HORA: {pedido.hora_buscou || "___:___"}
               </Text>
-              <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold" }}>
-                CONF. FORRO: {pedido.resp_forro || "_______"} - {pedido.data_forro ? formatDateBR(pedido.data_forro) : "__/__"} - {pedido.hora_forro || "__:__"}
+              <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold", color: "#1f2937" }}>
+                CONF. FORRO: {pedido.resp_forro || "_______"} - DATA: {pedido.data_forro ? formatDateBR(pedido.data_forro) : "___/___/___"} - HORA: {pedido.hora_forro || "___:___"}
               </Text>
-              <Text style={{ fontSize: dynamicStyles.textSize, width: "98%", fontWeight: "bold" }}>
-                CONF. UTENSÍLIO: {pedido.resp_utensilio || "___________"} - {pedido.data_utensilio ? formatDateBR(pedido.data_utensilio) : "__/__"} - {pedido.hora_utensilio || "__:__"}
+              <Text style={{ fontSize: dynamicStyles.textSize, width: "98%", fontWeight: "bold", color: "#1f2937" }}>
+                CONF. UTENSÍLIO: {pedido.resp_utensilio || "___________"} - DATA: {pedido.data_utensilio ? formatDateBR(pedido.data_utensilio) : "___/___/___"} - HORA: {pedido.hora_utensilio || "___:___"}
               </Text>
             </View>
           ) : (
@@ -422,11 +561,11 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 <Text style={{ fontSize: dynamicStyles.textSize, width: "35%", color: "#1f2937" }}>
                   {pedido.resp_entregou || "____________________"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#6b7280" }}>
-                  {pedido.data_entregou ? formatDateBR(pedido.data_entregou) : "___/___"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#374151", fontWeight: "bold" }}>
+                  DATA: {pedido.data_entregou ? formatDateBR(pedido.data_entregou) : "___/___/___"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#6b7280" }}>
-                  {pedido.hora_entregou || "__:__"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#374151", fontWeight: "bold" }}>
+                  HORA: {pedido.hora_entregou || "___:___"}
                 </Text>
               </View>
 
@@ -437,11 +576,11 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 <Text style={{ fontSize: dynamicStyles.textSize, width: "35%", color: "#1f2937" }}>
                   {pedido.resp_recebeu || "____________________"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#6b7280" }}>
-                  {pedido.data_recebeu ? formatDateBR(pedido.data_recebeu) : "___/___"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#374151", fontWeight: "bold" }}>
+                  DATA: {pedido.data_recebeu ? formatDateBR(pedido.data_recebeu) : "___/___/___"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#6b7280" }}>
-                  {pedido.hora_recebeu || "__:__"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#374151", fontWeight: "bold" }}>
+                  HORA: {pedido.hora_recebeu || "___:___"}
                 </Text>
               </View>
 
@@ -452,11 +591,11 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 <Text style={{ fontSize: dynamicStyles.textSize, width: "35%", color: "#1f2937" }}>
                   {pedido.resp_buscou || "____________________"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#6b7280" }}>
-                  {pedido.data_buscou ? formatDateBR(pedido.data_buscou) : "___/___"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#374151", fontWeight: "bold" }}>
+                  DATA: {pedido.data_buscou ? formatDateBR(pedido.data_buscou) : "___/___/___"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#6b7280" }}>
-                  {pedido.hora_buscou || "__:__"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#374151", fontWeight: "bold" }}>
+                  HORA: {pedido.hora_buscou || "___:___"}
                 </Text>
               </View>
 
@@ -467,11 +606,11 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 <Text style={{ fontSize: dynamicStyles.textSize, width: "35%", color: "#1f2937" }}>
                   {pedido.resp_forro || "____________________"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#6b7280" }}>
-                  {pedido.data_forro ? formatDateBR(pedido.data_forro) : "___/___"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#374151", fontWeight: "bold" }}>
+                  DATA: {pedido.data_forro ? formatDateBR(pedido.data_forro) : "___/___/___"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#6b7280" }}>
-                  {pedido.hora_forro || "__:__"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#374151", fontWeight: "bold" }}>
+                  HORA: {pedido.hora_forro || "___:___"}
                 </Text>
               </View>
 
@@ -482,11 +621,11 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 <Text style={{ fontSize: dynamicStyles.textSize, width: "35%", color: "#1f2937" }}>
                   {pedido.resp_utensilio || "____________________"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#6b7280" }}>
-                  {pedido.data_utensilio ? formatDateBR(pedido.data_utensilio) : "___/___"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "center", color: "#374151", fontWeight: "bold" }}>
+                  DATA: {pedido.data_utensilio ? formatDateBR(pedido.data_utensilio) : "___/___/___"}
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#6b7280" }}>
-                  {pedido.hora_utensilio || "__:__"}
+                <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#374151", fontWeight: "bold" }}>
+                  HORA: {pedido.hora_utensilio || "___:___"}
                 </Text>
               </View>
             </>
@@ -567,7 +706,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
             }}
           >
             <Text style={{ fontSize: dynamicStyles.textSize, fontWeight: "bold", color: "#374151" }}>
-              ASSINATURA: ______________________________________
+              ASSINATURA: ____________________________________________________________
             </Text>
             <Text style={{ fontSize: dynamicStyles.textSize, fontWeight: "bold", color: "#374151" }}>
               CPF/CNPJ/RG: {formatCpfCnpjBR(pedido.cpf)}

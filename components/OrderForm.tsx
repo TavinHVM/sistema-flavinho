@@ -64,24 +64,38 @@ const OrderForm: React.FC<OrderFormProps> = ({
     // Remover itens vazios primeiro
     const materiaisLimpos = form.materiais.filter(item => item.nome.trim() !== '');
     
-    // Adicionar cada item do conjunto como um material individual
+    // Criar uma cópia dos materiais existentes
     const novosMateriais = [...materiaisLimpos];
     
     conjunto.itens.forEach(item => {
       const valorUnitarioProporcional = Math.round(conjunto.preco_promocional / conjunto.itens.reduce((total, i) => total + i.quantidade, 0));
-      novosMateriais.push({
-        nome: `[CONJUNTO: ${conjunto.nome}] ${item.produto_nome}`,
-        quantidade: item.quantidade,
-        valor_unit: valorUnitarioProporcional, // já em centavos
-        valor_total: valorUnitarioProporcional * item.quantidade,
-        preco: conjunto.preco_promocional // em centavos
-      });
+      const nomeCompleto = `[CONJUNTO: ${conjunto.nome}] ${item.produto_nome}`;
+      
+      // Verificar se já existe um item igual (mesmo conjunto + produto)
+      const itemExistente = novosMateriais.find(material => material.nome === nomeCompleto);
+      
+      if (itemExistente) {
+        // Se existe, acumular as quantidades e recalcular o valor total
+        itemExistente.quantidade += item.quantidade;
+        itemExistente.valor_total = itemExistente.quantidade * itemExistente.valor_unit;
+      } else {
+        // Se não existe, adicionar novo item
+        novosMateriais.push({
+          nome: nomeCompleto,
+          quantidade: item.quantidade,
+          valor_unit: valorUnitarioProporcional, // já em centavos
+          valor_total: valorUnitarioProporcional * item.quantidade,
+          preco: conjunto.preco_promocional // em centavos
+        });
+      }
     });
 
-      // Se não há itens limpos e só conjuntos, adicionar um item vazio no final para permitir adicionar produtos individuais
-      if (materiaisLimpos.length === 0) {
-        novosMateriais.push({ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 });
-      }    setForm({ ...form, materiais: novosMateriais });
+    // Se não há itens limpos e só conjuntos, adicionar um item vazio no final para permitir adicionar produtos individuais
+    if (materiaisLimpos.length === 0) {
+      novosMateriais.push({ nome: "", quantidade: 1, valor_unit: 0, valor_total: 0, preco: 0 });
+    }
+    
+    setForm({ ...form, materiais: novosMateriais });
   }
 
   function handleMaterialFieldChange(idx: number, field: string, value: string | number) {
@@ -478,16 +492,14 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
                   {/* Coluna Ações */}
                   <td className="p-2 sm:p-3 text-center">
-                    {form.materiais.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeMaterial(idx)}
-                        className="bg-red-500 hover:bg-red-600 text-white p-1.5 sm:p-2 rounded transition-all duration-200 flex items-center justify-center mx-auto shadow-sm hover:shadow-md"
-                        title="Remover item"
-                      >
-                        <FaTrash className="text-xs sm:text-sm" />
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeMaterial(idx)}
+                      className="bg-red-500 hover:bg-red-600 text-white p-1.5 sm:p-2 rounded transition-all duration-200 flex items-center justify-center mx-auto shadow-sm hover:shadow-md"
+                      title="Remover item"
+                    >
+                      <FaTrash className="text-xs sm:text-sm" />
+                    </button>
                   </td>
                 </tr>
               ))}

@@ -312,7 +312,7 @@ export default function Orders() {
       if (form.desconto_tipo === 'porcentagem') {
         valor_desconto = Math.round((valor_total_bruto * form.desconto_valor) / 100);
       } else if (form.desconto_tipo === 'valor') {
-        valor_desconto = reaisParaCentavos(form.desconto_valor);
+        valor_desconto = form.desconto_valor; // já está em centavos
       }
       valor_final = Math.max(0, valor_total_bruto - valor_desconto);
     }
