@@ -446,13 +446,22 @@ export default function Orders() {
         }
 
         // Atualizar estoque - mover de "rua" de volta para "empresa"
-        const produto = produtos.find((p) => p.nome === item.nome);
+        // Extrair nome real do produto se for item de conjunto
+        let nomeProduto = item.nome;
+        if (item.nome.includes('[CONJUNTO:')) {
+          const match = item.nome.match(/\] (.+)$/);
+          if (match) {
+            nomeProduto = match[1];
+          }
+        }
+        
+        const produto = produtos.find((p) => p.nome === nomeProduto);
         if (produto) {
           const novaEmpresa = produto.quantidade_empresa + item.devolucao_atual;
           const novaRua = produto.quantidade_rua - item.devolucao_atual;
           
           if (novaRua < 0) {
-            setToast({ type: 'error', message: `Erro: Tentativa de devolver mais itens do que está em rota para "${item.nome}"` });
+            setToast({ type: 'error', message: `Erro: Tentativa de devolver mais itens do que está em rota para "${nomeProduto}"` });
             return;
           }
 
@@ -468,6 +477,9 @@ export default function Orders() {
             setToast({ type: 'error', message: 'Erro ao atualizar estoque!' });
             return;
           }
+        } else {
+          setToast({ type: 'error', message: `Produto "${nomeProduto}" não encontrado no estoque!` });
+          return;
         }
       }
 
