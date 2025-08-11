@@ -703,7 +703,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
           </div>
         </div>
 
-        {/* Responsável Recebeu */}
+        {/* Responsável Recebeu
         <div className="mb-4">
           <h3 className="text-gray-300 text-sm font-medium mb-2">Recebimento</h3>
           <div className="flex flex-col sm:flex-row gap-2 w-full">
@@ -735,7 +735,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
               />
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Responsável Buscou */}
         <div className="mb-4">

@@ -229,7 +229,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           </View>
           <View style={{ alignItems: "center" }}>
             {/* eslint-disable-next-line jsx-a11y/alt-text */}
-            <Image src={qrcodeBase64} style={{ width: 40, height: 40 }} />
+            <Image src={qrcodeBase64} style={{ width: 80, height: 80 }} />
             <Text style={{ fontWeight: "bold", fontSize: 8, marginTop: 2, textAlign: "center", color: "#1e40af" }}>
               PEDIDO Nº {pedido.numero}
             </Text>
@@ -252,7 +252,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
               padding: dynamicStyles.sectionPadding,
               marginVertical: dynamicStyles.sectionMargin
             }]}>
-              {["O material será cobrado aluguel de 12 em 12 horas", "Somente materiais de cozinha receberão limpos e deverão ser devolvidos limpos. Caso contrário, será cobrada taxa de limpeza", "O material só será recebido em perfeito estado", "Todos os materiais deverão ser conferidos. Não aceitamos reclamações posteriores", "O depósito é feito pelo cliente qualificado mediante quitação devida recebida", "O material alugado segue o art. 1256 do CC e responsabilidade conforme art. 901-902 CPC", "Material danificado poderá ser substituído por outro igual. Caso contrário, será cobrado o valor integral do item"].map((cl, i) => (
+              {["O material será cobrado aluguel de 12 em 12 horas", "Somente materiais de cozinha receberão limpos e deverão ser devolvidos limpos. Caso contrário, será cobrada taxa de limpeza", "O material só será recebido em perfeito estado", "Todos os materiais deverão ser conferidos. Não aceitamos reclamações posteriores", "O depósito é feito pelo cliente qualificado mediante quitação devida recebida", "O material alugado segue o art. 1256 do CC e responsabilidade conforme art. 901-902 CPC", "Material danificado poderá ser substituído por outro igual. Caso contrário, será cobrado o valor integral do item", "Materiais cancelados na semana do evento é cobrado uma multa de 30% do que foi cancelado"].map((cl, i) => (
                 <Text key={i} style={[styles.clausulaItem, { fontSize: dynamicStyles.textSize }]}>{`${i + 1}. ${cl}`}</Text>
               ))}
             </View>
@@ -538,9 +538,9 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
               <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold", color: "#1f2937" }}>
                 RESP. ENTREGOU: {pedido.resp_entregou || "___________"} - DATA: {pedido.data_entregou ? formatDateBR(pedido.data_entregou) : "___/___/___"} - HORA: {pedido.hora_entregou || "___:___"}
               </Text>
-              <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold", color: "#1f2937" }}>
+              {/* <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold", color: "#1f2937" }}>
                 RESP. RECEBEU: {pedido.resp_recebeu || "___________"} - DATA: {pedido.data_recebeu ? formatDateBR(pedido.data_recebeu) : "___/___/___"} - HORA: {pedido.hora_recebeu || "___:___"}
-              </Text>
+              </Text> */}
               <Text style={{ fontSize: dynamicStyles.textSize, width: "48%", fontWeight: "bold", color: "#1f2937" }}>
                 RESP. BUSCOU: {pedido.resp_buscou || "___________"} - DATA: {pedido.data_buscou ? formatDateBR(pedido.data_buscou) : "___/___/___"} - HORA: {pedido.hora_buscou || "___:___"}
               </Text>
@@ -569,7 +569,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 </Text>
               </View>
 
-              <View style={[styles.responsabilidadeItem, { paddingVertical: dynamicStyles.cellPadding }]}>
+              {/* <View style={[styles.responsabilidadeItem, { paddingVertical: dynamicStyles.cellPadding }]}>
                 <Text style={{ fontSize: dynamicStyles.textSize, width: "35%", fontWeight: "bold", color: "#374151" }}>
                   RESP. RECEBEU:
                 </Text>
@@ -582,7 +582,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 <Text style={{ fontSize: dynamicStyles.textSize, width: "15%", textAlign: "right", color: "#374151", fontWeight: "bold" }}>
                   HORA: {pedido.hora_recebeu || "___:___"}
                 </Text>
-              </View>
+              </View> */}
 
               <View style={[styles.responsabilidadeItem, { paddingVertical: dynamicStyles.cellPadding }]}>
                 <Text style={{ fontSize: dynamicStyles.textSize, width: "35%", fontWeight: "bold", color: "#374151" }}>

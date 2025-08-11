@@ -307,7 +307,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
             <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               👥 Responsabilidades
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
               {/* Entrega */}
               <div className="bg-gradient-to-br from-blue-800/30 to-blue-900/30 p-4 rounded-lg border border-blue-700/30">
@@ -330,7 +330,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
                 </div>
               </div>
 
-              {/* Recebimento */}
+              {/* Recebimento
               <div className="bg-gradient-to-br from-green-800/30 to-green-900/30 p-4 rounded-lg border border-green-700/30">
                 <h4 className="font-medium text-green-300 mb-3 flex items-center gap-2">
                   📦 Recebimento
@@ -349,7 +349,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
                     <span className="text-white font-medium">{pedidoAtualizado.hora_recebeu || '-'}</span>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Busca */}
               <div className="bg-gradient-to-br from-yellow-800/30 to-yellow-900/30 p-4 rounded-lg border border-yellow-700/30">
@@ -394,7 +394,7 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
               </div>
 
               {/* Conferência de Utensílios */}
-              <div className="bg-gradient-to-br from-orange-800/30 to-orange-900/30 p-4 rounded-lg border border-orange-700/30 md:col-span-2">
+              <div className="bg-gradient-to-br from-orange-800/30 to-orange-900/30 p-4 rounded-lg border border-orange-700/30 md:col-span-3">
                 <h4 className="font-medium text-orange-300 mb-3 flex items-center gap-2">
                   🍽️ Conferência de Utensílios
                 </h4>

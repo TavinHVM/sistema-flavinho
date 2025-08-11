@@ -75,7 +75,7 @@ const ConjuntoForm: React.FC<ConjuntoFormProps> = ({
           onClick={() => setShowForm(true)}
           className="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-200 flex items-center gap-2"
         >
-          <FaPlus /> Criar Novo Conjunto
+          <FaPlus /> Criar Novo Jogo
         </button>
       </div>
     );
@@ -85,7 +85,7 @@ const ConjuntoForm: React.FC<ConjuntoFormProps> = ({
     <div className="mb-6 bg-gray-800 rounded-lg p-6 shadow-lg">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          🎁 {isEditing ? "Editar Conjunto" : "Novo Conjunto"}
+          🎁 {isEditing ? "Editar Jogo" : "Novo Jogo"}
         </h2>
         {!isEditing && (
           <button
@@ -100,7 +100,7 @@ const ConjuntoForm: React.FC<ConjuntoFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Nome do Conjunto
+            Nome do jogo
           </label>
           <input
             type="text"
@@ -137,13 +137,13 @@ const ConjuntoForm: React.FC<ConjuntoFormProps> = ({
           onChange={(e) => setForm({ ...form, descricao: e.target.value })}
           className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows={3}
-          placeholder="Descreva o que inclui no conjunto..."
+          placeholder="Descreva o que inclui no jogo..."
         />
       </div>
 
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-white">Itens do Conjunto</h3>
+          <h3 className="text-lg font-semibold text-white">Itens do Jogo</h3>
           <button
             onClick={addItem}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
@@ -245,7 +245,7 @@ const ConjuntoForm: React.FC<ConjuntoFormProps> = ({
           ) : (
             <>
               {isEditing ? <FaEdit /> : <FaSave />}
-              {isEditing ? "Atualizar" : "Salvar"} Conjunto
+              {isEditing ? "Atualizar" : "Salvar"} Jogo
             </>
           )}
         </button>

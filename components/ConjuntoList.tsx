@@ -128,8 +128,8 @@ const ConjuntoList: React.FC<ConjuntoListProps> = ({
     return (
       <div className="text-center py-12 bg-gray-800 rounded-lg">
         <div className="text-gray-400 text-lg mb-2">🎁</div>
-        <div className="text-gray-400">Nenhum conjunto criado ainda</div>
-        <div className="text-gray-500 text-sm">Crie seu primeiro conjunto de produtos com desconto!</div>
+        <div className="text-gray-400">Nenhum jogo criado ainda</div>
+        <div className="text-gray-500 text-sm">Crie seu primeiro jogo de produtos com desconto!</div>
       </div>
     );
   }

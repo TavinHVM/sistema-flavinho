@@ -398,12 +398,12 @@ export default function Conjuntos() {
           
           <div className="flex justify-center mb-1 mt-6">
             <SectionTitle className="text-3xl flex items-center gap-3 mt-4">
-              🎁 Gestão de Conjuntos
+              🎁 Gestão de Jogos
             </SectionTitle>
           </div>
 
           <div className="mb-6 text-center text-gray-300">
-            <p>Crie conjuntos de produtos com preços promocionais para oferecer descontos especiais aos clientes.</p>
+            <p>Crie jogos de produtos com preços promocionais para oferecer descontos especiais aos clientes.</p>
           </div>
 
           <ConjuntoForm
@@ -418,7 +418,7 @@ export default function Conjuntos() {
 
           <div className="mt-8">
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-white">Conjuntos Criados</h2>
+              <h2 className="text-xl font-semibold text-white">Jogos Criados</h2>
               <div className="flex gap-3 items-center">
                 <SearchInput
                   value={search}
@@ -443,7 +443,7 @@ export default function Conjuntos() {
               <div className="text-center py-8">
                 <div className="inline-flex items-center gap-2 text-gray-400">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                  Carregando valores dos conjuntos...
+                  Carregando valores dos jogos...
                 </div>
               </div>
             )}

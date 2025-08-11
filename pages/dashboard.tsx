@@ -81,7 +81,7 @@ export default function Dashboard() {
                   onClick={() => router.push("/conjuntos")}
                   className="w-full bg-pink-500 text-white py-3 rounded font-poppins text-[0.95rem] font-medium hover:bg-pink-600 transition-all flex items-center justify-center"
                 >
-                  🎁 Conjuntos
+                  🎁 Jogos
                 </button>
                 <button
                   onClick={() => router.push("/devolucoes")}
