@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Image,
 } from "@react-pdf/renderer";
-import { Pedido } from "../types/Pedido";
+import { Pedido, PedidoItem } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 import logoBase64 from "./logoBase64";
 import qrcodeBase64 from "./qrcodeBase64";
@@ -134,6 +134,32 @@ const styles = StyleSheet.create({
   colMaterial: { width: "55%" },
   colValorUnit: { width: "17.5%" },
   colValorTotal: { width: "17.5%" },
+  // Estilos para conjuntos
+  conjuntoHeaderRow: {
+    backgroundColor: "#e0f2fe",
+    borderLeftWidth: 3,
+    borderLeftColor: "#0284c7",
+    borderTopWidth: 1,
+    borderTopColor: "#0284c7",
+  },
+  conjuntoHeaderText: {
+    fontWeight: "bold",
+    color: "#0284c7",
+    fontSize: 8,
+  },
+  conjuntoItemRow: {
+    backgroundColor: "#f0f9ff",
+    paddingLeft: 5,
+  },
+  conjuntoItemText: {
+    color: "#374151",
+    fontSize: 7,
+  },
+  conjuntoIndicator: {
+    width: 3,
+    backgroundColor: "#0284c7",
+    marginRight: 3,
+  },
   totaisSection: {
     marginTop: 4,
     padding: 4,
@@ -179,8 +205,36 @@ interface PedidoPDFProps {
 }
 
 const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
-  // Cálculo responsivo baseado na quantidade de itens
-  const numItens = pedido.materiais.length;
+  // Função para agrupar materiais por conjunto
+  const agruparMateriais = () => {
+    const gruposConjuntos: { [key: string]: PedidoItem[] } = {};
+    const materiaisIndividuais: PedidoItem[] = [];
+
+    // Separar materiais por conjunto ou individuais
+    pedido.materiais.forEach(material => {
+      const conjuntoMatch = material.nome.match(/^\[CONJUNTO:\s*([^\]]+)\]/);
+      
+      if (conjuntoMatch) {
+        const nomeConjunto = conjuntoMatch[1].trim();
+        if (!gruposConjuntos[nomeConjunto]) {
+          gruposConjuntos[nomeConjunto] = [];
+        }
+        gruposConjuntos[nomeConjunto].push(material);
+      } else {
+        materiaisIndividuais.push(material);
+      }
+    });
+
+    return { gruposConjuntos, materiaisIndividuais };
+  };
+
+  const { gruposConjuntos, materiaisIndividuais } = agruparMateriais();
+  
+  // Calcular número total de linhas para responsividade
+  const numLinhasConjuntos = Object.keys(gruposConjuntos).length * 2; // Cada conjunto ocupa 2 linhas (título + itens)
+  const numLinhasIndividuais = materiaisIndividuais.length;
+  const numItens = numLinhasConjuntos + numLinhasIndividuais;
+  
   const isLongTable = numItens > 15; // Tabela longa
   const isVeryLongTable = numItens > 25; // Tabela muito longa
 
@@ -320,8 +374,99 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
             <Text style={[styles.tableCell, styles.colValorUnit, { fontSize: dynamicStyles.tableHeaderSize }, styles.tableHeaderText]}>VALOR UNIT.</Text>
             <Text style={[styles.tableCell, styles.colValorTotal, { fontSize: dynamicStyles.tableHeaderSize }, styles.tableHeaderText]}>VALOR TOTAL</Text>
           </View>
-          {pedido.materiais.map((mat, i) => (
-            <View key={i} style={styles.tableRow}>
+          
+          {/* Renderizar conjuntos agrupados */}
+          {Object.entries(gruposConjuntos).map(([nomeConjunto, itensConjunto], conjuntoIndex) => {
+            // Calcular valores do conjunto
+            const quantidadeConjunto = itensConjunto[0]?.quantidade || 1;
+            const valorTotalConjunto = itensConjunto.reduce((total, item) => total + (item.valor_total || 0), 0);
+            const valorUnitarioConjunto = valorTotalConjunto / quantidadeConjunto;
+            
+            return (
+              <React.Fragment key={`conjunto-${conjuntoIndex}`}>
+                {/* Linha do cabeçalho do conjunto */}
+                <View style={[styles.tableRow, styles.conjuntoHeaderRow]}>
+                  <Text style={[
+                    styles.tableCell,
+                    styles.colQuant,
+                    styles.conjuntoHeaderText,
+                    { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding }
+                  ]}>
+                    {quantidadeConjunto}
+                  </Text>
+                  <Text style={[
+                    styles.tableCell,
+                    styles.colMaterial,
+                    styles.conjuntoHeaderText,
+                    { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding, textAlign: "left" }
+                  ]}>
+                    [JOGO]: {nomeConjunto}
+                  </Text>
+                  <Text style={[
+                    styles.tableCell,
+                    styles.colValorUnit,
+                    styles.conjuntoHeaderText,
+                    { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding }
+                  ]}>
+                    {formatarMoedaDeCentavos(valorUnitarioConjunto)}
+                  </Text>
+                  <Text style={[
+                    styles.tableCell,
+                    styles.colValorTotal,
+                    styles.conjuntoHeaderText,
+                    { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding }
+                  ]}>
+                    {formatarMoedaDeCentavos(valorTotalConjunto)}
+                  </Text>
+                </View>
+                
+                {/* Linhas dos itens do conjunto */}
+                {itensConjunto.map((item, itemIndex) => {
+                  const nomeItem = item.nome.replace(/^\[CONJUNTO:\s*[^\]]+\]\s*/, '');
+                  return (
+                    <View key={`item-${conjuntoIndex}-${itemIndex}`} style={[styles.tableRow, styles.conjuntoItemRow]}>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colQuant,
+                        styles.conjuntoItemText,
+                        { fontSize: dynamicStyles.tableTextSize - 0.5, padding: dynamicStyles.cellPadding }
+                      ]}>
+                        {'-> '}{item.quantidade}
+                      </Text>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colMaterial,
+                        styles.conjuntoItemText,
+                        { fontSize: dynamicStyles.tableTextSize - 0.5, padding: dynamicStyles.cellPadding, textAlign: "left", paddingLeft: 12 }
+                      ]}>
+                        {nomeItem}
+                      </Text>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colValorUnit,
+                        styles.conjuntoItemText,
+                        { fontSize: dynamicStyles.tableTextSize - 0.5, padding: dynamicStyles.cellPadding }
+                      ]}>
+                        -
+                      </Text>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colValorTotal,
+                        styles.conjuntoItemText,
+                        { fontSize: dynamicStyles.tableTextSize - 0.5, padding: dynamicStyles.cellPadding }
+                      ]}>
+                        -
+                      </Text>
+                    </View>
+                  );
+                })}
+              </React.Fragment>
+            );
+          })}
+          
+          {/* Renderizar materiais individuais */}
+          {materiaisIndividuais.map((mat, i) => (
+            <View key={`individual-${i}`} style={styles.tableRow}>
               <Text style={[
                 styles.tableCell,
                 styles.colQuant,
