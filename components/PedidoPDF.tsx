@@ -376,93 +376,133 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           </View>
           
           {/* Renderizar conjuntos agrupados */}
-          {Object.entries(gruposConjuntos).map(([nomeConjunto, itensConjunto], conjuntoIndex) => {
-            // Calcular valores do conjunto
-            const quantidadeConjunto = itensConjunto[0]?.quantidade || 1;
-            const valorTotalConjunto = itensConjunto.reduce((total, item) => total + (item.valor_total || 0), 0);
-            const valorUnitarioConjunto = valorTotalConjunto / quantidadeConjunto;
-            
-            return (
-              <React.Fragment key={`conjunto-${conjuntoIndex}`}>
-                {/* Linha do cabeçalho do conjunto */}
-                <View style={[styles.tableRow, styles.conjuntoHeaderRow]}>
-                  <Text style={[
-                    styles.tableCell,
-                    styles.colQuant,
-                    styles.conjuntoHeaderText,
-                    { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding }
-                  ]}>
-                    {quantidadeConjunto}
-                  </Text>
-                  <Text style={[
-                    styles.tableCell,
-                    styles.colMaterial,
-                    styles.conjuntoHeaderText,
-                    { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding, textAlign: "left" }
-                  ]}>
-                    [JOGO]: {nomeConjunto}
-                  </Text>
-                  <Text style={[
-                    styles.tableCell,
-                    styles.colValorUnit,
-                    styles.conjuntoHeaderText,
-                    { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding }
-                  ]}>
-                    {formatarMoedaDeCentavos(valorUnitarioConjunto)}
-                  </Text>
-                  <Text style={[
-                    styles.tableCell,
-                    styles.colValorTotal,
-                    styles.conjuntoHeaderText,
-                    { fontSize: dynamicStyles.tableTextSize, padding: dynamicStyles.cellPadding }
-                  ]}>
-                    {formatarMoedaDeCentavos(valorTotalConjunto)}
-                  </Text>
-                </View>
+          {(() => {
+            const conjuntoColors = ["#e0f2fe", "#fef9c3", "#fce7f3", "#dcfce7", "#f3e8ff", "#fee2e2", "#f1f5f9"];
+            return Object.entries(gruposConjuntos).map(([, itensConjunto], conjuntoIndex) => {
+              const quantidadeConjunto = itensConjunto[0]?.quantidade || 1;
+              const valorTotalConjunto = itensConjunto.reduce((total, item) => total + (item.valor_total || 0), 0);
+              const valorUnitarioConjunto = Math.round(valorTotalConjunto / quantidadeConjunto);
+              const conjuntoColor = conjuntoColors[conjuntoIndex % conjuntoColors.length];
+              const textColor = "#0284c7";
+              const n = itensConjunto.length;
+              const middleIndex = Math.floor(n / 2);
+              
+              const rows = [];
+              
+              for (let itemIndex = 0; itemIndex < n; itemIndex++) {
+                const item = itensConjunto[itemIndex];
+                const nomeItem = item.nome.replace(/^\[CONJUNTO:\s*[^\]]+\]\s*/, '');
                 
-                {/* Linhas dos itens do conjunto */}
-                {itensConjunto.map((item, itemIndex) => {
-                  const nomeItem = item.nome.replace(/^\[CONJUNTO:\s*[^\]]+\]\s*/, '');
-                  return (
-                    <View key={`item-${conjuntoIndex}-${itemIndex}`} style={[styles.tableRow, styles.conjuntoItemRow]}>
+                // Para número ímpar: valor no produto do meio
+                if (n % 2 === 1 && itemIndex === middleIndex) {
+                  rows.push(
+                    <View key={`item-${conjuntoIndex}-${itemIndex}`} style={[styles.tableRow, { backgroundColor: conjuntoColor }]}>
                       <Text style={[
                         styles.tableCell,
                         styles.colQuant,
-                        styles.conjuntoItemText,
-                        { fontSize: dynamicStyles.tableTextSize - 0.5, padding: dynamicStyles.cellPadding }
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, fontWeight: "bold", padding: dynamicStyles.cellPadding }
                       ]}>
                         {'-> '}{item.quantidade}
                       </Text>
                       <Text style={[
                         styles.tableCell,
                         styles.colMaterial,
-                        styles.conjuntoItemText,
-                        { fontSize: dynamicStyles.tableTextSize - 0.5, padding: dynamicStyles.cellPadding, textAlign: "left", paddingLeft: 12 }
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, fontWeight: "bold", padding: dynamicStyles.cellPadding, textAlign: "left" }
                       ]}>
                         {nomeItem}
                       </Text>
                       <Text style={[
                         styles.tableCell,
                         styles.colValorUnit,
-                        styles.conjuntoItemText,
-                        { fontSize: dynamicStyles.tableTextSize - 0.5, padding: dynamicStyles.cellPadding }
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, fontWeight: "bold", padding: dynamicStyles.cellPadding }
+                      ]}>
+                        {formatarMoedaDeCentavos(valorUnitarioConjunto)}
+                      </Text>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colValorTotal,
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, fontWeight: "bold", padding: dynamicStyles.cellPadding }
+                      ]}>
+                        {formatarMoedaDeCentavos(valorTotalConjunto)}
+                      </Text>
+                    </View>
+                  );
+                } 
+                // Para número par: valor no primeiro produto central
+                else if (n % 2 === 0 && itemIndex === middleIndex - 1) {
+                  rows.push(
+                    <View key={`item-${conjuntoIndex}-${itemIndex}`} style={[styles.tableRow, { backgroundColor: conjuntoColor }]}>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colQuant,
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, fontWeight: "bold", padding: dynamicStyles.cellPadding }
+                      ]}>
+                        {'-> '}{item.quantidade}
+                      </Text>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colMaterial,
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, fontWeight: "bold", padding: dynamicStyles.cellPadding, textAlign: "left" }
+                      ]}>
+                        {nomeItem}
+                      </Text>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colValorUnit,
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, fontWeight: "bold", padding: dynamicStyles.cellPadding }
+                      ]}>
+                        {formatarMoedaDeCentavos(valorUnitarioConjunto)}
+                      </Text>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colValorTotal,
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, fontWeight: "bold", padding: dynamicStyles.cellPadding }
+                      ]}>
+                        {formatarMoedaDeCentavos(valorTotalConjunto)}
+                      </Text>
+                    </View>
+                  );
+                } 
+                // Demais produtos do conjunto (sem valor)
+                else {
+                  rows.push(
+                    <View key={`item-${conjuntoIndex}-${itemIndex}`} style={[styles.tableRow, { backgroundColor: conjuntoColor }]}>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colQuant,
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, padding: dynamicStyles.cellPadding }
+                      ]}>
+                        {'-> '}{item.quantidade}
+                      </Text>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colMaterial,
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, padding: dynamicStyles.cellPadding, textAlign: "left" }
+                      ]}>
+                        {nomeItem}
+                      </Text>
+                      <Text style={[
+                        styles.tableCell,
+                        styles.colValorUnit,
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, padding: dynamicStyles.cellPadding }
                       ]}>
                         -
                       </Text>
                       <Text style={[
                         styles.tableCell,
                         styles.colValorTotal,
-                        styles.conjuntoItemText,
-                        { fontSize: dynamicStyles.tableTextSize - 0.5, padding: dynamicStyles.cellPadding }
+                        { fontSize: dynamicStyles.tableTextSize, color: textColor, padding: dynamicStyles.cellPadding }
                       ]}>
                         -
                       </Text>
                     </View>
                   );
-                })}
-              </React.Fragment>
-            );
-          })}
+                }
+              }
+              
+              return rows;
+            });
+          })()}
           
           {/* Renderizar materiais individuais */}
           {materiaisIndividuais.map((mat, i) => (
