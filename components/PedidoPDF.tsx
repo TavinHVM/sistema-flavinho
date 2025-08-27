@@ -17,84 +17,84 @@ import { formatarMoedaDeCentavos } from "../lib/currencyUtils";
 
 const styles = StyleSheet.create({
   page: {
-    padding: 15,
-    fontSize: 8,
+    padding: 10,
+    fontSize: 7,
     fontFamily: "Helvetica",
-    lineHeight: 1.2,
+    lineHeight: 1.1,
     backgroundColor: "#ffffff",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    marginBottom: 5,
-    paddingBottom: 5,
+    marginBottom: 3,
+    paddingBottom: 3,
     borderBottomWidth: 1,
     borderBottomColor: "#2563eb",
   },
   empresaInfo: {
     flex: 1,
-    paddingLeft: 8,
+    paddingLeft: 6,
   },
   empresaNome: {
     fontWeight: "bold",
-    fontSize: 10,
+    fontSize: 9,
     color: "#1e40af",
-    marginBottom: 2,
-  },
-  empresaContato: {
-    fontSize: 7,
-    color: "#374151",
     marginBottom: 1,
   },
+  empresaContato: {
+    fontSize: 6,
+    color: "#374151",
+    marginBottom: 0.5,
+  },
   titleCenter: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: "bold",
     textAlign: "center",
-    marginVertical: 3,
+    marginVertical: 2,
     color: "#1f2937",
   },
   titleCenterRed: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: "bold",
     textAlign: "center",
-    marginVertical: 3,
-    color: "#dc2626",
-    backgroundColor: "#fef2f2",
-    padding: 4,
-  },
-  subTextCenter: {
-    fontSize: 7,
-    textAlign: "center",
-    lineHeight: 1.3,
-  },
-  subTextCenterRed: {
-    fontSize: 7,
-    textAlign: "center",
-    lineHeight: 1.3,
+    marginVertical: 2,
     color: "#dc2626",
     backgroundColor: "#fef2f2",
     padding: 3,
-    marginVertical: 2,
+  },
+  subTextCenter: {
+    fontSize: 6,
+    textAlign: "center",
+    lineHeight: 1.2,
+  },
+  subTextCenterRed: {
+    fontSize: 6,
+    textAlign: "center",
+    lineHeight: 1.2,
+    color: "#dc2626",
+    backgroundColor: "#fef2f2",
+    padding: 2,
+    marginVertical: 1,
   },
   clausulas: {
-    marginVertical: 3,
+    marginVertical: 2,
     backgroundColor: "#f9fafb",
-    padding: 4,
+    padding: 3,
     borderWidth: 0.5,
     borderColor: "#e5e7eb",
   },
   clausulaItem: {
-    fontSize: 7,
-    marginBottom: 1,
+    fontSize: 6,
+    marginBottom: 0.5,
     textAlign: "justify",
     color: "#374151",
-    lineHeight: 1.2,
+    lineHeight: 1.1,
   },
   contratoSection: {
     backgroundColor: "#f0f9ff",
-    padding: 5,
-    marginVertical: 3,
+    padding: 3,
+    marginVertical: 2,
     borderWidth: 0.5,
     borderColor: "#0ea5e9",
   },
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderWidth: 1,
     borderColor: "#1f2937",
-    marginTop: 4,
+    marginTop: 2,
   },
   tableRow: {
     flexDirection: "row",
@@ -114,15 +114,15 @@ const styles = StyleSheet.create({
   tableHeaderText: {
     color: "#ffffff",
     fontWeight: "bold",
-    fontSize: 8,
+    fontSize: 7,
   },
   tableCell: {
     borderRightWidth: 0.5,
     borderBottomWidth: 0.5,
     borderColor: "#6b7280",
-    padding: 2.5,
+    padding: 1.5,
     textAlign: "center",
-    fontSize: 7,
+    fontSize: 6,
   },
   tableCellEven: {
     backgroundColor: "#f9fafb",
@@ -161,22 +161,22 @@ const styles = StyleSheet.create({
     marginRight: 3,
   },
   totaisSection: {
-    marginTop: 4,
-    padding: 4,
+    marginTop: 2,
+    padding: 3,
     backgroundColor: "#f0fdf4",
     borderWidth: 0.5,
     borderColor: "#22c55e",
   },
   responsabilidadesSection: {
-    marginTop: 5,
-    padding: 5,
+    marginTop: 2,
+    padding: 3,
     backgroundColor: "#fefce8",
     borderWidth: 0.5,
     borderColor: "#eab308",
   },
   observacoesSection: {
-    marginTop: 5,
-    padding: 3,
+    marginTop: 2,
+    padding: 2,
     backgroundColor: "#f8fafc",
     borderWidth: 0.5,
     borderColor: "#64748b",
@@ -184,16 +184,16 @@ const styles = StyleSheet.create({
   responsabilidadeItem: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 2,
-    paddingHorizontal: 3,
-    paddingVertical: 2,
+    marginBottom: 1,
+    paddingHorizontal: 2,
+    paddingVertical: 1,
     backgroundColor: "#ffffff",
     borderWidth: 0.5,
     borderColor: "#d1d5db",
   },
   assinaturaSection: {
-    marginTop: 5,
-    padding: 4,
+    marginTop: 2,
+    padding: 3,
     backgroundColor: "#f3f4f6",
     borderWidth: 0.5,
     borderColor: "#6b7280",
@@ -247,23 +247,23 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
 
   // Estilos dinâmicos baseados no tamanho da tabela
   const dynamicStyles = {
-    // Reduz espaçamentos para tabelas longas (menos agressivo)
-    headerMargin: isVeryLongTable ? 3 : isLongTable ? 4 : 5,
-    sectionPadding: isVeryLongTable ? 3 : isLongTable ? 4 : 5,
-    sectionMargin: isVeryLongTable ? 2 : isLongTable ? 3 : 3,
+    // Reduz espaçamentos para tabelas longas (mais agressivo)
+    headerMargin: isVeryLongTable ? 2 : isLongTable ? 2 : 3,
+    sectionPadding: isVeryLongTable ? 2 : isLongTable ? 2 : 3,
+    sectionMargin: isVeryLongTable ? 1 : isLongTable ? 1 : 2,
 
-    // Ajusta tamanhos de fonte (menos agressivo)
-    titleSize: isVeryLongTable ? 8 : isLongTable ? 8.5 : 9,
-    textSize: isVeryLongTable ? 6 : isLongTable ? 6.5 : 7,
-    tableTextSize: isVeryLongTable ? 6 : isLongTable ? 6.5 : 7,
-    tableHeaderSize: isVeryLongTable ? 7 : isLongTable ? 7.5 : 8,
+    // Ajusta tamanhos de fonte (mais agressivo)
+    titleSize: isVeryLongTable ? 7 : isLongTable ? 7 : 8,
+    textSize: isVeryLongTable ? 5.5 : isLongTable ? 6 : 6,
+    tableTextSize: isVeryLongTable ? 5.5 : isLongTable ? 6 : 6,
+    tableHeaderSize: isVeryLongTable ? 6 : isLongTable ? 6.5 : 7,
 
-    // Ajusta altura das células (menos agressivo)
-    cellPadding: isVeryLongTable ? 1.5 : isLongTable ? 2 : 2.5,
+    // Ajusta altura das células (mais agressivo)
+    cellPadding: isVeryLongTable ? 1 : isLongTable ? 1 : 1.5,
 
-    // Controla se mostra seções opcionais (menos restritivo)
-    showClausulas: numItens <= 30, // Aumenta o limite
-    compactResponsabilities: numItens > 20, // Compacta só após 20 itens
+    // Controla se mostra seções opcionais (mais restritivo)
+    showClausulas: numItens <= 20, // Reduz o limite
+    compactResponsabilities: numItens > 15, // Compacta mais cedo
   };
 
   return (
@@ -271,47 +271,90 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
       <Page size="A4" style={styles.page}>
         <View style={[styles.header, { marginBottom: dynamicStyles.headerMargin }]}>
           {/* eslint-disable-next-line jsx-a11y/alt-text */}
-          {logoBase64 && <Image src={logoBase64} style={{ width: 40, height: 40 }} />}
+          {logoBase64 && <Image src={logoBase64} style={{ width: 35, height: 35 }} />}
           <View style={styles.empresaInfo}>
             <Text style={styles.empresaNome}>
               FLAVINHO Espaço Locações & Festa
             </Text>
-            <Text style={styles.empresaContato}>joaoflavio.20@hotmail.com</Text>
-            <Text style={styles.empresaContato}>(62) 3273-4463 • (62) 99137-9037</Text>
-            <Text style={styles.empresaContato}>CNPJ 25.192.935/0001-48 PIX</Text>
-            <Text style={styles.empresaContato}>Av. Bela Vista Qd. 18 Lt. 03 - Ap. de Goiânia - GO</Text>
+            <Text style={styles.empresaContato}>joaoflavio.20@hotmail.com • (62) 3273-4463 • (62) 99137-9037</Text>
+            <Text style={styles.empresaContato}>CNPJ 25.192.935/0001-48 PIX • Av. Bela Vista Qd. 18 Lt. 03 - Ap. de Goiânia - GO</Text>
+            
+            {/* Cláusulas integradas no cabeçalho com separação visual */}
+            {dynamicStyles.showClausulas && (
+              <View style={{ 
+                marginTop: 4, 
+                paddingTop: 3, 
+                borderTopWidth: 0.5, 
+                borderTopColor: "#d1d5db",
+                backgroundColor: "#f9fafb",
+                padding: 3,
+                borderRadius: 2
+              }}>
+                <Text style={{ 
+                  fontSize: dynamicStyles.titleSize - 0.5, 
+                  fontWeight: "bold", 
+                  color: "#1f2937", 
+                  marginBottom: 2,
+                  textAlign: "center"
+                }}>
+                  CLÁUSULAS DO CONTRATO
+                </Text>
+                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 1 }}>
+                  {["O material será cobrado aluguel de 12 em 12 horas", "Somente materiais de cozinha receberão limpos e deverão ser devolvidos limpos. Caso contrário, será cobrada taxa de limpeza", "O material só será recebido em perfeito estado", "Todos os materiais deverão ser conferidos. Não aceitamos reclamações posteriores"].map((cl, i) => (
+                    <Text key={i} style={{ 
+                      fontSize: dynamicStyles.textSize - 0.5, 
+                      width: "49%", 
+                      color: "#374151", 
+                      lineHeight: 1.2, 
+                      marginBottom: 1,
+                      textAlign: "justify"
+                    }}>
+                      {`${i + 1}. ${cl}`}
+                    </Text>
+                  ))}
+                </View>
+                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 1, marginTop: 1 }}>
+                  {["O depósito é feito pelo cliente qualificado mediante quitação devida recebida", "O material alugado segue o art. 1256 do CC e responsabilidade conforme art. 901-902 CPC", "Material danificado poderá ser substituído por outro igual. Caso contrário, será cobrado o valor integral do item", "Materiais cancelados na semana do evento é cobrado uma multa de 30% do que foi cancelado"].map((cl, i) => (
+                    <Text key={i} style={{ 
+                      fontSize: dynamicStyles.textSize - 0.5, 
+                      width: "49%", 
+                      color: "#374151", 
+                      lineHeight: 1.2, 
+                      marginBottom: 1,
+                      textAlign: "justify"
+                    }}>
+                      {`${i + 5}. ${cl}`}
+                    </Text>
+                  ))}
+                </View>
+              </View>
+            )}
           </View>
           <View style={{ alignItems: "center" }}>
             {/* eslint-disable-next-line jsx-a11y/alt-text */}
             <Image src={qrcodeBase64} style={{ width: 80, height: 80 }} />
-            <Text style={{ fontWeight: "bold", fontSize: 8, marginTop: 2, textAlign: "center", color: "#1e40af" }}>
+            <Text style={{ fontWeight: "bold", fontSize: 8, marginTop: 1, textAlign: "center", color: "#1e40af" }}>
               PEDIDO Nº {pedido.numero}
             </Text>
           </View>
         </View>
 
-        <Text style={[styles.titleCenterRed, { fontSize: dynamicStyles.titleSize }]}>ATENÇÃO</Text>
-        <Text style={[styles.subTextCenterRed, { fontSize: dynamicStyles.textSize }]}>
-          *TODOS OS MATERIAIS DEVERÃO SER CONFERIDOS PELO CLIENTE NO RECEBIMENTO DO MESMO.
-        </Text>
-        <Text style={[styles.subTextCenterRed, { fontSize: dynamicStyles.textSize }]}>
-          OBS.: QUALQUER DEFEITO NOS MESMOS SERÁ COBRADO O VALOR DO MESMO OU REPOSIÇÃO COM OUTRO DO MESMO MODELO.
-        </Text>
-
-        {/* Cláusulas aparecem até 30 itens */}
-        {dynamicStyles.showClausulas && (
-          <>
-            <Text style={[styles.titleCenter, { fontSize: dynamicStyles.titleSize }]}>CLÁUSULAS DO CONTRATO</Text>
-            <View style={[styles.clausulas, {
-              padding: dynamicStyles.sectionPadding,
-              marginVertical: dynamicStyles.sectionMargin
-            }]}>
-              {["O material será cobrado aluguel de 12 em 12 horas", "Somente materiais de cozinha receberão limpos e deverão ser devolvidos limpos. Caso contrário, será cobrada taxa de limpeza", "O material só será recebido em perfeito estado", "Todos os materiais deverão ser conferidos. Não aceitamos reclamações posteriores", "O depósito é feito pelo cliente qualificado mediante quitação devida recebida", "O material alugado segue o art. 1256 do CC e responsabilidade conforme art. 901-902 CPC", "Material danificado poderá ser substituído por outro igual. Caso contrário, será cobrado o valor integral do item", "Materiais cancelados na semana do evento é cobrado uma multa de 30% do que foi cancelado"].map((cl, i) => (
-                <Text key={i} style={[styles.clausulaItem, { fontSize: dynamicStyles.textSize }]}>{`${i + 1}. ${cl}`}</Text>
-              ))}
-            </View>
-          </>
-        )}
+        {/* Seção de atenção separada e compacta */}
+        <View style={{
+          backgroundColor: "#fef2f2",
+          padding: dynamicStyles.sectionPadding,
+          marginVertical: dynamicStyles.sectionMargin,
+          borderWidth: 0.5,
+          borderColor: "#dc2626",
+        }}>
+          <Text style={[styles.titleCenterRed, { fontSize: dynamicStyles.titleSize, marginVertical: 1 }]}>ATENÇÃO</Text>
+          <Text style={[styles.subTextCenterRed, { fontSize: dynamicStyles.textSize, marginBottom: 1 }]}>
+            *TODOS OS MATERIAIS DEVERÃO SER CONFERIDOS PELO CLIENTE NO RECEBIMENTO DO MESMO.
+          </Text>
+          <Text style={[styles.subTextCenterRed, { fontSize: dynamicStyles.textSize, marginBottom: 0 }]}>
+            OBS.: QUALQUER DEFEITO NOS MESMOS SERÁ COBRADO O VALOR DO MESMO OU REPOSIÇÃO COM OUTRO DO MESMO MODELO.
+          </Text>
+        </View>
 
         <Text style={[styles.titleCenter, { fontSize: dynamicStyles.titleSize }]}>CONTRATO DE LOCAÇÃO</Text>
 
@@ -817,46 +860,44 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
           )}
         </View>
 
-        {/* Seção de Observações */}
+        {/* Seção de Observações - Compacta */}
         <View style={[styles.observacoesSection, {
           marginTop: dynamicStyles.sectionMargin,
           padding: dynamicStyles.sectionPadding
         }]}>
-          <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.titleSize, marginBottom: 2, color: "#1f2937" }}>OBSERVAÇÕES</Text>
+          <Text style={{ fontWeight: "bold", fontSize: dynamicStyles.titleSize, marginBottom: 1, color: "#1f2937" }}>OBSERVAÇÕES</Text>
           <View style={{
             borderWidth: 0.5,
             borderColor: "#6b7280",
             padding: dynamicStyles.sectionPadding,
-            minHeight: 30,
+            minHeight: isVeryLongTable ? 15 : isLongTable ? 20 : 25,
             backgroundColor: "#f9fafb"
           }}>
             <Text style={{
               fontSize: dynamicStyles.textSize,
               color: "#374151",
-              lineHeight: 1.4
+              lineHeight: 1.3
             }}>
               {pedido.obs ?
                 breakLongText(pedido.obs, 80)
-                : "_____________________________________________________________________________________________________________________________________________"
+                : "____________________________________________________________________________________________________________________________________"
               }
             </Text>
-            {!pedido.obs && (
+            {!pedido.obs && !isVeryLongTable && (
               <>
-                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
-                  _____________________________________________________________________________________________________________________________________________
+                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 2 }}>
+                  ____________________________________________________________________________________________________________________________________
                 </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
-                  _____________________________________________________________________________________________________________________________________________
-                </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
-                  _____________________________________________________________________________________________________________________________________________
-                </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
-                  _____________________________________________________________________________________________________________________________________________
-                </Text>
-                <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 3 }}>
-                  _____________________________________________________________________________________________________________________________________________
-                </Text>
+                {!isLongTable && (
+                  <>
+                    <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 2 }}>
+                      ____________________________________________________________________________________________________________________________________
+                    </Text>
+                    <Text style={{ fontSize: dynamicStyles.textSize, color: "#9ca3af", marginTop: 2 }}>
+                      ____________________________________________________________________________________________________________________________________
+                    </Text>
+                  </>
+                )}
               </>
             )}
           </View>
