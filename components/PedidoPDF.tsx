@@ -651,7 +651,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
         }]}>
           <Text style={{ 
             fontWeight: "bold", 
-            fontSize: dynamicStyles.titleSize + 1, 
+            fontSize: dynamicStyles.titleSize, 
             marginBottom: 4, 
             color: "#1f2937", 
             textAlign: "center",
@@ -679,14 +679,14 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
               marginBottom: 2
             }}>
               <Text style={{ 
-                fontSize: dynamicStyles.textSize + 1, 
+                fontSize: dynamicStyles.textSize, 
                 fontWeight: "bold",
                 color: "#374151" 
               }}>
                 TOTAL BRUTO:
               </Text>
               <Text style={{ 
-                fontSize: dynamicStyles.titleSize, 
+                fontSize: dynamicStyles.textSize + 0.5, 
                 fontWeight: "bold",
                 color: "#1f2937" 
               }}>
@@ -764,14 +764,14 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
               marginBottom: 2
             }}>
               <Text style={{ 
-                fontSize: dynamicStyles.textSize + 1, 
+                fontSize: dynamicStyles.textSize, 
                 fontWeight: "bold",
                 color: "#374151" 
               }}>
                 VALOR PAGO:
               </Text>
               <Text style={{ 
-                fontSize: dynamicStyles.titleSize, 
+                fontSize: dynamicStyles.textSize + 0.5, 
                 fontWeight: "bold",
                 color: "#059669" 
               }}>
@@ -793,7 +793,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
               borderRadius: 2
             }}>
               <Text style={{ 
-                fontSize: dynamicStyles.titleSize, 
+                fontSize: dynamicStyles.textSize + 0.5, 
                 fontWeight: "bold",
                 color: "#1f2937",
                 textTransform: "uppercase",
@@ -802,7 +802,7 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
                 VALOR A PAGAR:
               </Text>
               <Text style={{ 
-                fontSize: dynamicStyles.titleSize + 2, 
+                fontSize: dynamicStyles.textSize + 1.5, 
                 fontWeight: "bold",
                 color: (pedido.valor_deve || 0) > 0 ? "#dc2626" : "#059669"
               }}>
