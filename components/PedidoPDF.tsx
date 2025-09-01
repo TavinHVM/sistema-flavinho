@@ -584,6 +584,65 @@ const PedidoPDF: React.FC<PedidoPDFProps> = ({ pedido }) => {
               </Text>
             </View>
           ))}
+          
+          {/* Linhas em branco para anotações */}
+          {Array.from({ length: 4 }, (_, i) => (
+            <View key={`blank-${i}`} style={styles.tableRow}>
+              <Text style={[
+                styles.tableCell,
+                styles.colQuant,
+                { 
+                  fontSize: dynamicStyles.tableTextSize, 
+                  padding: dynamicStyles.cellPadding + 3,
+                  minHeight: 12,
+                  lineHeight: 1.2
+                },
+                (materiaisIndividuais.length + i) % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
+              ]}>
+                {/* Linha em branco */}
+              </Text>
+              <Text style={[
+                styles.tableCell,
+                styles.colMaterial,
+                { 
+                  fontSize: dynamicStyles.tableTextSize, 
+                  padding: dynamicStyles.cellPadding + 3, 
+                  textAlign: "left",
+                  minHeight: 12,
+                  lineHeight: 1.2
+                },
+                (materiaisIndividuais.length + i) % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
+              ]}>
+                {/* Espaço para anotações */}
+              </Text>
+              <Text style={[
+                styles.tableCell,
+                styles.colValorUnit,
+                { 
+                  fontSize: dynamicStyles.tableTextSize, 
+                  padding: dynamicStyles.cellPadding + 3,
+                  minHeight: 12,
+                  lineHeight: 1.2
+                },
+                (materiaisIndividuais.length + i) % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
+              ]}>
+                {/* Linha em branco */}
+              </Text>
+              <Text style={[
+                styles.tableCell,
+                styles.colValorTotal,
+                { 
+                  fontSize: dynamicStyles.tableTextSize, 
+                  padding: dynamicStyles.cellPadding + 3,
+                  minHeight: 12,
+                  lineHeight: 1.2
+                },
+                (materiaisIndividuais.length + i) % 2 === 0 ? styles.tableCellEven : styles.tableCellOdd
+              ]}>
+                {/* Linha em branco */}
+              </Text>
+            </View>
+          ))}
         </View>
 
         <View style={[styles.totaisSection, {
