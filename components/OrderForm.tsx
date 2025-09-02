@@ -320,192 +320,288 @@ const OrderForm: React.FC<OrderFormProps> = ({
             <table className="w-full min-w-[320px] sm:min-w-[600px] text-xs sm:text-sm">
               <thead className="sticky top-0 z-10">
                 <tr className="bg-gray-700 text-gray-200 border-b border-gray-600">
-                  <th className="p-2 sm:p-3 text-left rounded-tl-lg font-semibold w-16 sm:w-20">Qtd.</th>
-                  <th className="p-2 sm:p-3 text-left font-semibold min-w-[120px] sm:min-w-[200px]">Item</th>
-                  <th className="p-2 sm:p-3 text-center font-semibold w-20 sm:w-32 hidden sm:table-cell">Valor Unit.</th>
-                  <th className="p-2 sm:p-3 text-center font-semibold w-24 sm:w-32">Total</th>
-                  <th className="p-2 sm:p-3 text-center rounded-tr-lg font-semibold w-16 sm:w-20">Ações</th>
+                  <th className="border border-gray-600 px-2 py-2 w-[10%] text-white font-bold">QUANT.</th>
+                  <th className="border border-gray-600 px-2 py-2 w-[55%] text-white font-bold">MATERIAL</th>
+                  <th className="border border-gray-600 px-2 py-2 w-[17.5%] text-white font-bold">VALOR UNIT.</th>
+                  <th className="border border-gray-600 px-2 py-2 w-[17.5%] text-white font-bold">VALOR TOTAL</th>
+                  <th className="border border-gray-600 px-2 py-2 w-[5%] text-white font-bold">AÇÕES</th>
                 </tr>
               </thead>
             <tbody className="bg-gray-800/50">
-              {form.materiais.map((mat: Material, idx: number) => (
-                <tr key={mat.nome + '-' + idx} className="border-b border-gray-600/50 hover:bg-gray-700/30 transition-colors">
+              {(() => {
+                // Agrupar materiais por conjunto
+                const gruposConjuntos: { [key: string]: Material[] } = {};
+                const materiaisIndividuais: Material[] = [];
+
+                form.materiais.forEach(material => {
+                  const conjuntoMatch = material.nome.match(/^\[CONJUNTO:\s*([^\]]+)\]/);
                   
-                  {/* Coluna Quantidade */}
-                  <td className="p-2 sm:p-3">
-                    {(() => {
-                      // Extrair nome real do produto se for item de conjunto
-                      let nomeProduto = mat.nome;
-                      if (mat.nome.includes('[CONJUNTO:')) {
-                        const match = mat.nome.match(/\] (.+)$/);
-                        if (match) {
-                          nomeProduto = match[1];
-                        }
-                      }
-                      
-                      const produto = produtos.find(p => p.nome === nomeProduto);
-                      const estoqueDisponivel = produto?.quantidade_empresa || 0;
-                      const quantidadeExcedida = mat.quantidade > estoqueDisponivel;
-                      const isConjuntoItem = mat.nome.includes('[CONJUNTO:');
-                      
-                      return (
-                        <div className="relative">
-                          <input
-                            type="number"
-                            min={1}
-                            max={estoqueDisponivel}
-                            value={mat.quantidade}
-                            onChange={e => handleMaterialFieldChange(idx, "quantidade", parseInt(e.target.value))}
-                            className={`w-12 sm:w-16 px-1 sm:px-3 py-1 sm:py-2 rounded text-xs sm:text-sm border-2 focus:outline-none focus:ring-2 transition-all ${
-                              isConjuntoItem
-                                ? 'bg-purple-100 border-purple-300 text-purple-800 focus:ring-purple-300'
-                                : quantidadeExcedida && mat.nome
-                                ? 'bg-red-50 border-red-400 focus:ring-red-300 focus:border-red-500 text-black' 
-                                : 'bg-white border-gray-300 focus:ring-blue-300 focus:border-blue-500 text-black'
-                            }`}
-                            title={mat.nome ? `Máximo disponível: ${estoqueDisponivel}` : ''}
-                            disabled={isConjuntoItem}
-                          />
-                          {quantidadeExcedida && mat.nome && !isConjuntoItem && (
-                            <div className="absolute top-8 sm:top-12 left-0 bg-red-600 text-white text-xs px-2 py-1 rounded-md shadow-lg z-20 whitespace-nowrap">
-                              ⚠️ Máx: {estoqueDisponivel}
+                  if (conjuntoMatch) {
+                    const nomeConjunto = conjuntoMatch[1].trim();
+                    if (!gruposConjuntos[nomeConjunto]) {
+                      gruposConjuntos[nomeConjunto] = [];
+                    }
+                    gruposConjuntos[nomeConjunto].push(material);
+                  } else {
+                    materiaisIndividuais.push(material);
+                  }
+                });
+
+                const rows: React.ReactElement[] = [];
+
+                // Renderizar conjuntos agrupados
+                Object.entries(gruposConjuntos).forEach(([, itensConjunto], conjuntoIndex) => {
+                  const conjuntoColors = [
+                    "bg-cyan-100/80", "bg-yellow-100/80", "bg-pink-100/80", 
+                    "bg-green-100/80", "bg-purple-100/80", "bg-red-100/80", "bg-slate-100/80"
+                  ];
+                  const conjuntoColor = conjuntoColors[conjuntoIndex % conjuntoColors.length];
+                  const quantidadeConjunto = itensConjunto[0]?.quantidade || 1;
+                  const valorTotalConjunto = itensConjunto.reduce((total, item) => total + (item.valor_total || 0), 0);
+                  const valorUnitarioConjunto = Math.round(valorTotalConjunto / quantidadeConjunto);
+                  const n = itensConjunto.length;
+                  const middleIndex = Math.floor(n / 2);
+
+                  itensConjunto.forEach((item, itemIndex) => {
+                    const materialIdx = form.materiais.findIndex(m => m === item);
+                    const nomeItem = item.nome.replace(/^\[CONJUNTO:\s*[^\]]+\]\s*/, '');
+                    
+                    // Para número ímpar: valor no produto do meio
+                    if (n % 2 === 1 && itemIndex === middleIndex) {
+                      rows.push(
+                        <tr key={`conjunto-${conjuntoIndex}-${itemIndex}`} 
+                            className={`${conjuntoColor} border-l-4 border-l-cyan-600`}>
+                          <td className="border border-gray-600 px-2 py-1 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="font-bold text-cyan-700">→</span>
+                              <input
+                                type="number"
+                                min={1}
+                                value={item.quantidade}
+                                onChange={e => handleMaterialFieldChange(materialIdx, "quantidade", parseInt(e.target.value))}
+                                className="w-12 px-1 py-1 rounded text-xs border-2 bg-white border-cyan-300 text-cyan-800 focus:ring-cyan-300"
+                              />
                             </div>
-                          )}
-                        </div>
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-left">
+                            <div className="font-bold text-cyan-700 text-xs">{nomeItem}</div>
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-center font-bold text-cyan-700">
+                            {formatarMoedaDeCentavos(valorUnitarioConjunto)}
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-center font-bold text-cyan-700">
+                            {formatarMoedaDeCentavos(valorTotalConjunto)}
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-center">
+                            <button
+                              type="button"
+                              onClick={() => removeMaterial(materialIdx)}
+                              className="bg-red-500 hover:bg-red-600 text-white p-1 rounded text-xs"
+                              title="Remover item"
+                            >
+                              <FaTrash />
+                            </button>
+                          </td>
+                        </tr>
                       );
-                    })()}
-                  </td>
+                    } 
+                    // Para número par: valor no primeiro produto central
+                    else if (n % 2 === 0 && itemIndex === middleIndex - 1) {
+                      rows.push(
+                        <tr key={`conjunto-${conjuntoIndex}-${itemIndex}`} 
+                            className={`${conjuntoColor} border-l-4 border-l-cyan-600`}>
+                          <td className="border border-gray-600 px-2 py-1 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="font-bold text-cyan-700">→</span>
+                              <input
+                                type="number"
+                                min={1}
+                                value={item.quantidade}
+                                onChange={e => handleMaterialFieldChange(materialIdx, "quantidade", parseInt(e.target.value))}
+                                className="w-12 px-1 py-1 rounded text-xs border-2 bg-white border-cyan-300 text-cyan-800 focus:ring-cyan-300"
+                              />
+                            </div>
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-left">
+                            <div className="font-bold text-cyan-700 text-xs">{nomeItem}</div>
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-center font-bold text-cyan-700">
+                            {formatarMoedaDeCentavos(valorUnitarioConjunto)}
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-center font-bold text-cyan-700">
+                            {formatarMoedaDeCentavos(valorTotalConjunto)}
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-center">
+                            <button
+                              type="button"
+                              onClick={() => removeMaterial(materialIdx)}
+                              className="bg-red-500 hover:bg-red-600 text-white p-1 rounded text-xs"
+                              title="Remover item"
+                            >
+                              <FaTrash />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    }
+                    // Demais produtos do conjunto (sem valor)
+                    else {
+                      rows.push(
+                        <tr key={`conjunto-${conjuntoIndex}-${itemIndex}`} 
+                            className={`${conjuntoColor} border-l-4 border-l-cyan-600`}>
+                          <td className="border border-gray-600 px-2 py-1 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="text-cyan-700">→</span>
+                              <input
+                                type="number"
+                                min={1}
+                                value={item.quantidade}
+                                onChange={e => handleMaterialFieldChange(materialIdx, "quantidade", parseInt(e.target.value))}
+                                className="w-12 px-1 py-1 rounded text-xs border-2 bg-white border-cyan-300 text-cyan-800 focus:ring-cyan-300"
+                              />
+                            </div>
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-left">
+                            <div className="text-cyan-700 text-xs">{nomeItem}</div>
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-center text-cyan-700">
+                            -
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-center text-cyan-700">
+                            -
+                          </td>
+                          <td className="border border-gray-600 px-2 py-1 text-center">
+                            <button
+                              type="button"
+                              onClick={() => removeMaterial(materialIdx)}
+                              className="bg-red-500 hover:bg-red-600 text-white p-1 rounded text-xs"
+                              title="Remover item"
+                            >
+                              <FaTrash />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    }
+                  });
+                });
 
-                  {/* Coluna Item */}
-                  <td className="p-2 sm:p-3">
-                    <div className="relative">
-                      {mat.nome.includes('[CONJUNTO:') ? (
-                        // Item de conjunto - apenas visualização
-                        <div className="w-full px-2 sm:px-3 py-1 sm:py-2 rounded bg-purple-100 border-2 border-purple-300 text-purple-800 font-medium">
-                          <div className="flex items-center gap-1 sm:gap-2">
-                            <FaGift className="text-purple-600 text-xs sm:text-sm flex-shrink-0" />
-                            <span className="text-xs sm:text-sm truncate">{mat.nome}</span>
-                          </div>
+                // Renderizar materiais individuais
+                materiaisIndividuais.forEach((mat, i) => {
+                  const materialIdx = form.materiais.findIndex(m => m === mat);
+                  const isEven = i % 2 === 0;
+                  
+                  // Verificar estoque e validação
+                  let nomeProduto = mat.nome;
+                  if (mat.nome.includes('[CONJUNTO:')) {
+                    const match = mat.nome.match(/\] (.+)$/);
+                    if (match) {
+                      nomeProduto = match[1];
+                    }
+                  }
+                  
+                  const produto = produtos.find(p => p.nome === nomeProduto);
+                  const estoqueDisponivel = produto?.quantidade_empresa || 0;
+                  const quantidadeExcedida = mat.quantidade > estoqueDisponivel;
+                  
+                  // Background escuro como no OrderDetailsModal
+                  const backgroundClass = isEven ? 'bg-gray-700/40' : 'bg-gray-600/40';
+                  
+                  rows.push(
+                    <tr key={`individual-${i}`} 
+                        className={backgroundClass}>
+                      <td className="border border-gray-600 px-2 py-1 text-center">
+                        <input
+                          type="number"
+                          min={1}
+                          max={estoqueDisponivel}
+                          value={mat.quantidade}
+                          onChange={e => handleMaterialFieldChange(materialIdx, "quantidade", parseInt(e.target.value))}
+                          className={`w-12 px-1 py-1 rounded text-xs border-2 focus:outline-none focus:ring-2 transition-all ${
+                            quantidadeExcedida && mat.nome
+                              ? 'bg-red-50 border-red-400 focus:ring-red-300 focus:border-red-500 text-black' 
+                              : 'bg-white border-gray-300 focus:ring-blue-300 focus:border-blue-500 text-black'
+                          }`}
+                          title={mat.nome ? `Máximo disponível: ${estoqueDisponivel}` : ''}
+                        />
+                      </td>
+                      <td className="border border-gray-600 px-2 py-1 text-left">
+                        <div className="relative">
+                          <select
+                            value={mat.nome}
+                            onChange={e => handleMaterialFieldChange(materialIdx, "nome", e.target.value)}
+                            className="w-full px-2 py-1 rounded text-xs bg-white text-black border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all"
+                          >
+                            <option value="" className="text-gray-500">Selecione um item</option>
+                            {produtos
+                              .slice()
+                              .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+                              .map(p => {
+                                const estoqueDisponivel = p.quantidade_empresa;
+                                const estoqueTexto = estoqueDisponivel > 0 
+                                  ? ` (${estoqueDisponivel} disponível)`
+                                  : ' (SEM ESTOQUE)';
+                                const isDisponivel = estoqueDisponivel > 0;
+                                
+                                return (
+                                  <option 
+                                    key={p.id} 
+                                    value={p.nome}
+                                    disabled={!isDisponivel}
+                                    style={{ 
+                                      color: isDisponivel ? 'black' : '#999',
+                                      backgroundColor: isDisponivel ? 'white' : '#f5f5f5'
+                                    }}
+                                  >
+                                    {p.nome}{estoqueTexto}
+                                  </option>
+                                );
+                              })}
+                          </select>
+                          
+                          {/* Badge de estoque */}
+                          {mat.nome && (() => {
+                            const produto = produtos.find(p => p.nome === mat.nome);
+                            const estoqueDisponivel = produto?.quantidade_empresa || 0;
+                            
+                            return (
+                              <div className="absolute -bottom-6 left-0 z-10">
+                                <span className={`inline-flex items-center px-1 py-1 rounded-full text-xs font-medium shadow-sm ${
+                                  estoqueDisponivel > 10 
+                                    ? 'bg-green-100 text-green-800 border border-green-200' 
+                                    : estoqueDisponivel > 0 
+                                    ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                                    : 'bg-red-100 text-red-800 border border-red-200'
+                                }`}>
+                                  📦 {estoqueDisponivel}
+                                </span>
+                              </div>
+                            );
+                          })()}
                         </div>
-                      ) : (
-                        // Item individual - seleção normal
-                        <select
-                          value={mat.nome}
-                          onChange={e => handleMaterialFieldChange(idx, "nome", e.target.value)}
-                          className="w-full px-2 sm:px-3 py-1 sm:py-2 rounded text-xs sm:text-sm bg-white text-black border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all"
-                        >
-                          <option value="" className="text-gray-500">Selecione um item</option>
-                          {produtos
-                            .slice()
-                            .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
-                            .map(p => {
-                              const estoqueDisponivel = p.quantidade_empresa;
-                              const estoqueTexto = estoqueDisponivel > 0 
-                                ? ` (${estoqueDisponivel} disponível)`
-                                : ' (SEM ESTOQUE)';
-                              const isDisponivel = estoqueDisponivel > 0;
-                              
-                              return (
-                                <option 
-                                  key={p.id} 
-                                  value={p.nome}
-                                  disabled={!isDisponivel}
-                                  style={{ 
-                                    color: isDisponivel ? 'black' : '#999',
-                                    backgroundColor: isDisponivel ? 'white' : '#f5f5f5'
-                                  }}
-                                >
-                                  {p.nome}{estoqueTexto}
-                                </option>
-                              );
-                            })}
-                        </select>
-                      )}
-                      
-                      {/* Badge de estoque */}
-                      {mat.nome && !mat.nome.includes('[CONJUNTO:') && (() => {
-                        const produto = produtos.find(p => p.nome === mat.nome);
-                        const estoqueDisponivel = produto?.quantidade_empresa || 0;
-                        
-                        return (
-                          <div className="absolute -bottom-6 sm:-bottom-7 left-0 z-10">
-                            <span className={`inline-flex items-center px-1 sm:px-2 py-1 rounded-full text-xs font-medium shadow-sm ${
-                              estoqueDisponivel > 10 
-                                ? 'bg-green-100 text-green-800 border border-green-200' 
-                                : estoqueDisponivel > 0 
-                                ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
-                                : 'bg-red-100 text-red-800 border border-red-200'
-                            }`}>
-                              📦 {estoqueDisponivel}
-                            </span>
-                          </div>
-                        );
-                      })()}
-                      
-                      {/* Badge para itens de conjunto */}
-                      {mat.nome && mat.nome.includes('[CONJUNTO:') && (
-                        <div className="absolute -bottom-6 sm:-bottom-7 left-0 z-10">
-                          <span className="inline-flex items-center px-1 sm:px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
-                            🎁 Conjunto
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-
-                  {/* Coluna Valor Unitário - Oculta em mobile */}
-                  <td className="p-2 sm:p-3 text-center hidden sm:table-cell">
-                    <div className={`px-2 sm:px-3 py-1 sm:py-2 rounded border text-xs sm:text-sm ${
-                      mat.nome.includes('[CONJUNTO:') 
-                        ? 'bg-purple-100 border-purple-200' 
-                        : 'bg-gray-100 border-gray-200'
-                    }`}>
-                      <span className={`font-medium ${
-                        mat.nome.includes('[CONJUNTO:') 
-                          ? 'text-purple-700' 
-                          : 'text-gray-700'
-                      }`}>
-                        {mat.nome.includes('[CONJUNTO:') 
-                          ? formatarMoedaDeCentavos(mat.valor_unit)
-                          : getPrecoProduto(mat.nome) ? 
-                            formatarMoedaDeCentavos(getPrecoProduto(mat.nome)) 
-                            : 'R$ 0,00'
-                        }
-                      </span>
-                    </div>
-                  </td>
-
-                  {/* Coluna Valor Total */}
-                  <td className="p-2 sm:p-3 text-center">
-                    <div className="bg-green-100 px-2 sm:px-3 py-1 sm:py-2 rounded border border-green-200">
-                      <span className="text-green-800 font-bold text-xs sm:text-sm">
+                      </td>
+                      <td className="border border-gray-600 px-2 py-1 text-center text-gray-200">
+                        {formatarMoedaDeCentavos(mat.valor_unit || 0)}
+                      </td>
+                      <td className="border border-gray-600 px-2 py-1 text-center text-gray-200">
                         {formatarMoedaDeCentavos(mat.valor_total || 0)}
-                      </span>
-                      {/* Mostrar valor unitário em mobile */}
-                      <div className="block sm:hidden text-gray-600 text-xs mt-1">
-                        {mat.nome.includes('[CONJUNTO:') 
-                          ? `${formatarMoedaDeCentavos(mat.valor_unit)} un.`
-                          : getPrecoProduto(mat.nome) ? 
-                            `${formatarMoedaDeCentavos(getPrecoProduto(mat.nome))} un.` 
-                            : 'R$ 0,00 un.'
-                        }
-                      </div>
-                    </div>
-                  </td>
+                      </td>
+                      <td className="border border-gray-600 px-2 py-1 text-center">
+                        <button
+                          type="button"
+                          onClick={() => removeMaterial(materialIdx)}
+                          className="bg-red-500 hover:bg-red-600 text-white p-1 rounded text-xs"
+                          title="Remover item"
+                        >
+                          <FaTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                });
 
-                  {/* Coluna Ações */}
-                  <td className="p-2 sm:p-3 text-center">
-                    <button
-                      type="button"
-                      onClick={() => removeMaterial(idx)}
-                      className="bg-red-500 hover:bg-red-600 text-white p-1.5 sm:p-2 rounded transition-all duration-200 flex items-center justify-center mx-auto shadow-sm hover:shadow-md"
-                      title="Remover item"
-                    >
-                      <FaTrash className="text-xs sm:text-sm" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                return rows;
+              })()}
             </tbody>
           </table>
           </div>
