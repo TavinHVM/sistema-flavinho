@@ -871,9 +871,14 @@ const OrderForm: React.FC<OrderFormProps> = ({
           <ParcelasManager 
             pedidoId={Number(form.numero)} 
             valorTotal={valorFinalAtual}
+            valorPago={form.valor_pago || 0}
             onParcelasChange={(resumo: ResumoParcelas) => {
               // Aqui você pode usar o resumo para atualizar outros campos se necessário
               console.log('Resumo das parcelas:', resumo);
+            }}
+            onValorPagoChange={(novoValorPago: number) => {
+              // Atualizar o valor pago no formulário quando parcelas são marcadas como pagas
+              setForm({ ...form, valor_pago: novoValorPago });
             }}
           />
         </div>

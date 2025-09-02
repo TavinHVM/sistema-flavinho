@@ -8,13 +8,17 @@ import { FaPlus, FaTrash, FaEdit, FaCheck, FaTimes, FaCreditCard, FaExclamationT
 interface ParcelasManagerProps {
   pedidoId: number;
   valorTotal: number; // em centavos
+  valorPago?: number; // em centavos - valor já pago do pedido
   onParcelasChange?: (resumo: ResumoParcelas) => void;
+  onValorPagoChange?: (novoValorPago: number) => void; // callback para atualizar valor pago do pedido
 }
 
 const ParcelasManager: React.FC<ParcelasManagerProps> = ({ 
   pedidoId, 
   valorTotal, 
-  onParcelasChange 
+  valorPago = 0,
+  onParcelasChange,
+  onValorPagoChange
 }) => {
   const [parcelas, setParcelas] = useState<Parcela[]>([]);
   const [loading, setLoading] = useState(false);
@@ -112,6 +116,12 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
       return;
     }
 
+    // Validar se o valor da parcela não excede o valor disponível para parcelamento
+    if (novaParcela.valor && novaParcela.valor > valorDisponivelParaParcelas) {
+      showToast('error', `Valor da parcela (${formatarMoedaDeCentavos(novaParcela.valor)}) não pode ser maior que o valor disponível (${formatarMoedaDeCentavos(valorDisponivelParaParcelas)})`);
+      return;
+    }
+
     try {
       const proximoNumero = Math.max(...parcelas.map(p => p.numero_parcela), 0) + 1;
       
@@ -148,6 +158,27 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
 
   // Atualizar parcela
   const atualizarParcela = async (id: string) => {
+    if (!parcelaEditando.valor || !parcelaEditando.data_vencimento) {
+      showToast('error', 'Valor e data de vencimento são obrigatórios');
+      return;
+    }
+
+    // Buscar parcela original para calcular a diferença
+    const parcelaOriginal = parcelas.find(p => p.id === id);
+    if (!parcelaOriginal) {
+      showToast('error', 'Parcela não encontrada');
+      return;
+    }
+
+    // Calcular o valor disponível considerando que vamos remover a parcela original
+    const valorDisponivelParaEdicao = valorDisponivelParaParcelas + parcelaOriginal.valor;
+    
+    // Validar se o novo valor da parcela não excede o valor disponível
+    if (parcelaEditando.valor && parcelaEditando.valor > valorDisponivelParaEdicao) {
+      showToast('error', `Valor da parcela (${formatarMoedaDeCentavos(parcelaEditando.valor)}) não pode ser maior que o valor disponível (${formatarMoedaDeCentavos(valorDisponivelParaEdicao)})`);
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('parcelas')
@@ -208,6 +239,27 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
 
       if (error) throw error;
 
+      // Se existe callback para atualizar valor pago do pedido, chama ele
+      if (onValorPagoChange) {
+        // Calcular quanto foi pago/despago nesta operação
+        const diferencaPagamento = novoPagamento ? parcela.valor : -parcela.valor;
+        
+        // Atualizar o valor pago do pedido
+        const novoValorPagoTotal = valorPago + diferencaPagamento;
+        
+        // Atualizar o pedido no banco de dados
+        await supabase
+          .from('pedidos')
+          .update({
+            valor_pago: novoValorPagoTotal,
+            valor_deve: Math.max(0, valorTotal - novoValorPagoTotal),
+            updated_at: new Date().toISOString()
+          })
+          .eq('numero', pedidoId);
+        
+        onValorPagoChange(novoValorPagoTotal);
+      }
+
       showToast('success', `Parcela marcada como ${novoPagamento ? 'paga' : 'não paga'}`);
       fetchParcelas();
     } catch (error) {
@@ -236,20 +288,43 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
     }
 
     try {
-      const valorParcela = Math.round(valorTotal / numeroParcelas);
-      const valorUltimaParcela = valorTotal - (valorParcela * (numeroParcelas - 1));
+      // Calcular valor já parcelado (soma das parcelas existentes)
+      const valorJaParcelado = parcelas.reduce((acc, p) => acc + p.valor, 0);
+      
+      // Calcular valor disponível para novas parcelas
+      // É o valor total menos o valor já pago menos o valor já parcelado
+      const valorParaParcelas = Math.max(0, valorTotal - valorPago - valorJaParcelado);
+      
+      if (valorParaParcelas <= 0) {
+        showToast('error', 'Não há valor pendente para parcelar');
+        return;
+      }
+
+      // Confirmar com o usuário antes de gerar as parcelas
+      const confirmar = confirm(
+        `Gerar ${numeroParcelas} parcelas para o valor de ${formatarMoedaDeCentavos(valorParaParcelas)}?\n\n` +
+        `Isso criará parcelas de aproximadamente ${formatarMoedaDeCentavos(Math.round(valorParaParcelas / numeroParcelas))} cada.`
+      );
+      
+      if (!confirmar) return;
+      
+      const valorParcela = Math.round(valorParaParcelas / numeroParcelas);
+      const valorUltimaParcela = valorParaParcelas - (valorParcela * (numeroParcelas - 1));
       
       const novasParcelas = [];
       const hoje = new Date();
       
-      for (let i = 1; i <= numeroParcelas; i++) {
+      // Calcular próximo número de parcela
+      const proximoNumero = Math.max(...parcelas.map(p => p.numero_parcela), 0) + 1;
+      
+      for (let i = 0; i < numeroParcelas; i++) {
         const dataVencimento = new Date(hoje);
-        dataVencimento.setMonth(dataVencimento.getMonth() + i);
+        dataVencimento.setMonth(dataVencimento.getMonth() + (i + 1));
         
         novasParcelas.push({
           pedido_id: pedidoId,
-          numero_parcela: i,
-          valor: i === numeroParcelas ? valorUltimaParcela : valorParcela,
+          numero_parcela: proximoNumero + i,
+          valor: i === numeroParcelas - 1 ? valorUltimaParcela : valorParcela,
           data_vencimento: dataVencimento.toISOString().split('T')[0],
           status: 'pendente'
         });
@@ -261,7 +336,7 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
 
       if (error) throw error;
 
-      showToast('success', `${numeroParcelas} parcelas geradas automaticamente`);
+      showToast('success', `${numeroParcelas} parcelas geradas automaticamente (valor parcelado: ${formatarMoedaDeCentavos(valorParaParcelas)})`);
       fetchParcelas();
     } catch (error) {
       console.error('Erro ao gerar parcelas:', error);
@@ -276,6 +351,10 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
   }, [pedidoId, fetchParcelas]);
 
   const resumo = calcularResumo(parcelas);
+  
+  // Calcular valor disponível para novas parcelas
+  const valorJaParcelado = parcelas.reduce((acc, p) => acc + p.valor, 0);
+  const valorDisponivelParaParcelas = Math.max(0, valorTotal - valorPago - valorJaParcelado);
 
   return (
     <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-600">
@@ -293,10 +372,27 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
           <FaCreditCard className="text-blue-400" />
           Gestão de Parcelas
         </h3>
+        <div className="text-right">
+          <div className="text-xs text-gray-400">Valor Total: {formatarMoedaDeCentavos(valorTotal)}</div>
+          <div className="text-xs text-gray-400">Já Pago: {formatarMoedaDeCentavos(valorPago)}</div>
+          <div className="text-xs text-gray-400">Já Parcelado: {formatarMoedaDeCentavos(valorJaParcelado)}</div>
+          <div className="text-xs text-green-400 font-medium">
+            Disponível para Parcelas: {formatarMoedaDeCentavos(valorDisponivelParaParcelas)}
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-between items-center mb-4">
+        <div></div>
         <div className="flex gap-2">
           <button
             onClick={() => setShowAddForm(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs flex items-center gap-1"
+            disabled={valorDisponivelParaParcelas <= 0}
+            className={`px-3 py-1.5 rounded text-xs flex items-center gap-1 ${
+              valorDisponivelParaParcelas <= 0
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }`}
+            title={valorDisponivelParaParcelas <= 0 ? 'Não há valor disponível para parcelar' : 'Adicionar nova parcela'}
           >
             <FaPlus /> Adicionar
           </button>
@@ -306,11 +402,19 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
               if (num > 0) gerarParcelas(num);
               e.target.value = '';
             }}
-            className="bg-gray-700 text-white text-xs px-2 py-1.5 rounded border border-gray-600"
+            className={`text-xs px-2 py-1.5 rounded border border-gray-600 ${
+              valorDisponivelParaParcelas <= 0
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-700 text-white'
+            }`}
             defaultValue=""
+            disabled={valorDisponivelParaParcelas <= 0}
+            title={valorDisponivelParaParcelas <= 0 ? 'Não há valor disponível para parcelar' : 'Gerar parcelas automaticamente'}
           >
-            <option value="">Gerar Parcelas</option>
-            {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
+            <option value="">
+              {valorDisponivelParaParcelas <= 0 ? 'Sem valor disponível' : 'Gerar Parcelas'}
+            </option>
+            {valorDisponivelParaParcelas > 0 && [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
               <option key={num} value={num}>{num}x</option>
             ))}
           </select>
@@ -347,10 +451,16 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
           <h4 className="text-white font-medium mb-3">Nova Parcela</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-gray-300">Valor</label>
+              <label className="text-xs text-gray-300">
+                Valor (Máx: {formatarMoedaDeCentavos(valorDisponivelParaParcelas)})
+              </label>
               <input
                 type="text"
-                className="w-full px-2 py-1 rounded bg-white text-black text-sm"
+                className={`w-full px-2 py-1 rounded text-sm ${
+                  novaParcela.valor && novaParcela.valor > valorDisponivelParaParcelas
+                    ? 'bg-red-100 text-red-800 border-2 border-red-500'
+                    : 'bg-white text-black'
+                }`}
                 placeholder="0,00"
                 value={formatarInputDeCentavos(novaParcela.valor || 0)}
                 onChange={e => {
@@ -358,6 +468,11 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
                   setNovaParcela({ ...novaParcela, valor: parseInt(raw, 10) || 0 });
                 }}
               />
+              {novaParcela.valor && novaParcela.valor > valorDisponivelParaParcelas && (
+                <div className="text-xs text-red-400 mt-1">
+                  Valor excede o limite disponível
+                </div>
+              )}
             </div>
             <div>
               <label className="text-xs text-gray-300">Data de Vencimento</label>
@@ -392,7 +507,12 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
           <div className="flex gap-2 mt-3">
             <button
               onClick={adicionarParcela}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm"
+              disabled={!novaParcela.valor || !novaParcela.data_vencimento || (novaParcela.valor > valorDisponivelParaParcelas)}
+              className={`px-3 py-1.5 rounded text-sm ${
+                !novaParcela.valor || !novaParcela.data_vencimento || (novaParcela.valor > valorDisponivelParaParcelas)
+                  ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
+              }`}
             >
               <FaCheck /> Salvar
             </button>
@@ -435,16 +555,27 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs text-gray-300">Valor</label>
+                      <label className="text-xs text-gray-300">
+                        Valor (Máx: {formatarMoedaDeCentavos(valorDisponivelParaParcelas + (parcelas.find(p => p.id === parcela.id)?.valor || 0))})
+                      </label>
                       <input
                         type="text"
-                        className="w-full px-2 py-1 rounded bg-white text-black text-sm"
+                        className={`w-full px-2 py-1 rounded text-sm ${
+                          parcelaEditando.valor && parcelaEditando.valor > (valorDisponivelParaParcelas + (parcelas.find(p => p.id === parcela.id)?.valor || 0))
+                            ? 'bg-red-100 text-red-800 border-2 border-red-500'
+                            : 'bg-white text-black'
+                        }`}
                         value={formatarInputDeCentavos(parcelaEditando.valor || 0)}
                         onChange={e => {
                           const raw = e.target.value.replace(/\D/g, "");
                           setParcelaEditando({ ...parcelaEditando, valor: parseInt(raw, 10) || 0 });
                         }}
                       />
+                      {parcelaEditando.valor && parcelaEditando.valor > (valorDisponivelParaParcelas + (parcelas.find(p => p.id === parcela.id)?.valor || 0)) && (
+                        <div className="text-xs text-red-400 mt-1">
+                          Valor excede o limite disponível
+                        </div>
+                      )}
                     </div>
                     <div>
                       <label className="text-xs text-gray-300">Data de Vencimento</label>
@@ -486,7 +617,12 @@ const ParcelasManager: React.FC<ParcelasManagerProps> = ({
                   <div className="flex gap-2">
                     <button
                       onClick={() => atualizarParcela(parcela.id!)}
-                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm"
+                      disabled={!parcelaEditando.valor || !parcelaEditando.data_vencimento || (parcelaEditando.valor > (valorDisponivelParaParcelas + (parcelas.find(p => p.id === parcela.id)?.valor || 0)))}
+                      className={`px-3 py-1.5 rounded text-sm ${
+                        !parcelaEditando.valor || !parcelaEditando.data_vencimento || (parcelaEditando.valor > (valorDisponivelParaParcelas + (parcelas.find(p => p.id === parcela.id)?.valor || 0)))
+                          ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                          : 'bg-green-600 hover:bg-green-700 text-white'
+                      }`}
                     >
                       <FaCheck /> Salvar
                     </button>
