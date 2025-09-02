@@ -72,6 +72,9 @@ export default function Orders() {
     data_utensilio: "",
     hora_utensilio: "",
     obs: "",
+    // Campos de parcelas
+    possui_parcelas: false,
+    numero_total_parcelas: 0,
   });
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [produtos, setProdutos] = useState<ProdutoLocal[]>([]);
@@ -358,6 +361,9 @@ export default function Orders() {
       data_utensilio: form.data_utensilio ? toISODate(form.data_utensilio) : null,
       hora_utensilio: form.hora_utensilio || null,
       obs: form.obs || null,
+      // Campos de parcelas
+      possui_parcelas: form.possui_parcelas || false,
+      numero_total_parcelas: form.numero_total_parcelas || 0,
     };
 
     const numeroPedido = form.numero ? Number(form.numero) : null;

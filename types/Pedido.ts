@@ -52,4 +52,7 @@ export interface Pedido {
   data_devolucao_realizada?: string;
   responsavel_devolucao?: string;
   observacoes_devolucao?: string;
+  // Campos de parcelas
+  possui_parcelas?: boolean;
+  numero_total_parcelas?: number;
 }

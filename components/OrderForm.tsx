@@ -1,7 +1,9 @@
 import React from "react";
 import { Pedido } from "../types/Pedido";
 import { ConjuntoCompleto } from "../types/Conjunto";
+import { ResumoParcelas } from "../types/Parcela";
 import SectionTitle from "./SectionTitle";
+import ParcelasManager from "./ParcelasManager";
 import { FaTrash, FaGift } from "react-icons/fa";
 import { formatTelefoneBR } from "@/lib/formatNumber";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
@@ -861,6 +863,21 @@ const OrderForm: React.FC<OrderFormProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Gestão de Parcelas - apenas quando estiver editando um pedido existente */}
+      {isEditing && form.numero && (
+        <div className="mt-6 border-t-2 border-t-gray-500">
+          <h2 className="text-white text-base font-semibold mt-4 mb-4 text-center">Gestão de Parcelas</h2>
+          <ParcelasManager 
+            pedidoId={Number(form.numero)} 
+            valorTotal={valorFinalAtual}
+            onParcelasChange={(resumo: ResumoParcelas) => {
+              // Aqui você pode usar o resumo para atualizar outros campos se necessário
+              console.log('Resumo das parcelas:', resumo);
+            }}
+          />
+        </div>
+      )}
 
       <button
         className={`${isEditing ? 'bg-blue-600' : 'bg-green-600'} text-white rounded p-2 mt-4 font-bold w-full`}

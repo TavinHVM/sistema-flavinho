@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import OrderMaterialsList from "./OrderMaterialsList";
+import ParcelasResumo from "./ParcelasResumo";
 import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 import { FaFilePdf, FaUndo } from "react-icons/fa";
@@ -463,6 +464,16 @@ const OrderDetailsModal: React.FC<Props> = ({ pedido, open, onClose, onEditar, o
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Parcelas */}
+          {pedidoAtualizado.numero && (
+            <div className="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 rounded-xl p-6 border border-gray-700">
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                💳 Parcelas de Pagamento
+              </h3>
+              <ParcelasResumo pedidoId={Number(pedidoAtualizado.numero)} compact={false} />
             </div>
           )}
 

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaSortUp, FaSortDown, FaCheckSquare, FaSquare, FaTrashAlt } from "react-icons/fa";
 import OrderDetailsModal from "./OrderDetailsModal";
 import MultipleSelectionBar from "./MultipleSelectionBar";
+import ParcelasResumo from "./ParcelasResumo";
 import { Pedido } from "../types/Pedido";
 import { formatDateBR } from "../lib/formatDate";
 import { formatCpfCnpjBR } from "@/lib/formatCpfCnpj";
@@ -241,6 +242,9 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                 Devido {getSortIcon("valor_deve")}
               </span>
             </th>
+            <th className="p-3 min-w-[120px] text-center">
+              <span className="whitespace-nowrap">Parcelas</span>
+            </th>
             <th className="p-3 min-w-[140px] text-center">
               <span className="whitespace-nowrap">Status Devolução</span>
             </th>
@@ -401,6 +405,17 @@ const OrderList: React.FC<OrderListProps> = ({ pedidos, search, onEditar, onExcl
                 <span className={`font-bold ${(p.valor_deve || 0) > 0 ? 'text-red-400' : 'text-gray-400'}`}>
                   {formatarMoedaDeCentavos(p.valor_deve || 0)}
                 </span>
+              </td>
+              <td 
+                className={`p-3 ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
+                onClick={multipleSelection.isSelectionMode ? (e) => {
+                  e.stopPropagation();
+                  multipleSelection.toggleItem(p);
+                } : undefined}
+              >
+                {p.numero && (
+                  <ParcelasResumo pedidoId={Number(p.numero)} compact={true} />
+                )}
               </td>
               <td 
                 className={`p-3 text-center ${multipleSelection.isSelectionMode ? 'cursor-pointer' : ''}`}
